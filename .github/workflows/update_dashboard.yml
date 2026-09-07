@@ -1,0 +1,52 @@
+name: Daily Real Estate Data & Dashboard Update
+on:
+      schedule:
+        # 매일 한국 시간 오전 9시 (UTC 00:00)
+        - cron: '0 0 * * *'
+      workflow_dispatch: # 웹에서 수동 즉시 실행 가능
+
+    permissions:
+      contents: write
+
+    jobs:
+      update-data:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+              node-version: 18
+
+          - name: Install Dependencies
+            run: |
+              npm install
+              cd MCP && npm install
+
+          - name: Run Data Collection & Update Dashboard
+            env:
+              MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
+              ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+              NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
+              SMTP_USER: ${{ secrets.SMTP_USER }}
+              SMTP_PASS: ${{ secrets.SMTP_PASS }}
+            run: |
+              node MCP/fetch_today_dashboard.js
+
+          - name: Commit and Push Changes
+            run: |
+              git config --global user.name "github-
+  actions[bot]"
+              git config --global user.email "github-
+  actions[bot]@users.noreply.github.com"
+              git add data/
+              if git diff --staged --quiet; then
+                echo "변경 사항이 없어 커밋을 건너뜁니다."
+              else
+                git commit -m "chore(auto): update daily real
+  estate dashboard $(date +'%Y-%m-%d')"
+                git push
+              fi
