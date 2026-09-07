@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 신호등 — 송파구 심층 분석 대시보드</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-surface: #151c2c;
+            --bg-surface-hover: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #38bdf8;
+            --accent-indigo: #818cf8;
+            --border-color: #243048;
+            --border-bright: #334155;
+            
+            --signal-warning-bg: rgba(245, 158, 11, 0.15);
+            --signal-warning-border: #f59e0b;
+            --signal-warning-text: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1820px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-nav {
+            background: linear-gradient(135deg, #131b2e 0%, #1a233a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand-title h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-title p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .meta-tags {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .meta-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent-blue);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .signal-pill {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: var(--signal-warning-bg);
+            border: 1px solid var(--signal-warning-border);
+            color: var(--signal-warning-text);
+        }
+
+        /* 4 Stat Cards Top Row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-card .val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .stat-card .sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        /* Main Content Grid: Left Graph + Right Table */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1280px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th {
+            background: #111827;
+            color: var(--accent-blue);
+            padding: 12px 14px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-bright);
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-surface-hover);
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .plan-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .plan-card h4 {
+            font-size: 1rem;
+            color: var(--accent-indigo);
+            margin-bottom: 10px;
+        }
+
+        .plan-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .disclaimer-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.84rem;
+        }
+
+        footer {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Top Nav -->
+        <div class="top-nav">
+            <div class="brand-title">
+                <h1>🚦 부동산 신호등 — 송파구 심층 분석 리포트</h1>
+                <p>송파구 아파트 매수 타이밍 신호 및 단지별 수익성 심사 (1920x1080 화면 최적화)</p>
+            </div>
+            <div class="meta-tags">
+                <span class="signal-pill">⚠️ 최종 신호: 주의 (🟡)</span>
+                <span class="meta-badge">기준금리 2.75%</span>
+                <span class="meta-badge">2026.08</span>
+            </div>
+        </div>
+
+        <!-- 4 Key Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">송파구 아파트 평당가</span>
+                <span class="val">7,741만원</span>
+                <span class="sub">한국부동산원 / KB부동산 기준</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">평균 전세가율</span>
+                <span class="val">39.41%</span>
+                <span class="sub">서울 평균(50.92%) 대비 -11.51%p</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">트렌드 스코어</span>
+                <span class="val" style="color:#38bdf8;">+0.67</span>
+                <span class="sub">MICE 개발 & 정비사업 호재</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">리스크 스코어</span>
+                <span class="val" style="color:#f87171;">+1.33</span>
+                <span class="sub">기준금리 인상 & 토허제 규제</span>
+            </div>
+        </div>
+
+        <!-- Main Chart + Table Grid -->
+        <div class="main-grid">
+            <!-- Left Chart -->
+            <div class="panel">
+                <h3>📊 송파구 주요 단지 시세 & 전세가율 비교</h3>
+                <div class="chart-container">
+                    <canvas id="songpaChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Table -->
+            <div class="panel">
+                <h3>📋 대표 단지별 신호 & 수익성 심사 매트릭스</h3>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>단지명</th>
+                                <th>전용</th>
+                                <th>매매 실거래가</th>
+                                <th>전세가</th>
+                                <th>전세가율</th>
+                                <th>매수 신호</th>
+                                <th>LTV 40% 월순현금</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>잠실엘스</strong></td>
+                                <td>84㎡</td>
+                                <td>34억 8,000만</td>
+                                <td>13억 5,000만</td>
+                                <td>38.79%</td>
+                                <td><span class="signal-pill" style="font-size:0.78rem; padding:2px 8px;">주의</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-147만원 (적자)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>리센츠</strong></td>
+                                <td>84㎡</td>
+                                <td>35억 7,000만</td>
+                                <td>15억 2,000만</td>
+                                <td>42.58%</td>
+                                <td><span class="signal-pill" style="font-size:0.78rem; padding:2px 8px;">주의</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-138만원 (적자)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>헬리오시티</strong></td>
+                                <td>84㎡</td>
+                                <td>30억 0,000만</td>
+                                <td>13억 0,000만</td>
+                                <td>43.33%</td>
+                                <td><span class="signal-pill" style="font-size:0.78rem; padding:2px 8px;">주의</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-115만원 (적자)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>파크리오</strong></td>
+                                <td>84㎡</td>
+                                <td>24억 2,000만</td>
+                                <td>11억 5,000만</td>
+                                <td>47.52%</td>
+                                <td><span class="signal-pill" style="font-size:0.78rem; padding:2px 8px;">주의</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-89만원 (적자)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>올림픽선수기자촌</strong></td>
+                                <td>121㎡</td>
+                                <td>37억 9,000만</td>
+                                <td>15억 0,000만</td>
+                                <td>39.58%</td>
+                                <td><span class="signal-pill" style="font-size:0.78rem; padding:2px 8px;">주의</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-162만원 (적자)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>래미안송파파인탑</strong></td>
+                                <td>64㎡</td>
+                                <td>20억 7,000만</td>
+                                <td>9억 5,000만</td>
+                                <td>45.89%</td>
+                                <td><span style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#f87171; padding:2px 8px; border-radius:6px; font-weight:700; font-size:0.78rem;">관망</span></td>
+                                <td style="color:#f87171; font-weight:bold;">-75만원 (적자)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Plan Cards -->
+        <div class="panel">
+            <h3>💡 여신심사역 관점 수익성 개선 3대 솔루션</h3>
+            <div class="plan-grid">
+                <div class="plan-card">
+                    <h4>1. LTV 70% → 60% 이하 차입 축소</h4>
+                    <p>초기 투입 자본금을 1.2억에서 1.6억으로 확대하고 LTV를 축소할 경우 금리 +1%p 인상 시나리오에서도 월 순현금흐름 흑자 전환이 가능합니다.</p>
+                </div>
+                <div class="plan-card">
+                    <h4>2. 8월 한국은행 금통위 금리 추이 주시</h4>
+                    <p>연내 추가 금리 인발 공시 여부를 확인하고 주담대 고정금리 5% 돌파 시 매수 진입 시점을 연말 이후로 유보할 것을 권고합니다.</p>
+                </div>
+                <div class="plan-card">
+                    <h4>3. 문정 오피스텔/신축 입주 캘린더 모니터링</h4>
+                    <p>2025~2027년 신규 인근 공급 물량 입주 시점에 맞춰 초기 공실 리스크 및 임대료 조정 협상을 사전에 준비하십시오.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-banner">
+            ⚠️ <strong>준법감시 고지</strong>: 본 대시보드는 공공데이터 기반 4단계 AI 파이프라인의 수치 정리용 정보이며, 최종 매수·매도·자금집행 및 세무·대출 실행 결정과 책임은 투자자 본인에게 있습니다.
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <span>© 2026 부동산 신호등 — 송파구 대시보드 Engine</span>
+            <span>생성 파일: <a href="file:///C:/practice/geminiCLI/realestate_prj/data/songpa_analysis_dashboard.html" style="color:var(--accent-blue); text-decoration:none;">data/songpa_analysis_dashboard.html</a></span>
+        </footer>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('songpaChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['잠실엘스(84)', '리센츠(84)', '헬리오시티(84)', '파크리오(84)', '올림픽선수촌(121)'],
+                datasets: [
+                    {
+                        label: '매매가 (억)',
+                        data: [34.8, 35.7, 30.0, 24.2, 37.9],
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '전세가율 (%)',
+                        data: [38.79, 42.58, 43.33, 47.52, 39.58],
+                        backgroundColor: '#f87171',
+                        borderRadius: 6,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } } }
+                },
+                scales: {
+                    x: { ticks: { color: '#f8fafc', font: { size: 11 } }, grid: { color: '#243048' } },
+                    y: { type: 'linear', position: 'left', ticks: { color: '#38bdf8' }, grid: { color: '#243048' }, title: { display: true, text: '매매가 (억원)', color: '#38bdf8' } },
+                    y1: { type: 'linear', position: 'right', ticks: { color: '#f87171' }, grid: { drawOnChartArea: false }, title: { display: true, text: '전세가율 (%)', color: '#f87171' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

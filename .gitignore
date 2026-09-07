@@ -1,0 +1,25 @@
+﻿# Environment variables (API Keys, Secrets) - 절대 커밋 금지!
+.env
+**/.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+**/node_modules/
+package-lock.json
+
+# Cache and temporary files
+.cache/
+**/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+Thumbs.db
+.DS_Store
+
+# Editor directories
+.vscode/
+.idea/

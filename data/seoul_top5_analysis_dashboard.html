@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 신호등 — 서울 5대 상급지 종합 대시보드</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-surface: #151c2c;
+            --bg-surface-hover: #1e293b;
+            --bg-elevated: #1e2942;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #38bdf8;
+            --accent-indigo: #818cf8;
+            --border-color: #243048;
+            --border-bright: #334155;
+            
+            --signal-warning-bg: rgba(245, 158, 11, 0.15);
+            --signal-warning-border: #f59e0b;
+            --signal-warning-text: #fbbf24;
+            
+            --signal-watch-bg: rgba(239, 68, 68, 0.15);
+            --signal-watch-border: #ef4444;
+            --signal-watch-text: #f87171;
+
+            --signal-buy-bg: rgba(16, 185, 129, 0.15);
+            --signal-buy-border: #10b981;
+            --signal-buy-text: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 1920x1080 Optimized Container */
+        .dashboard-wrapper {
+            max-width: 1820px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Header Navigation */
+        .top-nav {
+            background: linear-gradient(135deg, #131b2e 0%, #1a233a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand-title h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-title p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .meta-tags {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent-blue);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* District Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-surface);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface-hover);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: #0f172a;
+        }
+
+        /* 5-Column Grid for 1920x1080 Resolution */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1600px) {
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .district-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .district-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-bright);
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .signal-pill {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+        }
+
+        .signal-warning {
+            background: var(--signal-warning-bg);
+            border: 1px solid var(--signal-warning-border);
+            color: var(--signal-warning-text);
+        }
+
+        .metric-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+        }
+
+        .metric-item .label {
+            color: var(--text-secondary);
+        }
+
+        .metric-item .val {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Score Progress Bar */
+        .score-box {
+            background: rgba(11, 15, 25, 0.6);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .score-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .bar-outer {
+            width: 90px;
+            height: 6px;
+            background: #27354a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar-inner-trend {
+            height: 100%;
+            background: var(--accent-blue);
+        }
+
+        .bar-inner-risk {
+            height: 100%;
+            background: #f87171;
+        }
+
+        /* Two Column Main Section: Charts + Detailed Table */
+        .main-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1280px) {
+            .main-content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Chart Canvas Container */
+        .chart-wrapper {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th {
+            background: #111827;
+            color: var(--accent-blue);
+            padding: 12px 14px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-bright);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-surface-hover);
+        }
+
+        /* Action Plan Card Grid */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .plan-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .plan-card h4 {
+            font-size: 1rem;
+            color: var(--accent-indigo);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plan-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Footer & Compliance */
+        footer {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        .disclaimer-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.84rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="brand-title">
+                <h1>🚦 부동산 신호등 <span style="font-size:1rem; color:var(--text-secondary); font-weight:normal;">| 서울 5대 상급지 종합 분석</span></h1>
+                <p>멀티 에이전트 파이프라인 정량 스코어링 & 매수 타이밍 통합 대시보드 (1920x1080 화면 최적화)</p>
+            </div>
+            <div class="meta-tags">
+                <div class="filter-tabs">
+                    <button class="tab-btn active" onclick="filterDistrict('all')">전체 보기</button>
+                    <button class="tab-btn" onclick="filterDistrict('gangnam')">강남구</button>
+                    <button class="tab-btn" onclick="filterDistrict('seocho')">서초구</button>
+                    <button class="tab-btn" onclick="filterDistrict('yongsan')">용산구</button>
+                    <button class="tab-btn" onclick="filterDistrict('songpa')">송파구</button>
+                    <button class="tab-btn" onclick="filterDistrict('mapo')">마포구</button>
+                </div>
+                <span class="meta-badge">기준금리 2.75%</span>
+                <span class="meta-badge">2026.08</span>
+            </div>
+        </div>
+
+        <!-- 5-Column District Cards Grid -->
+        <div class="cards-grid">
+            <!-- 강남구 -->
+            <div class="district-card" data-district="gangnam">
+                <div>
+                    <div class="card-header">
+                        <h2>강남구</h2>
+                        <span class="signal-pill signal-warning">⚠️ 주의</span>
+                    </div>
+                    <div class="metric-group">
+                        <div class="metric-item">
+                            <span class="label">최근 평당가</span>
+                            <span class="val">1억 1,200만</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">전세가율</span>
+                            <span class="val">37.65%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">대표 단지</span>
+                            <span class="val">은마 (39억)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <div class="score-line">
+                        <span>트렌드 (+2.0)</span>
+                        <div class="bar-outer"><div class="bar-inner-trend" style="width: 100%;"></div></div>
+                    </div>
+                    <div class="score-line">
+                        <span>리스크 (+2.0)</span>
+                        <div class="bar-outer"><div class="bar-inner-risk" style="width: 100%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 서초구 -->
+            <div class="district-card" data-district="seocho">
+                <div>
+                    <div class="card-header">
+                        <h2>서초구</h2>
+                        <span class="signal-pill signal-warning">⚠️ 주의</span>
+                    </div>
+                    <div class="metric-group">
+                        <div class="metric-item">
+                            <span class="label">최근 평당가</span>
+                            <span class="val">1.42억 (반포)</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">전세가율</span>
+                            <span class="val">41.80%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">대표 단지</span>
+                            <span class="val">원베일리 (56.3억)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <div class="score-line">
+                        <span>트렌드 (+1.0)</span>
+                        <div class="bar-outer"><div class="bar-inner-trend" style="width: 75%;"></div></div>
+                    </div>
+                    <div class="score-line">
+                        <span>리스크 (+2.0)</span>
+                        <div class="bar-outer"><div class="bar-inner-risk" style="width: 100%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 용산구 -->
+            <div class="district-card" data-district="yongsan">
+                <div>
+                    <div class="card-header">
+                        <h2>용산구</h2>
+                        <span class="signal-pill signal-warning">⚠️ 주의</span>
+                    </div>
+                    <div class="metric-group">
+                        <div class="metric-item">
+                            <span class="label">최근 평당가</span>
+                            <span class="val">8,690만</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">전세가율</span>
+                            <span class="val">51.90%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">대표 단지</span>
+                            <span class="val">한남더힐 (130억)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <div class="score-line">
+                        <span>트렌드 (+2.0)</span>
+                        <div class="bar-outer"><div class="bar-inner-trend" style="width: 100%;"></div></div>
+                    </div>
+                    <div class="score-line">
+                        <span>리스크 (+1.67)</span>
+                        <div class="bar-outer"><div class="bar-inner-risk" style="width: 91%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 송파구 -->
+            <div class="district-card" data-district="songpa">
+                <div>
+                    <div class="card-header">
+                        <h2>송파구</h2>
+                        <span class="signal-pill signal-warning">⚠️ 주의</span>
+                    </div>
+                    <div class="metric-group">
+                        <div class="metric-item">
+                            <span class="label">최근 평당가</span>
+                            <span class="val">7,741만</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">전세가율</span>
+                            <span class="val">39.41%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">대표 단지</span>
+                            <span class="val">잠실엘스 (34.8억)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <div class="score-line">
+                        <span>트렌드 (+0.67)</span>
+                        <div class="bar-outer"><div class="bar-inner-trend" style="width: 66%;"></div></div>
+                    </div>
+                    <div class="score-line">
+                        <span>리스크 (+1.33)</span>
+                        <div class="bar-outer"><div class="bar-inner-risk" style="width: 83%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 마포구 -->
+            <div class="district-card" data-district="mapo">
+                <div>
+                    <div class="card-header">
+                        <h2>마포구</h2>
+                        <span class="signal-pill signal-warning">⚠️ 주의</span>
+                    </div>
+                    <div class="metric-group">
+                        <div class="metric-item">
+                            <span class="label">최근 평당가</span>
+                            <span class="val">6,180만</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">전세가율</span>
+                            <span class="val">49.80%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="label">대표 단지</span>
+                            <span class="val">마프자 (29.5억)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <div class="score-line">
+                        <span>트렌드 (+1.25)</span>
+                        <div class="bar-outer"><div class="bar-inner-trend" style="width: 81%;"></div></div>
+                    </div>
+                    <div class="score-line">
+                        <span>리스크 (+1.33)</span>
+                        <div class="bar-outer"><div class="bar-inner-risk" style="width: 83%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Analytics Section (Chart + Detailed Matrix Table) -->
+        <div class="main-content-grid">
+            <!-- Left Panel: Interactive Chart -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3>📊 평당가 및 전세가율 시각화 비교</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="districtChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Panel: Matrix Comparison Table -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3>📋 서울 5대 상급지 심사 매트릭스 상세</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>자치구</th>
+                                <th>신호</th>
+                                <th>평당가</th>
+                                <th>전세가율</th>
+                                <th>트렌드</th>
+                                <th>리스크</th>
+                                <th>주요 호재</th>
+                                <th>핵심 규제</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-district="gangnam">
+                                <td><strong>강남구</strong></td>
+                                <td><span class="signal-pill signal-warning">주의</span></td>
+                                <td>1억 1,200만</td>
+                                <td>37.65%</td>
+                                <td>+2.00</td>
+                                <td>+2.00</td>
+                                <td>GBC, 영동대로, 압구정 70층</td>
+                                <td>토허제 2년 실거주, LTV 50%</td>
+                            </tr>
+                            <tr data-district="seocho">
+                                <td><strong>서초구</strong></td>
+                                <td><span class="signal-pill signal-warning">주의</span></td>
+                                <td>1.42억 (반포)</td>
+                                <td>41.80%</td>
+                                <td>+1.00</td>
+                                <td>+2.00</td>
+                                <td>경부고속도로 지하화, 서리풀</td>
+                                <td>서초 전역 토허제, LTV 50%</td>
+                            </tr>
+                            <tr data-district="yongsan">
+                                <td><strong>용산구</strong></td>
+                                <td><span class="signal-pill signal-warning">주의</span></td>
+                                <td>8,690만</td>
+                                <td>51.90%</td>
+                                <td>+2.00</td>
+                                <td>+1.67</td>
+                                <td>국제업무지구, 용산공원, GTX-B</td>
+                                <td>용산 전역 토허제, 투기과열지구</td>
+                            </tr>
+                            <tr data-district="songpa">
+                                <td><strong>송파구</strong></td>
+                                <td><span class="signal-pill signal-warning">주의</span></td>
+                                <td>7,741만</td>
+                                <td>39.41%</td>
+                                <td>+0.67</td>
+                                <td>+1.33</td>
+                                <td>잠실 MICE, 잠실주공5단지</td>
+                                <td>잠실동 토허제, LTV 70%</td>
+                            </tr>
+                            <tr data-district="mapo">
+                                <td><strong>마포구</strong></td>
+                                <td><span class="signal-pill signal-warning">주의</span></td>
+                                <td>6,180만</td>
+                                <td>49.80%</td>
+                                <td>+1.25</td>
+                                <td>+1.33</td>
+                                <td>상암 DMC 롯데몰, 공덕1구역</td>
+                                <td>비규제지역, 스트레스 DSR</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Plan Cards -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>💡 PB 프라이빗 뱅커의 3대 자산운용 실전 지침</h3>
+            </div>
+            <div class="plan-grid">
+                <div class="plan-card">
+                    <h4>1. LTV 15~20% 이하 감축 (역레버리지 차단)</h4>
+                    <p>현재 주담대 고정금리 상단 7.60% 및 기준금리 2.75% 인상 기조 아래 LTV 40% 적용 시 전 지역에서 월 -57만~-247만원 현금흐름 적자가 발생합니다. 대출 비율을 LTV 15~20% 이하로 조정 시 즉시 흑자(+185만~+225만원)로 전환됩니다.</p>
+                </div>
+                <div class="plan-card">
+                    <h4>2. 전세 승계 / 보증금 증액형 자본 구조</h4>
+                    <p>강남/서초 등 전세가율 30%대 저조 구간에서는 금융기관 대출 이자 지출 대신 무이자 성격의 임대차 전세 보증금을 활용하여 고금리 차입금을 상환하는 세팅이 수익률 방어에 유리합니다.</p>
+                </div>
+                <div class="plan-card">
+                    <h4>3. 풀옵션 하이엔드 인테리어 & 공실 Zero</h4>
+                    <p>학군 및 고소득 직주근접 수요가 밀집된 5개구 특성상 매물 인테리어 고급화를 통해 시세 대비 5~10% 월세 프리미엄을 확보하고 공실 수입 공백 리스크를 사전 방어합니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer Banner -->
+        <div class="disclaimer-banner">
+            ⚠️ <strong>준법감시 고지</strong>: 본 대시보드는 공공데이터 기반 4단계 AI 에이전트 파이프라인(re-data-collector → re-trend-risk-analyst → re-timing-judge → re-briefing-reporter)의 수치 정리용 정보이며, 최종 매수·매도·자금집행 및 세무·대출 실행 결정과 책임은 투자자 본인에게 있습니다.
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <span>© 2026 부동산 신호등 — 서울 5대 상급지 대시보드 Engine</span>
+            <span>생성 파일: <a href="file:///C:/practice/geminiCLI/realestate_prj/data/seoul_top5_analysis_dashboard.html" style="color:var(--accent-blue); text-decoration:none;">data/seoul_top5_analysis_dashboard.html</a></span>
+        </footer>
+    </div>
+
+    <!-- Chart.js Logic & Tab Filtering Script -->
+    <script>
+        // Chart Initialization
+        const ctx = document.getElementById('districtChart').getContext('2d');
+        const districtChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['서초구 (반포)', '강남구', '용산구', '송파구', '마포구'],
+                datasets: [
+                    {
+                        label: '최근 평당가 (만원)',
+                        data: [14200, 11200, 8690, 7741, 6180],
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '전세가율 (%)',
+                        data: [41.8, 37.65, 51.9, 39.41, 49.8],
+                        backgroundColor: '#f87171',
+                        borderRadius: 6,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#f8fafc', font: { family: 'Noto Sans KR', size: 12 } },
+                        grid: { color: '#243048' }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        ticks: { color: '#38bdf8' },
+                        grid: { color: '#243048' },
+                        title: { display: true, text: '평당가 (만원)', color: '#38bdf8' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        ticks: { color: '#f87171' },
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: '전세가율 (%)', color: '#f87171' }
+                    }
+                }
+            }
+        });
+
+        // Tab Filtering Function
+        function filterDistrict(districtKey) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.district-card');
+            const rows = document.querySelectorAll('tbody tr');
+
+            cards.forEach(card => {
+                if (districtKey === 'all' || card.getAttribute('data-district') === districtKey) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            rows.forEach(row => {
+                if (districtKey === 'all' || row.getAttribute('data-district') === districtKey) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

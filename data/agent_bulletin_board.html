@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부동산 신호등 · 멀티 에이전트 시스템 통합 게시판</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090c10;
+      --panel-bg: #131720;
+      --panel-border: #222938;
+      --panel-hover: #1c2333;
+      --text-main: #f0f4f8;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-yellow: #eab308;
+      --accent-red: #ef4444;
+      --accent-purple: #a855f7;
+      
+      --glow-blue: rgba(56, 189, 248, 0.15);
+      --glow-green: rgba(34, 197, 94, 0.15);
+      --glow-yellow: rgba(234, 179, 8, 0.15);
+      --glow-purple: rgba(168, 85, 247, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1820px;
+      margin: 0 auto;
+    }
+
+    /* Top Banner */
+    header {
+      background: linear-gradient(135deg, rgba(19, 23, 32, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+      background: #0d1117;
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: 1px solid #30363d;
+    }
+
+    .light {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+    .light.red { background-color: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
+    .light.yellow { background-color: var(--accent-yellow); box-shadow: 0 0 10px var(--accent-yellow); }
+    .light.green { background-color: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+
+    .brand-text h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .status-badges {
+      display: flex;
+      gap: 12px;
+    }
+
+    .badge-item {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--panel-border);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-item strong {
+      color: var(--accent-blue);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Pipeline Architecture Flow Banner */
+    .pipeline-bar {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+
+    .pipeline-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+
+    .p-step {
+      background: #181d28;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .p-step:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+
+    .p-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-1 .p-num { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); }
+    .step-2 .p-num { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+    .step-3 .p-num { background: rgba(234, 179, 8, 0.2); color: var(--accent-yellow); }
+    .step-4 .p-num { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+
+    .p-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .p-info p {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .arrow-icon {
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Grid of Agent Cards */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .agent-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .agent-card.collector::before { background: var(--accent-blue); }
+    .agent-card.analyst::before { background: var(--accent-purple); }
+    .agent-card.judge::before { background: var(--accent-yellow); }
+    .agent-card.reporter::before { background: var(--accent-green); }
+
+    .agent-card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .agent-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .collector .agent-tag { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .analyst .agent-tag { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+    .judge .agent-tag { background: rgba(234, 179, 8, 0.15); color: var(--accent-yellow); border: 1px solid rgba(234, 179, 8, 0.3); }
+    .reporter .agent-tag { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.3); }
+
+    .agent-title-box h3 {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .agent-title-box .persona {
+      font-size: 13px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .card-body {
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .spec-group {
+      margin-top: 14px;
+    }
+
+    .spec-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .spec-value {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .tool-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .tool-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tool-chip.api-verified {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .card-footer {
+      border-top: 1px solid var(--panel-border);
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .output-path {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-blue);
+    }
+
+    .btn-detail {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+
+    /* District Weekly Datasets Board */
+    .board-section {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .district-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .district-card {
+      background: #181d28;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .d-name {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .d-slug {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .d-stats {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .d-badge {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      background: #131720;
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      width: 800px;
+      max-width: 90vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: #fff; }
+
+    .modal-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .modal-body {
+      margin-top: 20px;
+    }
+
+    .prompt-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #e6edf3;
+      white-space: pre-wrap;
+      max-height: 350px;
+      overflow-y: auto;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Top Header -->
+    <header>
+      <div class="brand">
+        <div class="traffic-lights">
+          <div class="light red"></div>
+          <div class="light yellow"></div>
+          <div class="light green"></div>
+        </div>
+        <div class="brand-text">
+          <h1>부동산 신호등 · 에이전트 시스템 통합 게시판</h1>
+          <p>Real Estate Traffic Light Multi-Agent Orchestration Board</p>
+        </div>
+      </div>
+
+      <div class="status-badges">
+        <div class="badge-item">
+          <span>1차 REST API 키</span>
+          <strong>3/3 연동 (국토부·ECOS·NEIS)</strong>
+        </div>
+        <div class="badge-item">
+          <span>수집 보존 주차</span>
+          <strong>2026W33 (주별)</strong>
+        </div>
+        <div class="badge-item">
+          <span>분석 완료 자치구</span>
+          <strong>9개 지역</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pipeline Architecture Flow -->
+    <div class="pipeline-bar">
+      <div class="pipeline-title">
+        <span>🔄 4단계 파이프라인 단방향 데이터 흐름 (Unidirectional Data Pipeline)</span>
+      </div>
+      <div class="pipeline-steps">
+        <div class="p-step step-1">
+          <div class="p-num">1</div>
+          <div class="p-info">
+            <h4>re-data-collector</h4>
+            <p>공공데이터 1차 API 수집 및 주별 데이터셋</p>
+          </div>
+          <span class="arrow-icon">➔</span>
+        </div>
+
+        <div class="p-step step-2">
+          <div class="p-num">2</div>
+          <div class="p-info">
+            <h4>re-trend-risk-analyst</h4>
+            <p>트렌드 100점 & 3대 리스크 독립 스코어링</p>
+          </div>
+          <span class="arrow-icon">➔</span>
+        </div>
+
+        <div class="p-step step-3">
+          <div class="p-num">3</div>
+          <div class="p-info">
+            <h4>re-timing-judge</h4>
+            <p>3-Signal 매수 타이밍 & 수익성 시뮬레이터</p>
+          </div>
+          <span class="arrow-icon">➔</span>
+        </div>
+
+        <div class="p-step step-4">
+          <div class="p-num">4</div>
+          <div class="p-info">
+            <h4>re-briefing-reporter</h4>
+            <p>3초 PB 구조화 브리핑 및 1주 액션플랜</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent Cards Grid -->
+    <div class="agents-grid">
+
+      <!-- Agent 1: re-data-collector -->
+      <div class="agent-card collector">
+        <div class="card-header">
+          <span class="agent-tag">Step 1 · Data Collection</span>
+          <span style="font-size: 20px;">📡</span>
+        </div>
+        <div class="agent-title-box">
+          <h3>re-data-collector</h3>
+          <div class="persona">데이터 수집가 (통계 담당관)</div>
+        </div>
+        <div class="card-body">
+          <div class="spec-group">
+            <div class="spec-label">주요 미션</div>
+            <div class="spec-value">해석·판단 없이 1차 공공 API 수치 팩트를 수집하여 주별 원자재 데이터셋 생성</div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">연동 1차 REST API (MCP)</div>
+            <div class="tool-list">
+              <span class="tool-chip api-verified">MOLIT (실거래가)</span>
+              <span class="tool-chip api-verified">ECOS (기준금리/주담대)</span>
+              <span class="tool-chip api-verified">NEIS (학군 3개월캐시)</span>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">저장 컨벤션</div>
+            <div class="spec-value">{slug}_raw_2026W33.md (주별이력)<br>{slug}_raw.md (최신파이프라인)</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="output-path">data/re-data-collector/</span>
+          <button class="btn-detail" onclick="openModal('collector')">상세 프롬프트</button>
+        </div>
+      </div>
+
+      <!-- Agent 2: re-trend-risk-analyst -->
+      <div class="agent-card analyst">
+        <div class="card-header">
+          <span class="agent-tag">Step 2 · Quant Scoring</span>
+          <span style="font-size: 20px;">📊</span>
+        </div>
+        <div class="agent-title-box">
+          <h3>re-trend-risk-analyst</h3>
+          <div class="persona">트렌드·리스크 분석가 (수석 퀀트)</div>
+        </div>
+        <div class="card-body">
+          <div class="spec-group">
+            <div class="spec-label">주요 미션</div>
+            <div class="spec-value">원자재 데이터셋을 토대로 중장기 가격 트렌드 및 3대 리스크 점수 정량 산출</div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">평가 메트릭스</div>
+            <div class="tool-list">
+              <span class="tool-chip">트렌드 점수 (0~100)</span>
+              <span class="tool-chip">고점매수 리스크</span>
+              <span class="tool-chip">환금성 리스크</span>
+              <span class="tool-chip">금리 리스크</span>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">운영 원칙</div>
+            <div class="spec-value">매수/관망 매수판정 금지, 오직 정량적 스코어링표만 독립 작성</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="output-path">data/re-trend-risk-analyst/</span>
+          <button class="btn-detail" onclick="openModal('analyst')">상세 프롬프트</button>
+        </div>
+      </div>
+
+      <!-- Agent 3: re-timing-judge -->
+      <div class="agent-card judge">
+        <div class="card-header">
+          <span class="agent-tag">Step 3 · Decision Engine</span>
+          <span style="font-size: 20px;">🚦</span>
+        </div>
+        <div class="agent-title-box">
+          <h3>re-timing-judge</h3>
+          <div class="persona">판단 엔진 (투자 심의위원)</div>
+        </div>
+        <div class="card-body">
+          <div class="spec-group">
+            <div class="spec-label">주요 미션</div>
+            <div class="spec-value">점수표를 판정 규칙표에 따라 종합하여 3-Signal 매수 타이밍 및 수익성 리포트 판정</div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">판정 신호 (Signals)</div>
+            <div class="tool-list">
+              <span class="tool-chip" style="color: #ef4444;">🔴 관망</span>
+              <span class="tool-chip" style="color: #eab308;">🟡 주의</span>
+              <span class="tool-chip" style="color: #22c55e;">🟢 매수고려</span>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">금융 시뮬레이션</div>
+            <div class="spec-value">LTV 50%/70% 대출 이자 및 투자금 대비 기대 ROI 손익분기 계산</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="output-path">data/re-timing-judge/</span>
+          <button class="btn-detail" onclick="openModal('judge')">상세 프롬프트</button>
+        </div>
+      </div>
+
+      <!-- Agent 4: re-briefing-reporter -->
+      <div class="agent-card reporter">
+        <div class="card-header">
+          <span class="agent-tag">Step 4 · Executive Briefing</span>
+          <span style="font-size: 20px;">📑</span>
+        </div>
+        <div class="agent-title-box">
+          <h3>re-briefing-reporter</h3>
+          <div class="persona">브리핑 리포터 (PB 수석 컨설턴트)</div>
+        </div>
+        <div class="card-body">
+          <div class="spec-group">
+            <div class="spec-label">주요 미션</div>
+            <div class="spec-value">투자 의사결정자가 3초 만에 파악할 수 있는 3단 구조 PB 핵심 보고서 작성</div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">3단 리포트 구조</div>
+            <div class="tool-list">
+              <span class="tool-chip">1. 결론 (신호 & 시뮬)</span>
+              <span class="tool-chip">2. 핵심 이유 (3가지)</span>
+              <span class="tool-chip">3. 1주일 할일</span>
+            </div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-label">필수 요소</div>
+            <div class="spec-value">법적 면책 조항(Disclaimer) 및 원본 데이터 출처 명시</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="output-path">data/re-briefing-reporter/</span>
+          <button class="btn-detail" onclick="openModal('reporter')">상세 프롬프트</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- District Datasets Board Section -->
+    <div class="board-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🏛️ 2026년 33주차(`2026W33`) 자치구별 데이터셋 생성 현황 (9개 지역)</span>
+        </div>
+        <span style="font-size: 13px; color: var(--text-sub);">3대 API (국토부·ECOS·NEIS) 실시간 수집 완료</span>
+      </div>
+
+      <div class="district-grid">
+        <div class="district-card">
+          <div>
+            <div class="d-name">강남구 <span class="d-slug">gangnam</span></div>
+            <div class="d-stats">평당가 1억 8,381만 (압구정) · 학군지수 29점</div>
+          </div>
+          <span class="d-badge">gangnam_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">서초구 <span class="d-slug">seocho</span></div>
+            <div class="d-stats">평당가 1억 4,200만 (반포) · 학군지수 17점</div>
+          </div>
+          <span class="d-badge">seocho_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">송파구 <span class="d-slug">songpa</span></div>
+            <div class="d-stats">평당가 1억 4,372만 (잠실) · 학군지수 24점</div>
+          </div>
+          <span class="d-badge">songpa_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">용산구 <span class="d-slug">yongsan</span></div>
+            <div class="d-stats">평당가 1억 7,710만 (보광) · 학군지수 7점</div>
+          </div>
+          <span class="d-badge">yongsan_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">마포구 <span class="d-slug">mapo</span></div>
+            <div class="d-stats">평당가 1억 896만 (염리) · 학군지수 6점</div>
+          </div>
+          <span class="d-badge">mapo_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">종로구 <span class="d-slug">jongno</span></div>
+            <div class="d-stats">평당가 1억 638만 (홍파) · 학군지수 21점</div>
+          </div>
+          <span class="d-badge">jongno_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">성동구 <span class="d-slug">seongdong</span></div>
+            <div class="d-stats">평당가 1억 2,450만 (성수) · 학군지수 9점</div>
+          </div>
+          <span class="d-badge">seongdong_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">양천구 (양평) <span class="d-slug">yangcheon</span></div>
+            <div class="d-stats">평당가 8,290만 (목동) · 학군지수 16점</div>
+          </div>
+          <span class="d-badge">yangcheon_raw_2026W33.md</span>
+        </div>
+
+        <div class="district-card">
+          <div>
+            <div class="d-name">영등포구 <span class="d-slug">yeongdeungpo</span></div>
+            <div class="d-stats">평당가 9,850만 (여의도) · 학군지수 11점</div>
+          </div>
+          <span class="d-badge">yeongdeungpo_raw_2026W33.md</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- IpziTalk Integration Section -->
+    <div class="board-section" style="margin-top: 28px; background: linear-gradient(135deg, #131720 0%, #1a202c 100%); border-color: rgba(107, 75, 255, 0.3);">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🔮 입지톡 (IpziTalk) 연동 플러그인 · 스킬 27종 & MCP 11종 카탈로그</span>
+        </div>
+        <span style="font-size: 12px; background: rgba(107, 75, 255, 0.2); color: #a78bfa; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(107, 75, 255, 0.4); font-weight: 700;">
+          https://github.com/chatdaeri/ipzitalk
+        </span>
+      </div>
+
+      <!-- Installation Guide Card -->
+      <div style="background: #0f131c; border: 1px solid #2d3748; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">🚀 입지톡(IpziTalk) 플러그인 연동 방법</div>
+          <div style="font-size: 12px; color: var(--text-sub);">Claude Code / Antigravity 터미널에서 아래 명령을 입력하여 27종 스킬 및 11개 MCP 도구를 활성화할 수 있습니다.</div>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #1a202c; padding: 8px 14px; border-radius: 8px; border: 1px solid #4a5568; color: #38bdf8;">
+          /plugin marketplace add chatdaeri/ipzitalk
+        </div>
+      </div>
+
+      <!-- 11 MCP Tools -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 10px;">🛠️ 입지톡 MCP 원천 데이터 도구 (11개)</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_geocode</div>
+            <div style="font-size: 11px; color: var(--text-sub);">주소 ➔ 위도·경도 좌표 변환</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_address</div>
+            <div style="font-size: 11px; color: var(--text-sub);">단지명 ➔ 주소 후보 검색</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_region_code</div>
+            <div style="font-size: 11px; color: var(--text-sub);">법정동/청약홈 지역코드</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">search_by_nearby_category</div>
+            <div style="font-size: 11px; color: var(--text-sub);">주변 학교/지하철/마트 검색</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">search_by_nearby_keyword</div>
+            <div style="font-size: 11px; color: var(--text-sub);">주변 아파트/오피스텔 검색</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">search_announcement_info</div>
+            <div style="font-size: 11px; color: var(--text-sub);">청약홈 분양공고/분양가</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">enrich_complex_info</div>
+            <div style="font-size: 11px; color: var(--text-sub);">K-apt 세대수/주차/연식 보강</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_complex_info</div>
+            <div style="font-size: 11px; color: var(--text-sub);">K-apt 단지 상세정보</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_complex_trades</div>
+            <div style="font-size: 11px; color: var(--text-sub);">국토부 매매/전월세/분양권</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_static_map</div>
+            <div style="font-size: 11px; color: var(--text-sub);">네이버 정적 지도 이미지</div>
+          </div>
+          <div style="background: #181d28; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono';">get_map_embed_url</div>
+            <div style="font-size: 11px; color: var(--text-sub);">인터랙티브 지도 공유 URL</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 27 Skills Catalog -->
+      <div>
+        <div style="font-size: 13px; font-weight: 700; color: #a78bfa; text-transform: uppercase; margin-bottom: 10px;">✨ 입지톡 자동화 스킬 27종 카탈로그 (27 Skills)</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <!-- Category 1 -->
+          <div style="background: #151923; padding: 14px; border-radius: 10px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #a78bfa; margin-bottom: 8px;">📑 1. 분양·청약 분야 스킬 (8종)</div>
+            <ul style="font-size: 11px; color: var(--text-sub); line-height: 1.6; list-style: none; padding-left: 0;">
+              <li>• <code>presale-announcement-report</code> : 청약홈 분양공고 요약</li>
+              <li>• <code>presale-complex-analysis</code> : 분양 단지 입지 세부 분석</li>
+              <li>• <code>subscription-qualification-check</code> : 청약 가점 & 자격 진단</li>
+              <li>• <code>presale-price-comparison</code> : 인근 시세 대비 분양가 분석</li>
+              <li>• <code>presale-schedule-calendar</code> : 월별 분양/청약 일정표</li>
+              <li>• <code>presale-candidate-finder</code> : 지역별 분양 예정 단지 탐색</li>
+              <li>• <code>presale-roi-simulator</code> : 분상제 및 기대 시세차익</li>
+              <li>• <code>presale-competitor-matrix</code> : 주변 경쟁 분양 단지 매트릭스</li>
+            </ul>
+          </div>
+
+          <!-- Category 2 -->
+          <div style="background: #151923; padding: 14px; border-radius: 10px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🗺️ 2. 입지·인프라 분야 스킬 (10종)</div>
+            <ul style="font-size: 11px; color: var(--text-sub); line-height: 1.6; list-style: none; padding-left: 0;">
+              <li>• <code>ipzi-comprehensive-report</code> : 종합 입지 분석 리포트</li>
+              <li>• <code>traffic-infra-check</code> : 지하철/역세권/GTX 교통 입지</li>
+              <li>• <code>education-school-map</code> : 초중고/학원가/특목고 밀도</li>
+              <li>• <code>commercial-life-infra</code> : 마트/백화점/병원 생활 입지</li>
+              <li>• <code>trade-price-tracker</code> : 실거래가 및 평당가 시계열</li>
+              <li>• <code>kapt-complex-detail</code> : K-apt 세대수/주차/연식 상세</li>
+              <li>• <code>nearby-apt-comparator</code> : 반경 1~3km 주변 단지 비교</li>
+              <li>• <code>geocode-coordinate-converter</code> : 주소-좌표 역지오코딩</li>
+              <li>• <code>interactive-map-generator</code> : 지도 임베드 링크 생성</li>
+              <li>• <code>static-map-image-export</code> : 정적 지도 이미지 추출</li>
+            </ul>
+          </div>
+
+          <!-- Category 3 -->
+          <div style="background: #151923; padding: 14px; border-radius: 10px; border: 1px solid #2d3748;">
+            <div style="font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 8px;">📈 3. 투자·시장 분야 스킬 (9종)</div>
+            <ul style="font-size: 11px; color: var(--text-sub); line-height: 1.6; list-style: none; padding-left: 0;">
+              <li>• <code>jeonse-gap-invest-score</code> : 전세가율 & 갭투자 리스크</li>
+              <li>• <code>redevelopment-progress-check</code> : 재개발/재건축 정비단계</li>
+              <li>• <code>population-migration-flow</code> : 인구 이동 및 세대수 변동</li>
+              <li>• <code>district-income-analysis</code> : 자치구 소득 & 소비력 평가</li>
+              <li>• <code>crime-safety-index</code> : 5대 범죄율 & 치안 안전지수</li>
+              <li>• <code>living-pop-activity-rate</code> : 유동/생활인구 활동성 평가</li>
+              <li>• <code>macro-interest-overlay</code> : 기준금리/주담대 금리 오버레이</li>
+              <li>• <code>top5-district-comparison</code> : 서울 5대 상급지 종합 비교</li>
+              <li>• <code>executive-pb-briefing-gen</code> : 3초 파악 Executive PB 보고서</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="agentModal">
+    <div class="modal-container">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-header">
+        <h2 id="modalTitle">Agent Title</h2>
+        <div id="modalPersona" style="color: var(--text-sub); font-size: 14px;">Persona</div>
+      </div>
+      <div class="modal-body">
+        <div class="spec-label">시스템 지침 및 프롬프트 명세</div>
+        <div class="prompt-box" id="modalPrompt">
+          Prompt content here...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const agentPrompts = {
+      collector: {
+        title: "Step 1 · re-data-collector (데이터 수집가)",
+        persona: "국가승인통계를 다루는 통계 담당관. 감정 없이 팩트와 출처만 전달하는 실사(實査) 전문가.",
+        prompt: `## 페르소나
+- 어조: 건조하고 간결하며 중립적. 확신은 데이터가 있을 때만, 없으면 "조회 실패"라고 인정.
+- 말투: 명사형·단문 종결, 모든 수치 뒤 출처 표기, 표(테이블) 작성 우선.
+
+## 데이터 소스 우선순위 (3대 1차 API 연동)
+1. MOLIT API (국토교통부 아파트 매매/전월세 실거래가 API)
+2. ECOS API (한국은행 기준금리 및 주택담보대출 금리 시계열 API)
+3. NEIS API (나이스 자치구 고교 및 특목고/자율고 학군 지수 API - 3개월/분기 캐시)
+
+## 파일 저장 규칙
+- 주별 이력 파일: data/re-data-collector/{slug}_raw_{YYYY}W{주차}.md
+- 최신 가동 파일: data/re-data-collector/{slug}_raw.md`
+      },
+      analyst: {
+        title: "Step 2 · re-trend-risk-analyst (트렌드·리스크 분석가)",
+        persona: "부동산 파이프라인의 퀀트 분석가. 정량적 수치 산출 전문가.",
+        prompt: `## 페르소나
+- 어조: 분석적이고 냉철함. 주관적 견해 배제하고 데이터 원본 점수화.
+
+## 주요 스코어링 항목
+1. 중장기 트렌드 점수 (100점 만점): 매매가 상승률, 거래량 추이, 인구 이동
+2. 고점매수 리스크 (0~100점): 과거 최고가 대비 현재가 수준 (Gap 비율)
+3. 환금성 리스크 (0~100점): 월간 거래량 수준 및 매물 적체 기간
+4. 금리 리스크 (0~100점): 기준금리 및 주담대 금리 변동성 영향`
+      },
+      judge: {
+        title: "Step 3 · re-timing-judge (판단 엔진)",
+        persona: "부동산 투자 심의위원회 판정관.",
+        prompt: `## 판정 규칙 (3-Signal Engine)
+- 🟢 매수고려: 트렌드 점수 70점 이상 & 3대 리스크 모두 40점 미만
+- 🟡 주의: 리스크 항목 중 1~2개가 60점 이상이거나 전세가율 40% 미만
+- 🔴 관망: 트렌드 점수 50점 미만 또는 고금리/고점매수 리스크 80점 이상
+
+## 금융 시뮬레이터 (ROI Calculator)
+- LTV 50%, 70% 적용 시 월 대출 이자 감당액 산출
+- 3년/5년 기대 수익률 및 손익분기점(BEP) 시뮬레이션`
+      },
+      reporter: {
+        title: "Step 4 · re-briefing-reporter (브리핑 리포터)",
+        persona: "VIP PB (Private Banker) 수석 컨설턴트.",
+        prompt: `## 3초 PB 리포트 구조
+1. 3초 결론: 매수 타이밍 신호(🔴🟡🟢) + 예상 자금 시뮬레이션
+2. 핵심 이유 3가지: 트렌드, 리스크, 금리/학군 팩트 요약
+3. 1주일 할일 (Action Plan): 현장 방문 단지, 대출 한도 조회, 임장 체크리스트
+
+## 필수 준수사항
+- 법적 면책 조항 (Disclaimer) 포함
+- 1차 데이터 소스 출처 명시`
+      }
+    };
+
+    function openModal(key) {
+      const data = agentPrompts[key];
+      if (!data) return;
+      document.getElementById('modalTitle').innerText = data.title;
+      document.getElementById('modalPersona').innerText = data.persona;
+      document.getElementById('modalPrompt').innerText = data.prompt;
+      document.getElementById('agentModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('agentModal').classList.remove('active');
+    }
+
+    window.onclick = function(e) {
+      const modal = document.getElementById('agentModal');
+      if (e.target === modal) closeModal();
+    }
+  </script>
+</body>
+</html>

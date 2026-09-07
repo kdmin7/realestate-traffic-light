@@ -1,0 +1,465 @@
+<title>서울 부동산 인사이트 MCP 서버 · 설계도</title>
+<style>
+  :root {
+    --plane:#eef1f5; --surface:#ffffff; --surface-2:#f5f8fc; --surface-3:#eaf0f7;
+    --ink:#10151c; --ink-2:#46515f; --muted:#7b8794;
+    --line:#dbe2ea; --border:rgba(16,21,28,.10);
+    --build:#2563d8;      /* 직접 구축 */
+    --reuse:#0d9488;      /* 재활용 */
+    --catalyst:#c98a00;   /* 호재/2단계 */
+    --warn:#b45309;
+    --good:#0a8f0a;
+    --shadow:0 1px 2px rgba(16,21,28,.05), 0 6px 20px rgba(16,21,28,.06);
+    --mono:ui-monospace,"Cascadia Code","Source Code Pro",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --plane:#0b0e13; --surface:#141922; --surface-2:#1a2029; --surface-3:#1f2732;
+      --ink:#eef2f7; --ink-2:#aab6c4; --muted:#6f7d8c;
+      --line:#232b36; --border:rgba(255,255,255,.10);
+      --build:#4d84f0; --reuse:#2dd4bf; --catalyst:#e0a52e; --warn:#e0a52e; --good:#38c838;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 26px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="light"]{--plane:#eef1f5;--surface:#ffffff;--surface-2:#f5f8fc;--surface-3:#eaf0f7;--ink:#10151c;--ink-2:#46515f;--muted:#7b8794;--line:#dbe2ea;--border:rgba(16,21,28,.10);--build:#2563d8;--reuse:#0d9488;--catalyst:#c98a00;--warn:#b45309;--good:#0a8f0a;--shadow:0 1px 2px rgba(16,21,28,.05),0 6px 20px rgba(16,21,28,.06);}
+  :root[data-theme="dark"]{--plane:#0b0e13;--surface:#141922;--surface-2:#1a2029;--surface-3:#1f2732;--ink:#eef2f7;--ink-2:#aab6c4;--muted:#6f7d8c;--line:#232b36;--border:rgba(255,255,255,.10);--build:#4d84f0;--reuse:#2dd4bf;--catalyst:#e0a52e;--warn:#e0a52e;--good:#38c838;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.45);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--plane);color:var(--ink);line-height:1.5;
+    font-family:system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:30px 24px 72px;}
+  code,.mono{font-family:var(--mono);font-size:.92em;}
+
+  /* header */
+  header{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px;}
+  .kicker{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--build);margin-bottom:12px;}
+  .kicker .sq{width:9px;height:9px;background:var(--build);border-radius:2px;}
+  h1{font-size:clamp(25px,3.6vw,36px);font-weight:730;letter-spacing:-.022em;margin:0;text-wrap:balance;}
+  .lede{color:var(--ink-2);font-size:15px;margin:12px 0 0;max-width:64ch;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .tag{font-family:var(--mono);font-size:12px;padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);}
+  .tag b{color:var(--ink);font-weight:600;}
+  .theme-btn{position:absolute;top:24px;right:24px;background:var(--surface);color:var(--ink-2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;font-family:inherit;cursor:pointer;}
+  .theme-btn:hover{color:var(--ink);}
+  .theme-btn:focus-visible{outline:2px solid var(--build);outline-offset:2px;}
+
+  h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+  h2 .n{font-family:var(--mono);color:var(--build);font-size:13px;letter-spacing:0;}
+  h2::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);}
+
+  /* principles */
+  .principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  .principles .card{padding:17px 18px;}
+  .principles .pi{font-size:19px;margin-bottom:9px;display:block;}
+  .principles h3{font-size:14.5px;margin:0 0 6px;font-weight:660;letter-spacing:-.01em;}
+  .principles p{font-size:13px;color:var(--ink-2);margin:0;}
+
+  /* layer diagram */
+  .stack{display:flex;flex-direction:column;gap:0;}
+  .layer{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px;box-shadow:var(--shadow);position:relative;}
+  .layer + .layer{margin-top:26px;}
+  .layer + .layer::before{content:"";position:absolute;top:-22px;left:50%;width:2px;height:18px;background:var(--line);}
+  .layer + .layer::after{content:"▼";position:absolute;top:-14px;left:50%;transform:translateX(-42%);font-size:10px;color:var(--muted);}
+  .layer .lh{display:flex;align-items:baseline;gap:10px;margin-bottom:11px;}
+  .layer .lh .idx{font-family:var(--mono);font-size:12px;color:var(--build);}
+  .layer .lh h3{font-size:14.5px;margin:0;font-weight:660;letter-spacing:-.01em;}
+  .layer .lh .sub{font-size:12.5px;color:var(--muted);margin-left:auto;}
+  .row{display:flex;flex-wrap:wrap;gap:8px;}
+  .box{font-family:var(--mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--ink-2);}
+  .box.src{border-left:3px solid var(--reuse);}
+  .box.b{border-left:3px solid var(--build);}
+  .box.c{border-left:3px solid var(--catalyst);}
+
+  /* spatial pipeline */
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:6px;}
+  .flow .col{display:flex;flex-direction:column;gap:8px;}
+  .flow .arrow{color:var(--muted);font-size:18px;text-align:center;}
+  .flow .fbox{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 12px;box-shadow:var(--shadow);}
+  .flow .fbox .t{font-size:12.5px;font-weight:600;}
+  .flow .fbox .d{font-size:11.5px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+  .flow .head{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;font-weight:700;}
+  .note{font-size:12.5px;color:var(--ink-2);margin-top:12px;padding:11px 13px;background:var(--surface-3);border-radius:9px;border:1px solid var(--border);}
+  .note b{color:var(--ink);}
+
+  /* 2-tier table */
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .tier{padding:16px 17px;}
+  .tier .th{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .tier .th .dot{width:10px;height:10px;border-radius:3px;}
+  .tier h3{font-size:14.5px;margin:0;font-weight:660;}
+  .tier .win{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:11px;}
+  .tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;}
+  .tier li{font-size:13px;display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:7px;}
+  .tier li:last-child{border-bottom:none;}
+  .tier li span{color:var(--muted);font-family:var(--mono);font-size:11.5px;white-space:nowrap;}
+
+  /* tool catalog */
+  .tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+  .tool{padding:15px 16px;border-top:3px solid var(--build);}
+  .tool.reuse{border-top-color:var(--reuse);}
+  .tool.cat{border-top-color:var(--catalyst);}
+  .tool .tt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .tool .tname{font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--ink);}
+  .pill{font-size:10.5px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:600;letter-spacing:.02em;}
+  .pill.build{background:color-mix(in srgb,var(--build) 15%,transparent);color:var(--build);}
+  .pill.reuse{background:color-mix(in srgb,var(--reuse) 16%,transparent);color:var(--reuse);}
+  .pill.cat{background:color-mix(in srgb,var(--catalyst) 18%,transparent);color:var(--catalyst);}
+  .tool .desc{font-size:12.5px;color:var(--ink-2);margin:0 0 10px;}
+  .tool dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px;}
+  .tool dt{color:var(--muted);font-family:var(--mono);font-size:11px;}
+  .tool dd{margin:0;color:var(--ink-2);}
+  .tool dd .mono{color:var(--ink);}
+
+  /* scoring */
+  .formula{font-family:var(--mono);font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;line-height:1.9;color:var(--ink);}
+  .formula .w{color:var(--build);}
+  .formula .neg{color:var(--warn);}
+  .axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px;}
+  .axis{padding:13px 15px;}
+  .axis h4{margin:0 0 5px;font-size:13px;font-weight:650;}
+  .axis .sig{font-family:var(--mono);font-size:11.5px;color:var(--build);}
+  .axis p{font-size:12px;color:var(--ink-2);margin:6px 0 0;}
+
+  /* env + roadmap */
+  .env{width:100%;border-collapse:collapse;font-size:13px;overflow:hidden;border-radius:11px;}
+  .env th,.env td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);}
+  .env thead th{background:var(--surface-2);color:var(--ink-2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;}
+  .env td:first-child{font-family:var(--mono);font-size:12px;color:var(--build);white-space:nowrap;}
+  .env tr:last-child td{border-bottom:none;}
+  .env-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);background:var(--surface);}
+
+  .road{display:flex;flex-direction:column;gap:12px;}
+  .phase{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;padding:15px 17px;border-left:4px solid var(--build);}
+  .phase.p2{border-left-color:var(--reuse);}
+  .phase.p3{border-left-color:var(--catalyst);}
+  .phase .pn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--build);white-space:nowrap;padding-top:2px;}
+  .phase.p2 .pn{color:var(--reuse);} .phase.p3 .pn{color:var(--catalyst);}
+  .phase h3{font-size:14.5px;margin:0 0 4px;font-weight:650;}
+  .phase p{font-size:12.5px;color:var(--ink-2);margin:0;}
+  .phase .items{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px;}
+
+  .caveat{border:1px solid color-mix(in srgb,var(--warn) 35%,var(--border));background:color-mix(in srgb,var(--warn) 7%,var(--surface));border-radius:11px;padding:16px 18px;}
+  .caveat h3{margin:0 0 8px;font-size:14px;color:var(--warn);display:flex;gap:8px;align-items:center;}
+  .caveat ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:5px;}
+  .legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink-2);}
+  .legend-row span{display:inline-flex;align-items:center;gap:6px;}
+  .legend-row i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.7;}
+
+  @media(max-width:680px){
+    .flow{grid-template-columns:1fr;} .flow .arrow{transform:rotate(90deg);}
+    .tiers{grid-template-columns:1fr;} .theme-btn{position:static;margin-bottom:14px;}
+  }
+</style>
+
+<div class="wrap">
+  <button class="theme-btn" id="themeBtn">◐ 테마</button>
+  <header>
+    <div class="kicker"><span class="sq"></span>MCP SERVER DESIGN · v0.1 (draft)</div>
+    <h1>서울 부동산 인사이트 MCP 서버</h1>
+    <p class="lede">서울 25개 자치구를 기준 단위로, 20년치 가격 트렌드와 학군·범죄·유동인구·소득을
+      하나의 투명한 지표 체계로 결합하는 설계도. 기존 오픈소스 MCP는 재활용하고, 시장의 빈틈만 직접 구축합니다.</p>
+    <div class="meta">
+      <span class="tag">기준 단위 <b>자치구 25</b></span>
+      <span class="tag">시계열 <b>2006〜 · 분기</b></span>
+      <span class="tag">전략 <b>재활용+직접 하이브리드</b></span>
+      <span class="tag">런타임 <b>Node · MCP SDK</b></span>
+      <span class="tag" style="border-color:color-mix(in srgb,var(--warn) 40%,var(--border));color:var(--warn)">⚠ 투자조언 아님 · 지표 제공</span>
+    </div>
+  </header>
+
+  <!-- 1. 원칙 -->
+  <h2><span class="n">01</span> 설계 원칙</h2>
+  <div class="principles">
+    <div class="card"><span class="pi">🧭</span><h3>공간 단위 통일</h3><p>서로 다른 지리 단위(지번·경찰서·행정동·시군구)를 <b>자치구 25개</b>로 롤업해 비교 가능하게 만든다.</p></div>
+    <div class="card"><span class="pi">🕰️</span><h3>2단 시계열</h3><p>가격·거래량·금리는 <b>20년 분기 장기 코어</b>, 소득·범죄·학군은 <b>스냅샷+연 추세</b>로 분리 설계.</p></div>
+    <div class="card"><span class="pi">♻️</span><h3>재활용 우선</h3><p>지오코딩·KOSIS 등 검증된 MCP는 그대로 붙이고, <b>공간통일·스코어 로직만</b> 직접 소유한다.</p></div>
+    <div class="card"><span class="pi">⚖️</span><h3>투명한 가중치</h3><p>종합 스코어의 가중치는 숨기지 않고 <b>입력 파라미터로 노출</b> — 판단은 사용자 몫.</p></div>
+    <div class="card"><span class="pi">📐</span><h3>지수·실질 보정</h3><p>단순평균 대신 <b>실거래가격지수</b>, 명목 대신 <b>CPI 실질화</b>로 20년 비교의 왜곡 제거.</p></div>
+  </div>
+
+  <!-- 2. 아키텍처 -->
+  <h2><span class="n">02</span> 아키텍처 · 데이터 흐름</h2>
+  <div class="stack">
+    <div class="layer">
+      <div class="lh"><span class="idx">L1</span><h3>원천 API</h3><span class="sub">7개 기관</span></div>
+      <div class="row">
+        <span class="box b">국토부 실거래가</span>
+        <span class="box b">한국부동산원 R-ONE(지수)</span>
+        <span class="box b">한국은행 ECOS(금리)</span>
+        <span class="box b">경찰청 범죄통계</span>
+        <span class="box b">서울시 생활인구</span>
+        <span class="box b">학교알리미</span>
+        <span class="box src">KOSIS 소득 <em>(재활용)</em></span>
+        <span class="box src">네이버/카카오 지오코딩 <em>(재활용)</em></span>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lh"><span class="idx">L2</span><h3>수집 · 캐시</h3><span class="sub">파싱 · 레이트리밋 · 로컬 캐시</span></div>
+      <div class="row">
+        <span class="box">XML/JSON 파서</span>
+        <span class="box">응답 캐시(디스크)</span>
+        <span class="box">재시도·백오프</span>
+        <span class="box">법정동/행정동 코드북</span>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lh"><span class="idx">L3</span><h3>정규화</h3><span class="sub">공간 → 자치구 · 시간 → 분기 · 명목 → 실질</span></div>
+      <div class="row">
+        <span class="box">공간 롤업(→구25)</span>
+        <span class="box">분기 리샘플</span>
+        <span class="box">CPI 실질화</span>
+        <span class="box">인구 정규화(범죄율)</span>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lh"><span class="idx">L4</span><h3>지표 계산 · 종합 스코어</h3><span class="sub">CAGR · 전세가율 · 학군지수 · 가중합</span></div>
+      <div class="row">
+        <span class="box b">가격 트렌드</span>
+        <span class="box b">임대수익축</span>
+        <span class="box b">수요축</span>
+        <span class="box b">정주여건축</span>
+        <span class="box b">종합 스코어</span>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lh"><span class="idx">L5</span><h3>MCP 도구 레이어</h3><span class="sub">stdio · 아래 카탈로그</span></div>
+      <div class="row">
+        <span class="box b">get_price_trend</span>
+        <span class="box b">get_jeonse_ratio</span>
+        <span class="box b">get_crime_rate</span>
+        <span class="box b">get_living_population</span>
+        <span class="box b">get_school_index</span>
+        <span class="box b">get_district_score</span>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lh"><span class="idx">L6</span><h3>클라이언트</h3><span class="sub">Claude Desktop / Code</span></div>
+      <div class="row"><span class="box">자연어 질의 → 도구 호출 → 대시보드 시각화</span></div>
+    </div>
+  </div>
+  <div class="legend-row">
+    <span><i style="background:var(--build)"></i>직접 구축</span>
+    <span><i style="background:var(--reuse)"></i>재활용(외부 MCP)</span>
+    <span><i style="background:var(--catalyst)"></i>호재 레이어(2단계+)</span>
+  </div>
+
+  <!-- 3. 공간 통일 -->
+  <h2><span class="n">03</span> 공간 단위 통일 파이프라인</h2>
+  <div class="flow">
+    <div class="col">
+      <div class="head">원천(제각각)</div>
+      <div class="fbox"><div class="t">실거래가</div><div class="d">법정동코드</div></div>
+      <div class="fbox"><div class="t">생활인구</div><div class="d">행정동코드</div></div>
+      <div class="fbox"><div class="t">학교·학원</div><div class="d">지번 주소</div></div>
+      <div class="fbox"><div class="t">범죄</div><div class="d">경찰서 관할</div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col">
+      <div class="head">변환</div>
+      <div class="fbox"><div class="t">코드 앞자리 매핑</div><div class="d">code[:5] → 구</div></div>
+      <div class="fbox"><div class="t">지오코딩</div><div class="d">주소→좌표→구</div></div>
+      <div class="fbox"><div class="t">관할 매핑표</div><div class="d">경찰서↔구(수동)</div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col">
+      <div class="head">공통 단위</div>
+      <div class="fbox" style="border-left:3px solid var(--build)"><div class="t">자치구 25</div><div class="d">gu_code (11xxx)</div></div>
+    </div>
+  </div>
+  <div class="note">💡 <b>핵심 통찰</b>: 실거래가·생활인구는 <b>코드 앞자리만으로 자치구가 나와 지오코딩이 필요 없다.</b>
+    지오코딩(재활용)은 <b>지번 좌표가 필요한 점 데이터(학교·학원)</b>에만 쓴다. 경찰서 관할은 자치구와 다대다라
+    <b>수동 매핑표</b>를 두거나 서울경찰청의 자치구별 집계를 우선 사용한다.</div>
+
+  <!-- 4. 2단 시계열 -->
+  <h2><span class="n">04</span> 2단 시계열 설계</h2>
+  <div class="tiers">
+    <div class="card tier">
+      <div class="th"><span class="dot" style="background:var(--build)"></span><h3>Tier 1 · 장기 코어</h3></div>
+      <div class="win">2006〜현재 · 분기 리샘플</div>
+      <ul>
+        <li>아파트 매매가·중위가·㎡당가 <span>국토부</span></li>
+        <li>거래량 <span>국토부</span></li>
+        <li>실거래가격지수 <span>부동산원</span></li>
+        <li>전세가율·월세수익률 <span>국토부 전월세</span></li>
+        <li>기준금리·주담대금리 <span>ECOS</span></li>
+      </ul>
+    </div>
+    <div class="card tier">
+      <div class="th"><span class="dot" style="background:var(--catalyst)"></span><h3>Tier 2 · 스냅샷 + 연 추세</h3></div>
+      <div class="win">가용 기간만 · 연 단위</div>
+      <ul>
+        <li>평균 근로소득 <span>KOSIS · 연</span></li>
+        <li>5대범죄율 <span>경찰청 · 연</span></li>
+        <li>유동인구(생활인구) <span>서울시 · 2017〜</span></li>
+        <li>학군 강도 <span>학교알리미 · 현재</span></li>
+        <li>공급(입주·미분양) <span>부동산원 · 월</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">두 티어는 <b>절대 억지로 같은 축에 겹치지 않는다.</b> 장기 트렌드 차트 위에 Tier 2는 "현재값 배지"나
+    별도 패널로 표시 — 8년치 유동인구를 20년 가격과 한 선에 그리면 왜곡이 생긴다.</div>
+
+  <!-- 5. 도구 카탈로그 -->
+  <h2><span class="n">05</span> MCP 도구 카탈로그</h2>
+  <div class="tools">
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_price_trend</span><span class="pill build">직접·T1</span></div>
+      <p class="desc">자치구·기간·주택유형별 분기 실거래가/중위가/㎡당가/거래량 시계열.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, from, to, type</span></dd>
+        <dt>output</dt><dd>분기 배열 + CAGR·변동성</dd>
+        <dt>source</dt><dd>국토부 실거래가</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_price_index</span><span class="pill build">직접·T1</span></div>
+      <p class="desc">실거래가격지수(평형 구성 왜곡 보정) + CPI 실질지수 동시 반환.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, from, to</span></dd>
+        <dt>output</dt><dd>명목·실질 지수 시계열</dd>
+        <dt>source</dt><dd>부동산원 R-ONE</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_jeonse_ratio</span><span class="pill build">직접·T1</span></div>
+      <p class="desc">전세가율·월세 환산수익률 — <b>임대수익 축</b>(시세차익과 별개).</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, from, to</span></dd>
+        <dt>output</dt><dd>전세가율·수익률 시계열</dd>
+        <dt>source</dt><dd>국토부 전월세</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_macro_context</span><span class="pill build">직접·T1</span></div>
+      <p class="desc">기준금리·주담대금리 오버레이 — 사이클 효과를 지역 효과와 분리.</p>
+      <dl><dt>input</dt><dd><span class="mono">from, to</span></dd>
+        <dt>output</dt><dd>금리 시계열</dd>
+        <dt>source</dt><dd>한국은행 ECOS</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_crime_rate</span><span class="pill build">직접·T2</span></div>
+      <p class="desc">인구 1천명당 5대범죄 정규화. 경찰서→자치구 매핑 내장.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, year</span></dd>
+        <dt>output</dt><dd>범죄율 + 유형별</dd>
+        <dt>source</dt><dd>경찰청 + 인구</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_living_population</span><span class="pill build">직접·T2</span></div>
+      <p class="desc">생활인구(유동인구) 유입·증감 추세. 주중/주말·시간대 옵션.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, from, to</span></dd>
+        <dt>output</dt><dd>생활인구 시계열·증감률</dd>
+        <dt>source</dt><dd>서울 생활인구</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_school_index</span><span class="pill build">직접·T2</span></div>
+      <p class="desc">자사고·특목고 밀도 + 대학진학률 + 학원가 밀집도의 합성 학군지수(proxy).</p>
+      <dl><dt>input</dt><dd><span class="mono">gu</span></dd>
+        <dt>output</dt><dd>학군지수 + 구성요소</dd>
+        <dt>source</dt><dd>학교알리미 + 상가업소</dd></dl>
+    </div>
+    <div class="card tool">
+      <div class="tt"><span class="tname">get_region_income</span><span class="pill reuse">재활용·T2</span></div>
+      <p class="desc">자치구 평균 근로/종합소득. KOSIS MCP를 얇게 래핑.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, year</span></dd>
+        <dt>output</dt><dd>1인당 소득</dd>
+        <dt>source</dt><dd>KOSIS / TASIS</dd></dl>
+    </div>
+    <div class="card tool" style="border-top-color:var(--build)">
+      <div class="tt"><span class="tname">get_district_score</span><span class="pill build">직접·오케스트레이터</span></div>
+      <p class="desc"><b>핵심.</b> 위 지표를 0〜100 정규화 후 가중합해 자치구 순위·레이더를 반환. 가중치는 입력으로 노출.</p>
+      <dl><dt>input</dt><dd><span class="mono">weights?, gus?</span></dd>
+        <dt>output</dt><dd>구별 종합점수·순위·축별 분해</dd>
+        <dt>uses</dt><dd>위 8개 도구</dd></dl>
+    </div>
+    <div class="card tool cat">
+      <div class="tt"><span class="tname">get_supply_pipeline</span><span class="pill cat">호재·2단계</span></div>
+      <p class="desc">입주물량·미분양·인허가 — 수요만 보는 편향 보정.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu, from, to</span></dd>
+        <dt>source</dt><dd>부동산원/국토부</dd></dl>
+    </div>
+    <div class="card tool cat">
+      <div class="tt"><span class="tname">get_development_catalyst</span><span class="pill cat">호재·2단계</span></div>
+      <p class="desc">GTX·지하철 신설, 재건축·재개발 구역 등 선반영 호재 플래그.</p>
+      <dl><dt>input</dt><dd><span class="mono">gu</span></dd>
+        <dt>source</dt><dd>다수(수집형)</dd></dl>
+    </div>
+  </div>
+
+  <!-- 6. 스코어 -->
+  <h2><span class="n">06</span> 종합 스코어 공식</h2>
+  <div class="formula">
+score(구) = <span class="w">w₁</span>·실질가격상승률 + <span class="w">w₂</span>·거래량추세 + <span class="w">w₃</span>·전세가율<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="w">w₄</span>·유동인구증가 + <span class="w">w₅</span>·평균소득 + <span class="w">w₆</span>·학군지수<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="neg">− w₇·범죄율 − w₈·공급과잉</span><br>
+&nbsp;&nbsp;<span style="color:var(--muted)">각 항 = min-max 정규화(0〜100), 역방향 지표는 부호 반전, Σwᵢ = 1</span>
+  </div>
+  <div class="axes">
+    <div class="card axis"><h4>자본수익 축</h4><span class="sig">실질가격 CAGR · 거래량</span><p>얼마나 꾸준히 오르는 구조인가.</p></div>
+    <div class="card axis"><h4>임대수익 축</h4><span class="sig">전세가율 · 월세수익률</span><p>보유 중 현금흐름. 자본수익과 종종 반대.</p></div>
+    <div class="card axis"><h4>수요 체력 축</h4><span class="sig">유동인구 · 소득</span><p>가격을 떠받치는 기반.</p></div>
+    <div class="card axis"><h4>정주여건 축</h4><span class="sig">학군 · (−)범죄</span><p>실거주·재판매 매력.</p></div>
+  </div>
+
+  <!-- 7. 환경변수 -->
+  <h2><span class="n">07</span> 환경변수</h2>
+  <div class="env-wrap">
+    <table class="env">
+      <thead><tr><th>변수</th><th>발급처</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td>MOLIT_API_KEY</td><td>공공데이터포털</td><td>국토부 실거래가(매매·전월세)</td></tr>
+        <tr><td>REB_API_KEY</td><td>공공데이터포털</td><td>한국부동산원 실거래가격지수</td></tr>
+        <tr><td>ECOS_API_KEY</td><td>한국은행</td><td>기준금리·주담대금리</td></tr>
+        <tr><td>DATA_GO_KR_KEY</td><td>공공데이터포털</td><td>경찰청 범죄·학교알리미</td></tr>
+        <tr><td>SEOUL_OPEN_API_KEY</td><td>서울 열린데이터광장</td><td>생활인구(유동인구)</td></tr>
+        <tr><td>KOSIS_API_KEY</td><td>KOSIS</td><td>지역별 소득</td></tr>
+        <tr><td>NAVER_MAP_ID / _SECRET</td><td>네이버 클라우드</td><td>지오코딩(점 데이터)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8. 로드맵 -->
+  <h2><span class="n">08</span> 구축 로드맵</h2>
+  <div class="road">
+    <div class="card phase p1">
+      <div class="pn">PHASE 1</div>
+      <div><h3>장기 가격 코어</h3><p>가장 확실하고 임팩트 큰 것부터. 자치구별 20년 분기 가격·거래량·전세가율 + 검증(실거래가공개시스템 표본 대조).</p>
+        <div class="items">get_price_trend · get_price_index · get_jeonse_ratio</div></div>
+    </div>
+    <div class="card phase p2">
+      <div class="pn">PHASE 2</div>
+      <div><h3>맥락 + 정주여건 스냅샷</h3><p>금리 오버레이·실질보정, 소득(재활용)·범죄·유동인구·학군 스냅샷 결합, 종합 스코어 1차.</p>
+        <div class="items">get_macro_context · get_crime_rate · get_living_population · get_school_index · get_region_income · get_district_score</div></div>
+    </div>
+    <div class="card phase p3">
+      <div class="pn">PHASE 3</div>
+      <div><h3>공급·호재 레이어 + 대시보드</h3><p>입주물량·미분양, 교통·정비 호재 플래그, 그리고 전용 HTML 대시보드(반도체 대시보드 스타일).</p>
+        <div class="items">get_supply_pipeline · get_development_catalyst · dashboard</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 한계 -->
+  <h2><span class="n">09</span> 한계 · 반드시 명시할 전제</h2>
+  <div class="caveat">
+    <h3>⚠ 이 서버가 하지 않는 것</h3>
+    <ul>
+      <li><b>투자 조언 아님</b> — "어디를 사라"를 말하지 않는다. 지표를 조회·시각화할 뿐, 가중치와 결정은 사용자 몫.</li>
+      <li><b>과거 ≠ 미래</b> — 지난 20년은 저금리·상승장 비중이 컸다. 트렌드는 구조 파악용이지 수익 보장이 아니다.</li>
+      <li><b>학군은 proxy</b> — "서울대 진학률"은 공개 데이터가 없다. 자사고 밀도·진학률·학원가로 <b>근사</b>할 뿐임을 표기.</li>
+      <li><b>공간 근사 오차</b> — 경찰서 관할↔자치구, 원천징수지↔거주지 소득 등 불일치가 존재. 참고 지표로 볼 것.</li>
+      <li><b>동 단위 한계</b> — 소득·범죄는 자치구 해상도까지만. 같은 구 안의 동네 차이는 못 본다.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <b>서울 부동산 인사이트 MCP · 설계도 v0.1</b> — 데이터: 국토교통부 실거래가, 한국부동산원, 한국은행 ECOS,
+    경찰청, 서울 열린데이터광장, 학교알리미, KOSIS. 재활용 후보: awesome-mcp-korea 목록의 지오코딩·KOSIS·data.go.kr 서버.<br>
+    이 문서는 구현 전 설계 초안이며, 각 API의 최신 스펙·제공기간·라이선스는 착수 시 재확인이 필요합니다.
+  </footer>
+</div>
+
+<script>
+  const btn=document.getElementById("themeBtn");
+  const dark=()=>{const a=document.documentElement.getAttribute("data-theme");return a?a==="dark":matchMedia("(prefers-color-scheme: dark)").matches;};
+  const label=()=>btn.textContent=(dark()?"☀ 라이트":"☾ 다크");
+  btn.addEventListener("click",()=>{document.documentElement.setAttribute("data-theme",dark()?"light":"dark");label();});
+  label();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",label);
+</script>

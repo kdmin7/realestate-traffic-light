@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부동산 퀀트 AI 시스템: 에이전트 & MCP 페르소나 및 아키텍처</title>
+  <style>
+    :root {
+      --mck-navy-dark: #051C2C;
+      --mck-navy-base: #0A2540;
+      --mck-blue-accent: #005587;
+      --mck-blue-light: #38BDF8;
+      --mck-bg: #F1F5F9;
+      --mck-card: #FFFFFF;
+      --mck-border: #E2E8F0;
+      
+      --role-collector: #6366F1;
+      --role-analyst: #F59E0B;
+      --role-judge: #10B981;
+      --role-reporter: #EC4899;
+      --role-mcp: #8B5CF6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--mck-bg);
+      color: #1E293B;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    /* Header */
+    .header-banner {
+      background: linear-gradient(135deg, var(--mck-navy-dark) 0%, var(--mck-navy-base) 100%);
+      color: white;
+      padding: 48px;
+      border-radius: 16px;
+      margin-bottom: 40px;
+      border-bottom: 4px solid var(--mck-blue-accent);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .header-banner h1 {
+      font-size: 36px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    
+    .header-banner p {
+      font-size: 18px;
+      color: #CBD5E1;
+      max-width: 800px;
+    }
+
+    /* Architecture Pipeline Section */
+    .section-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--mck-navy-dark);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 24px;
+      background-color: var(--mck-blue-accent);
+      border-radius: 4px;
+    }
+
+    .pipeline-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 50px;
+      position: relative;
+    }
+
+    /* Connecting Lines */
+    .pipeline-container::after {
+      content: '';
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      right: 100px;
+      height: 4px;
+      background: #CBD5E1;
+      z-index: 0;
+      border-radius: 4px;
+    }
+
+    /* Agent Persona Cards */
+    .agent-card {
+      background: var(--mck-card);
+      border: 1px solid var(--mck-border);
+      border-radius: 16px;
+      padding: 30px;
+      width: 23%;
+      z-index: 1;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .agent-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+
+    .agent-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--mck-border);
+    }
+
+    .agent-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .bg-collector { background: var(--role-collector); }
+    .bg-analyst { background: var(--role-analyst); }
+    .bg-judge { background: var(--role-judge); }
+    .bg-reporter { background: var(--role-reporter); }
+
+    .agent-title h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--mck-navy-dark);
+      margin-bottom: 4px;
+    }
+    
+    .agent-title .slug {
+      font-size: 13px;
+      color: #64748B;
+      font-family: 'JetBrains Mono', monospace;
+      background: #F1F5F9;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .persona-desc {
+      font-size: 15px;
+      color: #334155;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    .task-list {
+      list-style: none;
+    }
+    .task-list li {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 10px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .task-list li::before {
+      content: '⚡';
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 12px;
+    }
+
+    /* MCP Card */
+    .mcp-section {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      border-radius: 16px;
+      padding: 40px;
+      color: white;
+      margin-bottom: 50px;
+      display: flex;
+      gap: 40px;
+      box-shadow: 0 10px 25px rgba(49,46,129,0.2);
+    }
+
+    .mcp-info {
+      flex: 1;
+    }
+    
+    .mcp-info h2 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #A5B4FC;
+      margin-bottom: 12px;
+    }
+    
+    .mcp-info p {
+      font-size: 16px;
+      color: #E0E7FF;
+      margin-bottom: 24px;
+    }
+
+    .mcp-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .tool-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .tool-card h4 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    
+    .tool-card p {
+      font-size: 13px;
+      color: #C7D2FE;
+      margin: 0;
+    }
+
+    /* Interaction Flow */
+    .flow-diagram {
+      background: var(--mck-card);
+      border: 1px solid var(--mck-border);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #F8FAFC;
+      border-radius: 8px;
+      border-left: 4px solid var(--mck-blue-accent);
+    }
+    
+    .flow-step {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--mck-navy-dark);
+      width: 100px;
+      flex-shrink: 0;
+    }
+    
+    .flow-desc {
+      font-size: 15px;
+      color: #334155;
+    }
+    
+    .flow-desc b {
+      color: var(--mck-blue-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="header-banner">
+      <h1>부동산 퀀트 AI 시스템: 에이전트 &amp; MCP 페르소나 구조도</h1>
+      <p>데이터 수집부터 퀀트 분석, 의사결정 판정, 최종 리포트 및 이메일 발송까지 유기적으로 연결된 4단계 자율 에이전트 파이프라인과 MCP(Model Context Protocol) 아키텍처 매뉴얼입니다.</p>
+    </div>
+
+    <!-- Agent Pipeline -->
+    <div class="section-title">4-Stage Agent Pipeline (자율 에이전트 파이프라인)</div>
+    <div class="pipeline-container">
+      
+      <!-- Agent 1: Data Collector -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-icon bg-collector">📡</div>
+          <div class="agent-title">
+            <h3>데이터 수집가</h3>
+            <span class="slug">re-data-collector</span>
+          </div>
+        </div>
+        <div class="persona-desc">"정확한 원천 데이터를 빠짐없이 수집하여 분석의 기반을 다집니다."</div>
+        <ul class="task-list">
+          <li>MCP 도구를 호출하여 국토부 실거래가 조회</li>
+          <li>한국은행 ECOS 기준금리 및 금리 전망 API 수집</li>
+          <li>수집된 JSON/XML 데이터를 마크다운 원자재로 변환하여 저장</li>
+        </ul>
+      </div>
+
+      <!-- Agent 2: Trend Analyst -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-icon bg-analyst">📊</div>
+          <div class="agent-title">
+            <h3>트렌드 분석가</h3>
+            <span class="slug">re-trend-risk-analyst</span>
+          </div>
+        </div>
+        <div class="persona-desc">"수집된 원시 데이터 속에서 숨겨진 패턴과 리스크 점수를 도출합니다."</div>
+        <ul class="task-list">
+          <li>원자재 파일을 읽어 전세가율 및 평당가 트렌드 분석</li>
+          <li>금리 민감도 및 학군 프리미엄 기반 리스크 스코어링 (0~100점)</li>
+          <li>객관적인 퀀트 지표를 점수표 형태로 저장</li>
+        </ul>
+      </div>
+
+      <!-- Agent 3: Timing Judge -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-icon bg-judge">⚖️</div>
+          <div class="agent-title">
+            <h3>판단 엔진</h3>
+            <span class="slug">re-timing-judge</span>
+          </div>
+        </div>
+        <div class="persona-desc">"감정을 배제하고 오직 규칙과 점수에 기반하여 냉철한 매수/관망 신호를 판정합니다."</div>
+        <ul class="task-list">
+          <li>트렌드 점수를 읽고 사전에 정의된 알고리즘 룰셋 적용</li>
+          <li>🟢매수고려 / 🟡주의 / 🔴관망 3단계 교통신호 판정</li>
+          <li>LTV 50% 기준 3년 기대 ROI 수익성 시뮬레이션 계산</li>
+        </ul>
+      </div>
+
+      <!-- Agent 4: Briefing Reporter -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-icon bg-reporter">📝</div>
+          <div class="agent-title">
+            <h3>리포터 / 발행인</h3>
+            <span class="slug">re-briefing-reporter</span>
+          </div>
+        </div>
+        <div class="persona-desc">"복잡한 숫자를 경영진이 3초 만에 이해할 수 있는 맥킨지 스타일의 전략 브리핑으로 번역합니다."</div>
+        <ul class="task-list">
+          <li>결론-이유-할일 3단 구조의 직관적인 브리핑 문서 작성</li>
+          <li>1920x1080 FHD 맞춤형 HTML 게시판 대시보드 생성</li>
+          <li>Gmail 인라인 렌더링 호환 이메일 템플릿 생성 및 정기 발송 자동화</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- MCP Section -->
+    <div class="mcp-section">
+      <div class="mcp-info">
+        <h2>MCP (Model Context Protocol) 툴킷 서버</h2>
+        <p>에이전트들이 외부 세상(API, DB, 메일서버)과 소통할 수 있도록 권한과 도구를 제공하는 핵심 인프라 계층입니다. 현재 부동산 전용 로컬 서버 및 IpziTalk 클라우드 플러그인이 연동되어 있습니다.</p>
+        <div style="display:inline-block; background:rgba(165,180,252,0.2); color:#C7D2FE; padding:6px 16px; border-radius:20px; font-size:14px; font-weight:700;">
+          작동 위치: /MCP/realestate-server.js
+        </div>
+      </div>
+      <div style="flex:1;">
+        <div class="mcp-tools">
+          <div class="tool-card">
+            <h4>📡 Public API Connectors</h4>
+            <p>국토교통부 실거래가 OPEN API, 한국은행 ECOS 통계, 나이스(NEIS) 학군 정보 실시간 조회</p>
+          </div>
+          <div class="tool-card">
+            <h4>📨 Nodemailer Mailer</h4>
+            <p>SMTP_USER, SMTP_PASS 환경변수 기반 무인 백그라운드 자동 메일 발송 모듈</p>
+          </div>
+          <div class="tool-card">
+            <h4>🤖 IpziTalk Skills 연동</h4>
+            <p>27종 카탈로그(임장 보고서 생성, 임대차 계약서 리뷰 등) 외부 전문 스킬 접근 권한</p>
+          </div>
+          <div class="tool-card">
+            <h4>💾 Local File System</h4>
+            <p>마크다운, JSON, HTML 아티팩트의 실시간 읽기/쓰기 및 파일 무결성 보장</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interaction Flow -->
+    <div class="section-title">End-to-End 작동 관계 및 워크플로우</div>
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-step">STEP 01</div>
+        <div class="flow-desc"><b>[trigger]</b> 사용자의 "/매수타이밍" 명령 또는 스케줄러(매주 목요일 09:00)에 의해 파이프라인 가동</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">STEP 02</div>
+        <div class="flow-desc"><b>[re-data-collector]</b>가 MCP 서버를 호출하여 25개 자치구의 최신 실거래가 및 ECOS 금리 데이터를 Fetch ➔ <code>mapo_raw.md</code> 저장</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">STEP 03</div>
+        <div class="flow-desc"><b>[re-trend-risk-analyst]</b>가 원자재를 읽고 트렌드 분석 및 학군/금리 리스크 스코어링 진행 ➔ <code>mapo_scores.md</code> 저장</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">STEP 04</div>
+        <div class="flow-desc"><b>[re-timing-judge]</b>가 스코어를 기반으로 규칙 엔진 가동, LTV 50% ROI 산출 및 매수/관망 신호 판정 ➔ <code>mapo_signal.md</code> 저장</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">STEP 05</div>
+        <div class="flow-desc"><b>[re-briefing-reporter]</b>가 최종 신호들을 취합하여 맥킨지 스타일의 2-Page HTML 대시보드 및 인라인 이메일 템플릿 빌드</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">STEP 06</div>
+        <div class="flow-desc"><b>[Nodemailer MCP]</b>를 통해 완성된 리포트를 경영진 이메일(`kdmin7@gmail.com`)로 안전하게 전송 완료</div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

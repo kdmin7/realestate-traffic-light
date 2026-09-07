@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.xn--2i4b29e45ae11a8la.com)",
+      "WebFetch(domain:www.bok.or.kr)",
+      "WebFetch(domain:kosis.kr)",
+      "WebFetch(domain:asil.kr)",
+      "WebFetch(domain:superkts.com)",
+      "WebFetch(domain:buking.kr)",
+      "WebFetch(domain:data.songpa.seoul.kr)",
+      "WebFetch(domain:stat.molit.go.kr)",
+      "WebFetch(domain:jumin.mois.go.kr)",
+      "WebFetch(domain:www.karnews.or.kr)",
+      "WebFetch(domain:www.asiae.co.kr)",
+      "WebFetch(domain:land.seoul.go.kr)",
+      "WebFetch(domain:biz.heraldcorp.com)",
+      "WebFetch(domain:v.daum.net)",
+      "WebFetch(domain:landstockbiz.com)",
+      "WebFetch(domain:hogangnono.com)",
+      "Skill(artifact-design)",
+      "WebFetch(domain:rt.molit.go.kr)",
+      "WebFetch(domain:www.reb.or.kr)",
+      "WebFetch(domain:ipzi-talk.synergylabs.kr)",
+      "WebFetch(domain:github.com)",
+      "Artifact",
+      "Bash(claude mcp *)",
+      "Bash(plugin *)"
+    ]
+  }
+}

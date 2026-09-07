@@ -1,0 +1,16 @@
+{
+  "name": "realestate_prj",
+  "version": "1.0.0",
+  "description": "> **4개의 AI 에이전트가 켜주는 매수 타이밍 신호**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^9.0.5"
+  }
+}

@@ -1,0 +1,519 @@
+<title>대미 반도체 수출입 대시보드 · HS 8541</title>
+<style>
+  :root {
+    --plane:       #eef1f4;
+    --surface:     #ffffff;
+    --surface-2:   #f7f9fb;
+    --ink:         #0b0f14;
+    --ink-2:       #4b5560;
+    --muted:       #7c8792;
+    --grid:        #e3e8ee;
+    --axis:        #c4cdd6;
+    --ring:        rgba(11,15,20,0.09);
+    --exp:         #2a78d6;   /* 수출 */
+    --imp:         #eb6834;   /* 수입 */
+    --pos:         #0ca30c;   /* 흑자 */
+    --pos-ink:     #067006;
+    --neg:         #d03b3b;   /* 적자 */
+    --neg-ink:     #b52a2a;
+    --shadow:      0 1px 2px rgba(11,15,20,0.04), 0 8px 24px rgba(11,15,20,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --plane:     #0c0e11;
+      --surface:   #16191d;
+      --surface-2: #1c2025;
+      --ink:       #f2f5f8;
+      --ink-2:     #b6c0ca;
+      --muted:     #808b96;
+      --grid:      #262b31;
+      --axis:      #363c43;
+      --ring:      rgba(255,255,255,0.10);
+      --exp:       #3987e5;
+      --imp:       #d95926;
+      --pos:       #23b823;
+      --pos-ink:   #4fd24f;
+      --neg:       #e35555;
+      --neg-ink:   #f07d7d;
+      --shadow:    0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="light"] {
+    --plane:#eef1f4; --surface:#ffffff; --surface-2:#f7f9fb; --ink:#0b0f14; --ink-2:#4b5560;
+    --muted:#7c8792; --grid:#e3e8ee; --axis:#c4cdd6; --ring:rgba(11,15,20,0.09);
+    --exp:#2a78d6; --imp:#eb6834; --pos:#0ca30c; --pos-ink:#067006; --neg:#d03b3b; --neg-ink:#b52a2a;
+    --shadow:0 1px 2px rgba(11,15,20,0.04),0 8px 24px rgba(11,15,20,0.05);
+  }
+  :root[data-theme="dark"] {
+    --plane:#0c0e11; --surface:#16191d; --surface-2:#1c2025; --ink:#f2f5f8; --ink-2:#b6c0ca;
+    --muted:#808b96; --grid:#262b31; --axis:#363c43; --ring:rgba(255,255,255,0.10);
+    --exp:#3987e5; --imp:#d95926; --pos:#23b823; --pos-ink:#4fd24f; --neg:#e35555; --neg-ink:#f07d7d;
+    --shadow:0 1px 2px rgba(0,0,0,0.4),0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+    font-feature-settings: "tnum" 0;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 28px 24px 64px; }
+
+  /* ---- Header ---- */
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--exp); margin: 0 0 6px; }
+  h1 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 700; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+  .subtitle { color: var(--ink-2); font-size: 14px; margin: 8px 0 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip { font-size: 12.5px; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--ring); border-radius: 999px; padding: 5px 12px; }
+  .chip b { color: var(--ink); font-weight: 650; }
+  .theme-btn { background: var(--surface); color: var(--ink-2); border: 1px solid var(--ring); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .theme-btn:hover { color: var(--ink); }
+  .theme-btn:focus-visible { outline: 2px solid var(--exp); outline-offset: 2px; }
+
+  /* ---- KPI ---- */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px; }
+  .kpi { background: var(--surface); border: 1px solid var(--ring); border-radius: 14px; padding: 20px 20px 18px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .kpi::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background: var(--accent, var(--exp)); }
+  .kpi .label { font-size: 13px; color: var(--ink-2); font-weight: 550; margin: 0 0 10px; display:flex; align-items:center; gap:7px; }
+  .kpi .dot { width:9px; height:9px; border-radius:3px; background: var(--accent, var(--exp)); flex:none; }
+  .kpi .value { font-size: clamp(26px, 3.2vw, 34px); font-weight: 720; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .kpi .unit { font-size: 14px; color: var(--muted); font-weight: 600; margin-left: 4px; letter-spacing: 0; }
+  .kpi .sub { font-size: 12.5px; color: var(--muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
+
+  /* ---- Panels ---- */
+  .grid-2 { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; margin-bottom: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--ring); border-radius: 14px; padding: 18px 18px 12px; box-shadow: var(--shadow); }
+  .panel h2 { font-size: 15px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .panel .hint { font-size: 12.5px; color: var(--muted); margin: 3px 0 0; }
+  .panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom: 6px; }
+  .legend { display: flex; gap: 14px; align-items: center; flex: none; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); font-weight: 500; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .chart { width: 100%; }
+  .chart svg { width: 100%; display: block; overflow: visible; }
+
+  text { font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; }
+  .ax { fill: var(--muted); font-size: 11px; }
+  .ax-num { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .val-lbl { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .bar { transition: opacity .12s; cursor: pointer; }
+  .bar.dim { opacity: .32; }
+
+  /* ---- Tooltip ---- */
+  .tip { position: fixed; pointer-events: none; z-index: 50; background: var(--ink); color: var(--surface); padding: 9px 11px; border-radius: 9px; font-size: 12.5px; line-height: 1.5; box-shadow: 0 6px 20px rgba(0,0,0,.28); opacity: 0; transform: translateY(3px); transition: opacity .1s; max-width: 260px; }
+  .tip.on { opacity: 1; transform: none; }
+  .tip .t-title { font-weight: 650; margin-bottom: 4px; }
+  .tip .t-row { display: flex; justify-content: space-between; gap: 18px; font-variant-numeric: tabular-nums; }
+  .tip .t-row .k { color: rgba(255,255,255,.66); }
+  :root[data-theme="dark"] .tip, @media (prefers-color-scheme: dark) { }
+
+  /* ---- Table ---- */
+  .table-wrap { overflow-x: auto; margin-top: 4px; border-radius: 12px; border: 1px solid var(--ring); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; background: var(--surface); }
+  thead th { text-align: right; font-weight: 600; color: var(--ink-2); background: var(--surface-2); padding: 11px 14px; border-bottom: 1px solid var(--ring); white-space: nowrap; position: sticky; top: 0; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+  tbody tr.total td { font-weight: 700; background: var(--surface-2); border-top: 1.5px solid var(--axis); }
+  td.pos { color: var(--pos-ink); }
+  td.neg { color: var(--neg-ink); }
+  .tbl-toggle { background: none; border: 1px solid var(--ring); color: var(--ink-2); border-radius: 8px; padding: 6px 12px; font-size: 12.5px; font-family: inherit; cursor: pointer; }
+  .tbl-toggle:hover { color: var(--ink); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 18px; line-height: 1.7; }
+  .caption b { color: var(--ink-2); font-weight: 600; }
+  section { margin-top: 16px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">관세청 · 품목별 국가별 수출입실적</p>
+      <h1>대미(對美) 반도체 수출입 대시보드</h1>
+      <p class="subtitle">HS 8541(다이오드·트랜지스터·광전지 등) 기준 · 대한민국 → 미국</p>
+      <div class="chips">
+        <span class="chip">국가 <b>미국 (US)</b></span>
+        <span class="chip">품목 <b>HS 8541</b></span>
+        <span class="chip">기간 <b>2025.09 – 2025.12</b></span>
+        <span class="chip">단위 <b>USD</b></span>
+      </div>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="테마 전환">
+      <span id="themeIcon">◐</span><span id="themeLabel">테마</span>
+    </button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>월별 수출 · 수입</h2>
+          <p class="hint">막대에 마우스를 올리면 상세 금액이 표시됩니다</p>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--exp)"></i>수출</span>
+          <span><i style="background:var(--imp)"></i>수입</span>
+        </div>
+      </div>
+      <div class="chart" id="chartMonthly"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>월별 무역수지 추이</h2>
+          <p class="hint">수출 − 수입 (전 기간 흑자)</p>
+        </div>
+      </div>
+      <div class="chart" id="chartBalance"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>품목별 순무역수지 (4개월 합산)</h2>
+        <p class="hint">오른쪽(파랑)=흑자, 왼쪽(빨강)=적자 · 값이 큰 순으로 정렬</p>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--exp)"></i>흑자</span>
+        <span><i style="background:var(--neg)"></i>적자</span>
+      </div>
+    </div>
+    <div class="chart" id="chartItems"></div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>상세 데이터</h2>
+        <p class="hint">품목별 4개월 합산 실적</p>
+      </div>
+      <button class="tbl-toggle" id="tblToggle" aria-expanded="false">표 펼치기</button>
+    </div>
+    <div id="tblContainer" hidden>
+      <div class="table-wrap">
+        <table id="dataTable">
+          <thead>
+            <tr><th>품목</th><th>수출금액</th><th>수입금액</th><th>무역수지</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <p class="caption">
+    <b>데이터 출처</b> · 공공데이터포털 「관세청_품목별 국가별 수출입실적」 API (getNitemtradeList), <code>get_semiconductor_trade</code> MCP 도구로 조회.<br>
+    <b>참고</b> · HS 8541에는 다이오드·트랜지스터뿐 아니라 <b>광전지(태양전지)</b>가 포함되며, 전 기간 흑자의 대부분은 태양전지 품목에서 발생합니다.
+    메모리·시스템 반도체(집적회로)는 별도 코드 <b>HS 8542</b>로 조회해야 합니다. 금액은 USD 기준.
+  </p>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// 원천 데이터: 대미 HS 8541 수출입 (2025.09–12), 단위 USD
+// [수출, 수입] 순, 품목 순서는 items 배열과 동일
+// ---------------------------------------------------------------------------
+const months = ["2025.09", "2025.10", "2025.11", "2025.12"];
+const items = [
+  "다이오드",
+  "전력다이오드 (<1W)",
+  "기타 다이오드",
+  "사이리스터·트라이액",
+  "LED (발광다이오드)",
+  "태양전지 (모듈 미조립)",
+  "태양전지 (모듈·패널)",
+  "기타 광전소자",
+  "반도체 트랜스듀서",
+  "기타 소자",
+  "압전소자",
+  "부분품",
+];
+// raw[monthIdx][itemIdx] = [exp, imp]
+const raw = [
+  [[920323,888978],[892583,1011750],[752255,6720273],[1982,21764],[339251,6830492],[17167513,986878],[1478879,1971],[153214,233903],[2479,97470],[233251,239270],[976753,444687],[89360,424740]],
+  [[1278364,699033],[909387,698424],[383920,2178992],[1801,481972],[344842,4725536],[24485027,16071],[7778571,29251],[113901,269733],[11437,134560],[236366,429050],[1231508,278940],[19935,111395]],
+  [[874750,834040],[802685,485214],[619638,1982260],[0,9661],[410045,4351462],[111173751,2793],[6754059,4749],[185174,314639],[19294,36836],[267298,393598],[779671,395400],[35986,45455]],
+  [[2067512,786062],[1009038,1008640],[660651,1471813],[953,161176],[1226070,6129902],[56567839,15139],[2514584,8680],[121323,536039],[6173,46644],[223727,555580],[802703,2269096],[1338962,214001]],
+];
+
+// ---- Aggregations ----
+const monthly = months.map((m, i) => {
+  let exp = 0, imp = 0;
+  raw[i].forEach(([e, im]) => { exp += e; imp += im; });
+  return { m, exp, imp, bal: exp - imp };
+});
+const itemTotals = items.map((name, j) => {
+  let exp = 0, imp = 0;
+  raw.forEach(row => { exp += row[j][0]; imp += row[j][1]; });
+  return { name, exp, imp, bal: exp - imp };
+});
+const grand = monthly.reduce((a, d) => ({ exp: a.exp + d.exp, imp: a.imp + d.imp }), { exp: 0, imp: 0 });
+grand.bal = grand.exp - grand.imp;
+
+// ---- Formatters ----
+const nf = new Intl.NumberFormat("en-US");
+const fmt = n => (n < 0 ? "-$" : "$") + nf.format(Math.abs(n));
+function fmtKR(n) {
+  const a = Math.abs(n), s = n < 0 ? "-" : "";
+  if (a >= 1e8) return s + (a / 1e8).toFixed(2) + "억";
+  if (a >= 1e4) return s + Math.round(a / 1e4).toLocaleString() + "만";
+  return s + nf.format(a);
+}
+const SVGNS = "http://www.w3.org/2000/svg";
+const el = (t, a = {}) => { const e = document.createElementNS(SVGNS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---- Tooltip ----
+const tip = document.getElementById("tip");
+function showTip(html, ev) {
+  tip.innerHTML = html; tip.classList.add("on");
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + w > innerWidth - 8) x = ev.clientX - w - pad;
+  if (y + h > innerHeight - 8) y = ev.clientY - h - pad;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+const hideTip = () => tip.classList.remove("on");
+
+// ---- KPI tiles ----
+function renderKPIs() {
+  const box = document.getElementById("kpis");
+  const cards = [
+    { label: "총 수출금액", value: grand.exp, color: "var(--exp)", sub: `4개월 합계 · 약 ${fmtKR(grand.exp)} 달러` },
+    { label: "총 수입금액", value: grand.imp, color: "var(--imp)", sub: `4개월 합계 · 약 ${fmtKR(grand.imp)} 달러` },
+    { label: "무역수지", value: grand.bal, color: "var(--pos)", sub: `흑자 · 수출이 수입의 ${(grand.exp / grand.imp).toFixed(1)}배` },
+  ];
+  box.innerHTML = cards.map(c => `
+    <div class="kpi" style="--accent:${c.color}">
+      <p class="label"><span class="dot"></span>${c.label}</p>
+      <div class="value">${c.value < 0 ? "−" : ""}$${nf.format(Math.abs(c.value))}<span class="unit">USD</span></div>
+      <p class="sub">${c.sub}</p>
+    </div>`).join("");
+}
+
+// ---- Chart 1: monthly grouped bars ----
+function renderMonthly() {
+  const host = document.getElementById("chartMonthly");
+  host.innerHTML = "";
+  const W = host.clientWidth || 640, H = 300;
+  const m = { t: 16, r: 8, b: 34, l: 46 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(...monthly.map(d => Math.max(d.exp, d.imp)));
+  const niceMax = Math.ceil(max / 2e7) * 2e7;
+  const y = v => m.t + ih - (v / niceMax) * ih;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "월별 수출입 막대그래프" });
+
+  // gridlines + y ticks (억 달러)
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = (niceMax / ticks) * i, yy = y(v);
+    svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: cssv("--grid"), "stroke-width": 1 }));
+    const tx = el("text", { x: m.l - 8, y: yy + 4, "text-anchor": "end", class: "ax-num" });
+    tx.textContent = v === 0 ? "0" : (v / 1e8).toFixed(1) + "억";
+    svg.appendChild(tx);
+  }
+  svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: cssv("--axis"), "stroke-width": 1.5 }));
+
+  const band = iw / monthly.length, bw = Math.min(38, band * 0.28), gap = 4;
+  monthly.forEach((d, i) => {
+    const cx = m.l + band * i + band / 2;
+    const x1 = cx - bw - gap / 2, x2 = cx + gap / 2;
+    [["exp", x1, cssv("--exp"), "수출"], ["imp", x2, cssv("--imp"), "수입"]].forEach(([key, x, col, lab]) => {
+      const v = d[key], bh = Math.max(0, y(0) - y(v));
+      const r = el("rect", { x, y: y(v), width: bw, height: bh, rx: 4, fill: col, class: "bar" });
+      r.addEventListener("mousemove", ev => showTip(
+        `<div class="t-title">${d.m} · ${lab}</div><div class="t-row"><span class="k">금액</span><span>${fmt(v)}</span></div>`, ev));
+      r.addEventListener("mouseleave", hideTip);
+      svg.appendChild(r);
+    });
+    const tx = el("text", { x: cx, y: H - 12, "text-anchor": "middle", class: "ax" });
+    tx.textContent = d.m.replace("2025.", "") + "월";
+    svg.appendChild(tx);
+  });
+  host.appendChild(svg);
+}
+
+// ---- Chart 2: balance area/line ----
+function renderBalance() {
+  const host = document.getElementById("chartBalance");
+  host.innerHTML = "";
+  const W = host.clientWidth || 400, H = 300;
+  const m = { t: 22, r: 16, b: 34, l: 46 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(...monthly.map(d => d.bal));
+  const niceMax = Math.ceil(max / 2e7) * 2e7;
+  const x = i => m.l + (iw / (monthly.length - 1)) * i;
+  const y = v => m.t + ih - (v / niceMax) * ih;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "월별 무역수지 추이" });
+
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = (niceMax / ticks) * i, yy = y(v);
+    svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: cssv("--grid"), "stroke-width": 1 }));
+    const tx = el("text", { x: m.l - 8, y: yy + 4, "text-anchor": "end", class: "ax-num" });
+    tx.textContent = v === 0 ? "0" : (v / 1e8).toFixed(1) + "억";
+    svg.appendChild(tx);
+  }
+
+  const pos = cssv("--pos");
+  const pts = monthly.map((d, i) => [x(i), y(d.bal)]);
+  const dLine = pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" ");
+  const dArea = `M${pts[0][0]} ${y(0)} ` + pts.map(p => "L" + p[0] + " " + p[1]).join(" ") + ` L${pts[pts.length - 1][0]} ${y(0)} Z`;
+
+  const gid = "balgrad";
+  const defs = el("defs");
+  const lg = el("linearGradient", { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 });
+  lg.appendChild(el("stop", { offset: "0%", "stop-color": pos, "stop-opacity": 0.26 }));
+  lg.appendChild(el("stop", { offset: "100%", "stop-color": pos, "stop-opacity": 0.02 }));
+  defs.appendChild(lg); svg.appendChild(defs);
+  svg.appendChild(el("path", { d: dArea, fill: `url(#${gid})` }));
+  svg.appendChild(el("path", { d: dLine, fill: "none", stroke: pos, "stroke-width": 2.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+  monthly.forEach((d, i) => {
+    const px = x(i), py = y(d.bal);
+    svg.appendChild(el("circle", { cx: px, cy: py, r: 4.5, fill: cssv("--surface"), stroke: pos, "stroke-width": 2.5 }));
+    const lbl = el("text", { x: px, y: py - 12, "text-anchor": "middle", class: "val-lbl", fill: cssv("--pos-ink"), "font-size": 11.5 });
+    lbl.textContent = fmtKR(d.bal);
+    svg.appendChild(lbl);
+    const hit = el("rect", { x: px - 22, y: m.t, width: 44, height: ih, fill: "transparent", class: "bar" });
+    hit.addEventListener("mousemove", ev => showTip(
+      `<div class="t-title">${d.m} · 무역수지</div>
+       <div class="t-row"><span class="k">수출</span><span>${fmt(d.exp)}</span></div>
+       <div class="t-row"><span class="k">수입</span><span>${fmt(d.imp)}</span></div>
+       <div class="t-row"><span class="k">수지</span><span>${fmt(d.bal)}</span></div>`, ev));
+    hit.addEventListener("mouseleave", hideTip);
+    svg.appendChild(hit);
+    const tx = el("text", { x: px, y: H - 12, "text-anchor": "middle", class: "ax" });
+    tx.textContent = d.m.replace("2025.", "") + "월";
+    svg.appendChild(tx);
+  });
+  host.appendChild(svg);
+}
+
+// ---- Chart 3: item diverging bars ----
+function renderItems() {
+  const host = document.getElementById("chartItems");
+  host.innerHTML = "";
+  const data = [...itemTotals].sort((a, b) => b.bal - a.bal);
+  const W = host.clientWidth || 900;
+  const rowH = 30, m = { t: 8, r: 20, b: 24, l: 150 };
+  const H = m.t + m.b + data.length * rowH;
+  const iw = W - m.l - m.r;
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.bal)));
+  const zero = m.l + iw * (maxAbs / (maxAbs + maxAbs)); // symmetric → center; but data skews positive
+  // Scale symmetric around zero using maxAbs on both sides
+  const xZero = m.l + iw * 0.62; // give more room to the dominant positive side
+  const posScale = (W - m.r - xZero) / maxAbs;
+  const negMax = Math.max(...data.filter(d => d.bal < 0).map(d => -d.bal), 1);
+  const negScale = (xZero - m.l) / (maxAbs); // keep same scale as positive for honesty
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "품목별 순무역수지" });
+
+  const posCol = cssv("--exp"), negCol = cssv("--neg");
+  data.forEach((d, i) => {
+    const cy = m.t + i * rowH + rowH / 2;
+    // item label
+    const lab = el("text", { x: m.l - 12, y: cy + 4, "text-anchor": "end", class: "ax", fill: cssv("--ink-2"), "font-size": 12 });
+    lab.textContent = d.name;
+    svg.appendChild(lab);
+
+    const isPos = d.bal >= 0;
+    const len = Math.abs(d.bal) * (isPos ? posScale : negScale);
+    const bx = isPos ? xZero : xZero - len;
+    const bw = Math.max(len, d.bal === 0 ? 0 : 2);
+    const rect = el("rect", { x: bx, y: cy - 9, width: bw, height: 18, rx: 4, fill: isPos ? posCol : negCol, class: "bar" });
+    rect.addEventListener("mousemove", ev => showTip(
+      `<div class="t-title">${d.name}</div>
+       <div class="t-row"><span class="k">수출</span><span>${fmt(d.exp)}</span></div>
+       <div class="t-row"><span class="k">수입</span><span>${fmt(d.imp)}</span></div>
+       <div class="t-row"><span class="k">수지</span><span>${fmt(d.bal)}</span></div>`, ev));
+    rect.addEventListener("mouseleave", hideTip);
+    svg.appendChild(rect);
+
+    // value label at bar end
+    const vlbl = el("text", {
+      x: isPos ? bx + bw + 7 : bx - 7,
+      y: cy + 4, "text-anchor": isPos ? "start" : "end",
+      class: "val-lbl", "font-size": 11.5,
+      fill: isPos ? cssv("--pos-ink") : cssv("--neg-ink"),
+    });
+    vlbl.textContent = (d.bal >= 0 ? "+" : "−") + "$" + fmtKR(Math.abs(d.bal));
+    svg.appendChild(vlbl);
+  });
+  // zero baseline
+  svg.appendChild(el("line", { x1: xZero, x2: xZero, y1: m.t, y2: H - m.b, stroke: cssv("--axis"), "stroke-width": 1.5 }));
+  host.appendChild(svg);
+}
+
+// ---- Table ----
+function renderTable() {
+  const tb = document.querySelector("#dataTable tbody");
+  const data = [...itemTotals].sort((a, b) => b.bal - a.bal);
+  tb.innerHTML = data.map(d => `
+    <tr>
+      <td>${d.name}</td>
+      <td>${fmt(d.exp)}</td>
+      <td>${fmt(d.imp)}</td>
+      <td class="${d.bal >= 0 ? "pos" : "neg"}">${d.bal >= 0 ? "+" : "−"}$${nf.format(Math.abs(d.bal))}</td>
+    </tr>`).join("") + `
+    <tr class="total">
+      <td>총계</td>
+      <td>${fmt(grand.exp)}</td>
+      <td>${fmt(grand.imp)}</td>
+      <td class="pos">+$${nf.format(grand.bal)}</td>
+    </tr>`;
+}
+
+// ---- Theme toggle (also respected by artifact viewer) ----
+const themeBtn = document.getElementById("themeBtn");
+function currentDark() {
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr) return attr === "dark";
+  return matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function syncThemeLabel() {
+  const dark = currentDark();
+  document.getElementById("themeIcon").textContent = dark ? "☀" : "☾";
+  document.getElementById("themeLabel").textContent = dark ? "라이트" : "다크";
+}
+themeBtn.addEventListener("click", () => {
+  const next = currentDark() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  syncThemeLabel();
+  renderAll();
+});
+
+// ---- Table toggle ----
+const tblToggle = document.getElementById("tblToggle");
+const tblContainer = document.getElementById("tblContainer");
+tblToggle.addEventListener("click", () => {
+  const open = tblContainer.hasAttribute("hidden");
+  if (open) { tblContainer.removeAttribute("hidden"); tblToggle.textContent = "표 접기"; tblToggle.setAttribute("aria-expanded", "true"); }
+  else { tblContainer.setAttribute("hidden", ""); tblToggle.textContent = "표 펼치기"; tblToggle.setAttribute("aria-expanded", "false"); }
+});
+
+// ---- Render all ----
+function renderAll() {
+  renderKPIs();
+  renderMonthly();
+  renderBalance();
+  renderItems();
+  renderTable();
+}
+renderAll();
+syncThemeLabel();
+
+let rt;
+addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderAll, 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { syncThemeLabel(); renderAll(); });
+</script>

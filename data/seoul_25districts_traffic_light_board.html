@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울 25개 자치구 매수 타이밍 신호등 & 수익성 시뮬레이션 통합 게시판</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0f17;
+      --card-bg: #141a24;
+      --card-border: #212b3b;
+      --card-hover: #1b2433;
+      --text-title: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      
+      --signal-green: #22c55e;
+      --signal-green-bg: rgba(34, 197, 94, 0.12);
+      --signal-yellow: #eab308;
+      --signal-yellow-bg: rgba(234, 179, 8, 0.12);
+      --signal-red: #ef4444;
+      --signal-red-bg: rgba(239, 68, 68, 0.12);
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-title);
+      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1840px;
+      margin: 0 auto;
+    }
+
+    /* Main Header */
+    header {
+      background: linear-gradient(135deg, #141a24 0%, #1e2736 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px 36px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .lights-badge {
+      display: flex;
+      gap: 8px;
+      background: #090c12;
+      padding: 10px 16px;
+      border-radius: 24px;
+      border: 1px solid #2a3547;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+    .dot.green { background: var(--signal-green); box-shadow: 0 0 12px var(--signal-green); }
+    .dot.yellow { background: var(--signal-yellow); box-shadow: 0 0 12px var(--signal-yellow); }
+    .dot.red { background: var(--signal-red); box-shadow: 0 0 12px var(--signal-red); }
+
+    .header-title h1 {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .header-summary {
+      display: flex;
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: #090c12;
+      border: 1px solid var(--card-border);
+      padding: 12px 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .kpi-card .label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    .kpi-card .val { font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+    .kpi-card .val.green { color: var(--signal-green); }
+    .kpi-card .val.yellow { color: var(--signal-yellow); }
+    .kpi-card .val.red { color: var(--signal-red); }
+    .kpi-card .val.blue { color: var(--accent-blue); }
+
+    /* Filter Bar */
+    .filter-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: #090c12;
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      background: #2a3547;
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    .search-input {
+      background: #090c12;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      width: 260px;
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--accent-blue); }
+
+    /* 25 Districts Grid (5 columns per row on 1920x1080) */
+    .districts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .d-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .d-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+
+    .d-card.sig-green::before { background: var(--signal-green); }
+    .d-card.sig-yellow::before { background: var(--signal-yellow); }
+    .d-card.sig-red::before { background: var(--signal-red); }
+
+    .d-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      border-color: #38bdf8;
+    }
+
+    .d-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .d-name-box {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .d-name-box h3 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .d-name-box .slug {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sig-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sig-green .sig-badge { background: var(--signal-green-bg); color: var(--signal-green); border: 1px solid rgba(34, 197, 94, 0.3); }
+    .sig-yellow .sig-badge { background: var(--signal-yellow-bg); color: var(--signal-yellow); border: 1px solid rgba(234, 179, 8, 0.3); }
+    .sig-red .sig-badge { background: var(--signal-red-bg); color: var(--signal-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .d-card-body {
+      margin-bottom: 16px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .metric-label { color: var(--text-sub); }
+    .metric-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #e2e8f0; }
+
+    .sim-box {
+      background: #090c12;
+      border: 1px solid #1e2736;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+
+    .sim-header {
+      font-size: 11px;
+      color: var(--accent-blue);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .sim-item .lbl { color: var(--text-muted); font-size: 10px; }
+    .sim-item .num { font-weight: 700; color: #f1f5f9; font-family: 'JetBrains Mono', monospace; }
+
+    .d-card-footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-detail-sm {
+      background: #1e2736;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-detail-sm:hover {
+      background: #334155;
+      border-color: #38bdf8;
+    }
+
+    /* Detail Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: #141a24;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      width: 900px;
+      max-width: 92vw;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px; right: 28px;
+      background: none; border: none;
+      color: var(--text-muted); font-size: 24px; cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+
+    .m-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 16px;
+    }
+
+    .m-title h2 { font-size: 22px; font-weight: 900; }
+    .m-title p { font-size: 13px; color: var(--text-sub); }
+
+    .m-body { font-size: 14px; line-height: 1.6; }
+
+    .m-section { margin-bottom: 20px; }
+    .m-section-title { font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 8px; }
+
+    .m-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .m-table th, .m-table td {
+      border: 1px solid #212b3b;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .m-table th { background: #090c12; color: var(--text-sub); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <div class="lights-badge">
+          <div class="dot green"></div>
+          <div class="dot yellow"></div>
+          <div class="dot red"></div>
+        </div>
+        <div class="header-title">
+          <h1>서울 25개 자치구 매수 타이밍 신호등 & 수익성 시뮬레이션 게시판</h1>
+          <p>Seoul 25 Districts Real Estate Traffic Light Signal & Financial ROI Simulator Board (2026W33)</p>
+        </div>
+      </div>
+
+      <div class="header-summary">
+        <div class="kpi-card">
+          <div class="label">총 자치구</div>
+          <div class="val blue">25개 구</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">🟢 매수고려</div>
+          <div class="val green">11개 구</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">🟡 주의</div>
+          <div class="val yellow">9개 구</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">🔴 관망</div>
+          <div class="val red">5개 구</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filterDistricts('all')">전체 보기 (25)</button>
+        <button class="tab-btn" onclick="filterDistricts('green')">🟢 매수고려 (11)</button>
+        <button class="tab-btn" onclick="filterDistricts('yellow')">🟡 주의 (9)</button>
+        <button class="tab-btn" onclick="filterDistricts('red')">🔴 관망 (5)</button>
+      </div>
+      <input type="text" class="search-input" id="searchInput" placeholder="자치구 검색 (예: 강남구, 마포구)" onkeyup="searchDistricts()">
+    </div>
+
+    <!-- 25 Districts Grid -->
+    <div class="districts-grid" id="districtsGrid">
+      <!-- Cards rendered by JavaScript -->
+    </div>
+
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="m-header">
+        <div class="sig-badge" id="modalSigBadge">🟢 매수고려</div>
+        <div class="m-title">
+          <h2 id="modalGuName">강남구 (gangnam)</h2>
+          <p id="modalSub">2026년 33주차 실거래 및 금융 분석 보고서</p>
+        </div>
+      </div>
+      <div class="m-body" id="modalBody">
+        <!-- Content inserted dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const districtsData = [
+      { name: "송파구", slug: "songpa", sig: "green", sigText: "🟢 매수고려", score: 78, price: "1억 4,372만", jeonse: "44.52%", school: "24점", highApt: "잠실주공5단지 (45.2억)", ltv50: "월 420만", roi3y: "+24.5%", bep: "3년 2개월" },
+      { name: "마포구", slug: "mapo", sig: "green", sigText: "🟢 매수고려", score: 76, price: "1억 0,896만", jeonse: "49.80%", school: "6점", highApt: "마포프레스티지자이 (28억)", ltv50: "월 340만", roi3y: "+22.8%", bep: "3년 4개월" },
+      { name: "성동구", slug: "seongdong", sig: "green", sigText: "🟢 매수고려", score: 77, price: "1억 2,450만", jeonse: "48.50%", school: "9점", highApt: "트리마제 (46.5억)", ltv50: "월 350만", roi3y: "+23.2%", bep: "3년 3개월" },
+      { name: "양천구", slug: "yangcheon", sig: "green", sigText: "🟢 매수고려", score: 75, price: "8,290만", jeonse: "50.15%", school: "16점", highApt: "목동6단지 (22.8억)", ltv50: "월 280만", roi3y: "+26.0%", bep: "3년 1개월" },
+      { name: "영등포구", slug: "yeongdeungpo", sig: "green", sigText: "🟢 매수고려", score: 74, price: "9,850만", jeonse: "52.80%", school: "11점", highApt: "여의도 시범 (35.5억)", ltv50: "월 310만", roi3y: "+25.2%", bep: "3년 2개월" },
+      { name: "동작구", slug: "dongjak", sig: "green", sigText: "🟢 매수고려", score: 73, price: "7,850만", jeonse: "54.20%", school: "10점", highApt: "아크로리버하임 (23.5억)", ltv50: "월 260만", roi3y: "+24.0%", bep: "3년 3개월" },
+      { name: "강동구", slug: "gangdong", sig: "green", sigText: "🟢 매수고려", score: 74, price: "7,250만", jeonse: "53.50%", school: "15점", highApt: "올림픽파크포레온 (21.5억)", ltv50: "월 250만", roi3y: "+27.5%", bep: "3년 0개월" },
+      { name: "성북구", slug: "seongbuk", sig: "green", sigText: "🟢 매수고려", score: 72, price: "5,450만", jeonse: "58.40%", school: "12점", highApt: "래미안길음센터피스 (14.2억)", ltv50: "월 190만", roi3y: "+28.0%", bep: "2년 11개월" },
+      { name: "은평구", slug: "eunpyeong", sig: "green", sigText: "🟢 매수고려", score: 71, price: "4,650만", jeonse: "59.10%", school: "8점", highApt: "힐스테이트녹번 (11.5억)", ltv50: "월 150만", roi3y: "+26.5%", bep: "3년 1개월" },
+      { name: "서대문구", slug: "seodaemun", sig: "green", sigText: "🟢 매수고려", score: 73, price: "5,850만", jeonse: "56.50%", school: "11점", highApt: "e편한세상신촌 (15.5억)", ltv50: "월 210만", roi3y: "+25.0%", bep: "3년 2개월" },
+      { name: "강서구", slug: "gangseo", sig: "green", sigText: "🟢 매수고려", score: 72, price: "5,150만", jeonse: "56.80%", school: "11점", highApt: "마곡엠밸리7단지 (16.2억)", ltv50: "월 220만", roi3y: "+24.8%", bep: "3년 3개월" },
+      { name: "동대문구", slug: "dongdaemun", sig: "green", sigText: "🟢 매수고려", score: 73, price: "5,350만", jeonse: "57.80%", school: "10점", highApt: "래미안엘리티아 (14.5억)", ltv50: "월 180만", roi3y: "+27.0%", bep: "3년 0개월" },
+
+      { name: "강남구", slug: "gangnam", sig: "yellow", sigText: "🟡 주의", score: 68, price: "1억 8,381만", jeonse: "41.20%", school: "29점", highApt: "신현대11차 (100.5억)", ltv50: "월 625만", roi3y: "+18.5%", bep: "4년 1개월" },
+      { name: "서초구", slug: "seocho", sig: "yellow", sigText: "🟡 주의", score: 69, price: "1억 4,200만", jeonse: "41.80%", school: "17점", highApt: "래미안원베일리 (71.5억)", ltv50: "월 580만", roi3y: "+17.2%", bep: "4년 3개월" },
+      { name: "용산구", slug: "yongsan", sig: "yellow", sigText: "🟡 주의", score: 67, price: "1억 7,710만", jeonse: "51.90%", school: "7점", highApt: "한강로 아크로타워 (28.0억)", ltv50: "월 490만", roi3y: "+21.0%", bep: "3년 8개월" },
+      { name: "종로구", slug: "jongno", sig: "yellow", sigText: "🟡 주의", score: 66, price: "1억 0,638만", jeonse: "53.80%", school: "21점", highApt: "경희궁자이2단지 (22.5억)", ltv50: "월 290만", roi3y: "+16.8%", bep: "4년 2개월" },
+      { name: "광진구", slug: "gwangjin", sig: "yellow", sigText: "🟡 주의", score: 67, price: "8,150만", jeonse: "52.10%", school: "14점", highApt: "자양더샵 (18.5억)", ltv50: "월 270만", roi3y: "+19.5%", bep: "3년 9개월" },
+      { name: "중구", slug: "junggu", sig: "yellow", sigText: "🟡 주의", score: 65, price: "7,450만", jeonse: "54.00%", school: "9점", highApt: "남산타운 (12.8억)", ltv50: "월 240만", roi3y: "+18.0%", bep: "4년 0개월" },
+      { name: "구로구", slug: "guro", sig: "yellow", sigText: "🟡 주의", score: 64, price: "4,250만", jeonse: "58.90%", school: "8점", highApt: "신도림e편한세상4차 (15.8억)", ltv50: "월 170만", roi3y: "+17.5%", bep: "4년 1개월" },
+      { name: "관악구", slug: "gwanak", sig: "yellow", sigText: "🟡 주의", score: 65, price: "4,550만", jeonse: "59.50%", school: "9점", highApt: "e편한세상서울대입구 (12.5억)", ltv50: "월 160만", roi3y: "+19.0%", bep: "3년 10개월" },
+
+      { name: "노원구", slug: "nowon", sig: "red", sigText: "🔴 관망", score: 48, price: "4,850만", jeonse: "55.20%", school: "18점", highApt: "중계주공5단지 (9.8억)", ltv50: "월 130만", roi3y: "+12.0%", bep: "5년 2개월" },
+      { name: "중랑구", slug: "jungnang", sig: "red", sigText: "🔴 관망", score: 46, price: "3,950만", jeonse: "61.20%", school: "6점", highApt: "사가정센트럴아이파크 (10.5억)", ltv50: "월 140만", roi3y: "+14.5%", bep: "4년 9개월" },
+      { name: "강북구", slug: "gangbuk", sig: "red", sigText: "🔴 관망", score: 44, price: "3,850만", jeonse: "62.50%", school: "6점", highApt: "미아래미안트리베라 (9.2억)", ltv50: "월 120만", roi3y: "+11.5%", bep: "5년 4개월" },
+      { name: "도봉구", slug: "dobong", sig: "red", sigText: "🔴 관망", score: 43, price: "3,650만", jeonse: "63.10%", school: "7점", highApt: "창동주공19단지 (7.2억)", ltv50: "월 110만", roi3y: "+13.0%", bep: "5년 1개월" },
+      { name: "금천구", slug: "geumcheon", sig: "red", sigText: "🔴 관망", score: 45, price: "3,750만", jeonse: "60.50%", school: "5점", highApt: "롯데캐슬골드파크1차 (10.8억)", ltv50: "월 130만", roi3y: "+12.5%", bep: "5년 3개월" }
+    ];
+
+    function renderCards(list) {
+      const grid = document.getElementById('districtsGrid');
+      grid.innerHTML = list.map(d => `
+        <div class="d-card sig-${d.sig}">
+          <div class="d-card-header">
+            <div class="d-name-box">
+              <h3>${d.name}</h3>
+              <span class="slug">${d.slug}</span>
+            </div>
+            <div class="sig-badge">${d.sigText}</div>
+          </div>
+          
+          <div class="d-card-body">
+            <div class="metric-row">
+              <span class="metric-label">평균 평당가</span>
+              <span class="metric-val">${d.price}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">평균 전세가율</span>
+              <span class="metric-val">${d.jeonse}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">학군 지수 (NEIS)</span>
+              <span class="metric-val">${d.school}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">트렌드 스코어</span>
+              <span class="metric-val" style="color:var(--accent-blue);">${d.score}점</span>
+            </div>
+
+            <div class="sim-box">
+              <div class="sim-header">
+                <span>금융 시뮬레이터</span>
+                <span>LTV 50%</span>
+              </div>
+              <div class="sim-grid">
+                <div class="sim-item">
+                  <div class="lbl">월 이자 감당</div>
+                  <div class="num">${d.ltv50}</div>
+                </div>
+                <div class="sim-item">
+                  <div class="lbl">3년 기대 ROI</div>
+                  <div class="num" style="color:var(--signal-green);">${d.roi3y}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card-footer">
+            <span class="file-tag">${d.slug}_raw_2026W33.md</span>
+            <button class="btn-detail-sm" onclick="openDetail('${d.slug}')">3초 리포트</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterDistricts(type) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      if (type === 'all') renderCards(districtsData);
+      else renderCards(districtsData.filter(d => d.sig === type));
+    }
+
+    function searchDistricts() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderCards(districtsData.filter(d => d.name.toLowerCase().includes(q) || d.slug.toLowerCase().includes(q)));
+    }
+
+    function openDetail(slug) {
+      const d = districtsData.find(x => x.slug === slug);
+      if (!d) return;
+      document.getElementById('modalSigBadge').innerText = d.sigText;
+      document.getElementById('modalSigBadge').className = `sig-badge sig-${d.sig}`;
+      document.getElementById('modalGuName').innerText = `${d.name} (${d.slug})`;
+      document.getElementById('modalSub').innerText = `2026년 33주차 1차 API 기반 3초 PB 브리핑 & 금융 리포트`;
+
+      document.getElementById('modalBody').innerHTML = `
+        <div class="m-section">
+          <div class="m-section-title">1. 3초 핵심 판정 결론</div>
+          <p><b>${d.name}</b>의 2026년 33주차 매수 타이밍 신호는 <b>${d.sigText}</b> 입니다. (트렌드 스코어: <b>${d.score}점</b>, 전세가율: <b>${d.jeonse}</b>, 주요 단지: ${d.highApt})</p>
+        </div>
+
+        <div class="m-section">
+          <div class="m-section-title">2. 3대 1차 API 수집 팩트 매트릭스</div>
+          <table class="m-table">
+            <tr><th>지표 항목</th><th>수치 및 내용</th><th>데이터 소스</th></tr>
+            <tr><td>한국은행 기준금리</td><td>연 2.75% (0.25%p 인상)</td><td>한국은행 ECOS API</td></tr>
+            <tr><td>주택담보대출 금리</td><td>고정형 연 4.30% / 변동형 연 4.38%</td><td>한국은행 ECOS API</td></tr>
+            <tr><td>학군 지수 (NEIS)</td><td>${d.school}</td><td>나이스 NEIS API (3개월 캐시)</td></tr>
+            <tr><td>평균 평당가</td><td>${d.price}</td><td>국토교통부 실거래가 API</td></tr>
+            <tr><td>평균 전세가율</td><td>${d.jeonse}</td><td>한국부동산원 / 서울시 주택정보마당</td></tr>
+          </table>
+        </div>
+
+        <div class="m-section">
+          <div class="m-section-title">3. 금융 수익성 & 손익분기 시뮬레이션</div>
+          <table class="m-table">
+            <tr><th>시나리오</th><th>월 대출 이자</th><th>3년 기대 ROI</th><th>손익분기점 (BEP)</th></tr>
+            <tr><td>LTV 50% 자기자본 위주</td><td><b>${d.ltv50}</b></td><td><b style="color:var(--signal-green);">${d.roi3y}</b></td><td><b>${d.bep}</b></td></tr>
+            <tr><td>LTV 70% 레버리지 최대화</td><td>월 추가 감당 필요</td><td>시장 변동성 주의</td><td>약 4년 소요</td></tr>
+          </table>
+        </div>
+
+        <div class="m-section">
+          <div class="m-section-title">4. 1주일 할일 (Action Plan)</div>
+          <p>• ${d.name} 주요 최고가 단지 (${d.highApt}) 급매물 등록 일자 확인<br>
+          • 시중은행 주담대 고정금리(4.30%) 대출 한도 사전 심사<br>
+          • 전세가율 현황(${d.jeonse}) 기반 갭투자 자금 소요액 최종 검증</p>
+        </div>
+      `;
+
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // Initial Render
+    renderCards(districtsData);
+  </script>
+</body>
+</html>

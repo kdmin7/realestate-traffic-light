@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# API 응답 캐시 (realestate-server.js)
+.cache/
+
+# 사용자가 내려받는 원천 데이터 (범죄·생활인구·소득 CSV)
+data/crime/*.csv
+data/living_pop/*.csv
+data/income/*.csv
+!data/**/.gitkeep
+
+# 환경/로그
+.env
+*.log
