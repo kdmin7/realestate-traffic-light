@@ -1,10 +1,10 @@
-    name: Daily Real Estate Data & Dashboard Update
+    name: Weekly Real Estate Data & Dashboard Update
 
     on:
       schedule:
-        # 매일 한국 시간 오전 9시 (UTC 00:00)
-        - cron: '0 0 * * *'
-      workflow_dispatch: # 웹에서 수동 즉시 실행 가능
+        # 매주 월요일 한국 시간 오전 9시 (UTC 00:00, 1=월요일)
+        - cron: '0 0 * * 1'
+      workflow_dispatch: # 필요 시 언제든 웹에서 수동 즉시 실행 가능
 
     permissions:
       contents: write
@@ -45,6 +45,6 @@
               if git diff --staged --quiet; then
                 echo "변경 사항이 없어 커밋을 건너뜁니다."
               else
-                git commit -m "chore(auto): update daily real estate dashboard $(date +'%Y-%m-%d')"
+                git commit -m "chore(auto): update weekly real estate dashboard $(date +'%Y-%m-%d')"
                 git push
               fi
