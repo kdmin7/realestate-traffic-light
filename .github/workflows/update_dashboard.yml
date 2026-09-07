@@ -1,4 +1,4 @@
-name: Daily Real Estate Data & Dashboard Update
+    name: Daily Real Estate Data & Dashboard Update
 
     on:
       schedule:
