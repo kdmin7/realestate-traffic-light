@@ -1,5 +1,6 @@
 name: Daily Real Estate Data & Dashboard Update
-on:
+
+    on:
       schedule:
         # 매일 한국 시간 오전 9시 (UTC 00:00)
         - cron: '0 0 * * *'
@@ -38,15 +39,12 @@ on:
 
           - name: Commit and Push Changes
             run: |
-              git config --global user.name "github-
-  actions[bot]"
-              git config --global user.email "github-
-  actions[bot]@users.noreply.github.com"
-              git add data/
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git add data/ index.html
               if git diff --staged --quiet; then
                 echo "변경 사항이 없어 커밋을 건너뜁니다."
               else
-                git commit -m "chore(auto): update daily real
-  estate dashboard $(date +'%Y-%m-%d')"
+                git commit -m "chore(auto): update daily real estate dashboard $(date +'%Y-%m-%d')"
                 git push
               fi
