@@ -2,8 +2,8 @@
 
     on:
       schedule:
-        # 매주 월요일 한국 시간 오전 9시 (UTC 00:00, 1=월요일)
-        - cron: '0 0 * * 1'
+        # (매일 한국시간 오전 06:00 자동 실행)
+        - cron: '0 21 * * *'
       workflow_dispatch: # 필요 시 언제든 웹에서 수동 즉시 실행 가능
 
     permissions:
@@ -35,7 +35,7 @@
               SMTP_USER: ${{ secrets.SMTP_USER }}
               SMTP_PASS: ${{ secrets.SMTP_PASS }}
             run: |
-              node MCP/fetch_today_dashboard.js
+              node MCP/daily_pipeline_sync.js
 
           - name: Commit and Push Changes
             run: |
