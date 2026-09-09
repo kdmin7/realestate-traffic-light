@@ -77,7 +77,105 @@ const SEOUL_GU = {
   관악구: "11620", 서초구: "11650", 강남구: "11680", 송파구: "11710",
   강동구: "11740",
 };
-const CODE_TO_GU = Object.fromEntries(Object.entries(SEOUL_GU).map(([k, v]) => [v, k]));
+
+// 경기도 31개 시·군 및 일반구 법정동코드(앞 5자리)
+const GYEONGGI_GU = {
+  // 수원시
+  "수원시 장안구": "41111", "장안구": "41111",
+  "수원시 권선구": "41113", "권선구": "41113",
+  "수원시 팔달구": "41115", "팔달구": "41115",
+  "수원시 영통구": "41117", "영통구": "41117", "수원시": "41110",
+  // 성남시
+  "성남시 수정구": "41131", "수정구": "41131",
+  "성남시 중원구": "41133", "중원구": "41133",
+  "성남시 분당구": "41135", "분당구": "41135", "분당": "41135", "판교": "41135", "성남시": "41130",
+  // 의정부시
+  "의정부시": "41150", "의정부": "41150",
+  // 안양시
+  "안양시 만안구": "41171", "만안구": "41171",
+  "안양시 동안구": "41173", "동안구": "41173", "평촌": "41173", "안양시": "41170",
+  // 부천시
+  "부천시": "41190", "부천": "41190", "부천시 원미구": "41192", "원미구": "41192",
+  "부천시 소사구": "41194", "소사구": "41194", "부천시 오정구": "41196", "오정구": "41196",
+  // 광명시
+  "광명시": "41210", "광명": "41210",
+  // 평택시
+  "평택시": "41220", "평택": "41220", "고덕": "41220",
+  // 동두천시
+  "동두천시": "41250", "동두천": "41250",
+  // 안산시
+  "안산시 상록구": "41271", "상록구": "41271",
+  "안산시 단원구": "41273", "단원구": "41273", "안산시": "41270",
+  // 고양시
+  "고양시 덕양구": "41281", "덕양구": "41281",
+  "고양시 일산동구": "41285", "일산동구": "41285", "일산동": "41285",
+  "고양시 일산서구": "41287", "일산서구": "41287", "일산서": "41287",
+  "일산": "41285", "고양시": "41280",
+  // 과천시
+  "과천시": "41290", "과천": "41290",
+  // 구리시
+  "구리시": "41310", "구리": "41310",
+  // 남양주시
+  "남양주시": "41360", "남양주": "41360", "다산": "41360", "별내": "41360",
+  // 오산시
+  "오산시": "41370", "오산": "41370",
+  // 시흥시
+  "시흥시": "41390", "시흥": "41390", "배곧": "41390",
+  // 군포시
+  "군포시": "41410", "군포": "41410", "산본": "41410",
+  // 의왕시
+  "의왕시": "41430", "의왕": "41430",
+  // 하남시
+  "하남시": "41450", "하남": "41450", "미사": "41450", "위례": "41450",
+  // 용인시
+  "용인시 처인구": "41461", "처인구": "41461",
+  "용인시 기흥구": "41463", "기흥구": "41463",
+  "용인시 수지구": "41465", "수지구": "41465", "수지": "41465", "용인시": "41460",
+  // 파주시
+  "파주시": "41480", "파주": "41480", "운정": "41480",
+  // 이천시
+  "이천시": "41500", "이천": "41500",
+  // 안성시
+  "안성시": "41550", "안성": "41550",
+  // 김포시
+  "김포시": "41570", "김포": "41570",
+  // 화성시
+  "화성시": "41590", "화성": "41590", "동탄": "41590",
+  // 광주시
+  "광주시": "41610", "경기 광주시": "41610", "경기광주": "41610",
+  // 양주시
+  "양주시": "41630", "양주": "41630", "옥정": "41630",
+  // 포천시
+  "포천시": "41650", "포천": "41650",
+  // 여주시
+  "여주시": "41670", "여주": "41670",
+  // 연천군
+  "연천군": "41800", "연천": "41800",
+  // 가평군
+  "가평군": "41820", "가평": "41820",
+  // 양평군
+  "양평군": "41830", "양평": "41830",
+};
+
+// 표준 대표 명칭 매핑
+const CANONICAL_REGIONS = {
+  ...SEOUL_GU,
+  "수원시 장안구": "41111", "수원시 권선구": "41113", "수원시 팔달구": "41115", "수원시 영통구": "41117",
+  "성남시 수정구": "41131", "성남시 중원구": "41133", "성남시 분당구": "41135",
+  "의정부시": "41150", "안양시 만안구": "41171", "안양시 동안구": "41173",
+  "부천시": "41190", "광명시": "41210", "평택시": "41220", "동두천시": "41250",
+  "안산시 상록구": "41271", "안산시 단원구": "41273",
+  "고양시 덕양구": "41281", "고양시 일산동구": "41285", "고양시 일산서구": "41287",
+  "과천시": "41290", "구리시": "41310", "남양주시": "41360", "오산시": "41370",
+  "시흥시": "41390", "군포시": "41410", "의왕시": "41430", "하남시": "41450",
+  "용인시 처인구": "41461", "용인시 기흥구": "41463", "용인시 수지구": "41465",
+  "파주시": "41480", "이천시": "41500", "안성시": "41550", "김포시": "41570",
+  "화성시": "41590", "광주시": "41610", "양주시": "41630", "포천시": "41650",
+  "여주시": "41670", "연천군": "41800", "가평군": "41820", "양평군": "41830",
+};
+
+const ALL_REGIONS = { ...SEOUL_GU, ...GYEONGGI_GU };
+const CODE_TO_GU = Object.fromEntries(Object.entries(CANONICAL_REGIONS).map(([k, v]) => [v, k]));
 
 const parser = new XMLParser({
   ignoreAttributes: true, parseTagValue: false, parseAttributeValue: false, trimValues: true,
@@ -124,9 +222,19 @@ async function pool(items, limit, worker) {
 }
 
 function resolveGu(district) {
-  const code = /^\d{5}$/.test(district) ? district : SEOUL_GU[district];
+  if (!district) return null;
+  const trimmed = String(district).trim();
+  let code = /^\d{5}$/.test(trimmed) ? trimmed : ALL_REGIONS[trimmed];
+  if (!code) {
+    const foundKey = Object.keys(ALL_REGIONS).find(
+      (k) => k === trimmed || k === `${trimmed}구` || k === `${trimmed}시` || k === `${trimmed}군`
+    );
+    if (foundKey) code = ALL_REGIONS[foundKey];
+  }
   if (!code) return null;
-  return { code, name: CODE_TO_GU[code] || district };
+  const name = CODE_TO_GU[code] || trimmed;
+  const province = code.startsWith("11") ? "seoul" : code.startsWith("41") ? "gyeonggi" : "other";
+  return { code, name, province };
 }
 function resolvePeriod(startYearMonth, endYearMonth) {
   const now = new Date();
@@ -137,22 +245,83 @@ function resolvePeriod(startYearMonth, endYearMonth) {
 
 // ---------------------------------------------------------------------------
 // 국토부 API 호출 + 캐시 (매매·전월세 공통)
-// ---------------------------------------------------------------------------
-
 function cachePath(ds, code, ym) {
   return path.join(CACHE_DIR, ds.cacheSub, code, `${ym}.json`);
 }
-function readCache(ds, code, ym) {
+
+function isFinalMonth(ym) {
+  const now = new Date();
+  const currentYm = now.getFullYear() * 100 + (now.getMonth() + 1);
+  // 신고기한 30일을 고려하여 2개월 전 이전의 데이터는 확정 데이터(과거 데이터)로 간주
+  const cutoffYm = (now.getMonth() + 1 <= 2)
+    ? (now.getFullYear() - 1) * 100 + (now.getMonth() + 1 + 10)
+    : now.getFullYear() * 100 + (now.getMonth() - 1);
+  return Number(ym) < cutoffYm;
+}
+
+function rowKey(r) {
+  return `${r.y}-${r.m}-${r.d}_${r.apt}_${r.amount}_${r.area}_${r.floor}_${r.dong || ""}`;
+}
+
+function mergeRows(existingRows, newRows) {
+  const map = new Map();
+  // 1. 기존 데이터 우선 등록 (기존 데이터 완벽 보존)
+  for (const r of (existingRows || [])) {
+    map.set(rowKey(r), r);
+  }
+  // 2. 최신 증분 데이터 병합
+  for (const r of (newRows || [])) {
+    const k = rowKey(r);
+    if (!map.has(k)) {
+      map.set(k, r);
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => {
+    const da = `${a.y}${String(a.m).padStart(2, "0")}${String(a.d).padStart(2, "0")}`;
+    const db = `${b.y}${String(b.m).padStart(2, "0")}${String(b.d).padStart(2, "0")}`;
+    return da.localeCompare(db);
+  });
+}
+
+function readCacheInfo(ds, code, ym) {
   try {
     const p = cachePath(ds, code, ym);
-    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, "utf8"));
+    if (!fs.existsSync(p)) return null;
+    const stat = fs.statSync(p);
+    const parsed = JSON.parse(fs.readFileSync(p, "utf8"));
+    if (Array.isArray(parsed)) {
+      return { rows: parsed, updatedAt: stat.mtime.toISOString(), isFinal: isFinalMonth(ym) };
+    } else if (parsed && Array.isArray(parsed.rows)) {
+      return {
+        rows: parsed.rows,
+        updatedAt: parsed.updatedAt || stat.mtime.toISOString(),
+        isFinal: parsed.isFinal ?? isFinalMonth(ym),
+        latestDealDate: parsed.latestDealDate,
+      };
+    }
   } catch { /* 손상 캐시 무시 */ }
   return null;
 }
-function writeCache(ds, code, ym, data) {
+
+function readCache(ds, code, ym) {
+  const info = readCacheInfo(ds, code, ym);
+  return info ? info.rows : null;
+}
+
+function writeCache(ds, code, ym, rows, extraMeta = {}) {
   try {
     fs.mkdirSync(path.join(CACHE_DIR, ds.cacheSub, code), { recursive: true });
-    fs.writeFileSync(cachePath(ds, code, ym), JSON.stringify(data));
+    const latestDeal = rows.length > 0 ? rows[rows.length - 1] : null;
+    const latestDealDate = latestDeal ? `${latestDeal.y}-${String(latestDeal.m).padStart(2, "0")}-${String(latestDeal.d).padStart(2, "0")}` : null;
+    const payload = {
+      updatedAt: new Date().toISOString(),
+      isFinal: isFinalMonth(ym),
+      totalCount: rows.length,
+      latestDealDate,
+      ...extraMeta,
+      rows,
+    };
+    fs.writeFileSync(cachePath(ds, code, ym), JSON.stringify(payload, null, 2));
   } catch { /* 캐시 실패 비치명적 */ }
 }
 
@@ -177,24 +346,54 @@ async function fetchPage(ds, code, ym, pageNo) {
   return { items, total: Number(root.body?.totalCount ?? items.length) };
 }
 
-async function fetchMonth(ds, code, ym) {
-  const cached = readCache(ds, code, ym);
-  if (cached) return cached;
+/**
+ * 특정 연월(ym) 데이터 조회 (증분 업데이트 및 캐싱 지원)
+ * - 과거 확정월: 기존 캐시 100% 재사용 (API 호출 0)
+ * - 최신 진행월: 기존 캐시를 유지하면서 마지막 업데이트 이후의 최신 데이터만 증분 병합
+ */
+async function fetchMonth(ds, code, ym, forceRefresh = false) {
+  const cachedInfo = readCacheInfo(ds, code, ym);
+  const isFinal = isFinalMonth(ym);
+
+  // 1. 과거 확정월은 캐시가 있으면 영구 재사용
+  if (cachedInfo && isFinal) {
+    return cachedInfo.rows;
+  }
+
+  // 2. 최신 진행월: 오늘 12시간 이내에 이미 업데이트되었고 forceRefresh가 아니면 기존 캐시 사용
+  if (cachedInfo && !forceRefresh) {
+    const cacheAgeMs = Date.now() - new Date(cachedInfo.updatedAt).getTime();
+    if (cacheAgeMs < 12 * 60 * 60 * 1000) {
+      return cachedInfo.rows;
+    }
+  }
+
+  // 3. 최신 데이터 조회 (API 호출)
   const first = await fetchPage(ds, code, ym, 1);
   let all = first.items;
   const pages = Math.ceil(first.total / 100);
   for (let p = 2; p <= pages; p++) all = all.concat((await fetchPage(ds, code, ym, p)).items);
-  const rows = all.map(ds.map).filter(ds.valid);
-  writeCache(ds, code, ym, rows);
-  return rows;
+  const fetchedRows = all.map(ds.map).filter(ds.valid);
+
+  // 4. 기존 데이터와 최신 데이터의 증분 병합 (기존 데이터 보존 + 최신 일정 갱신)
+  const mergedRows = cachedInfo ? mergeRows(cachedInfo.rows, fetchedRows) : fetchedRows;
+  writeCache(ds, code, ym, mergedRows, {
+    newlyAddedCount: mergedRows.length - (cachedInfo?.rows?.length || 0),
+  });
+  return mergedRows;
 }
 
-/** 지정 기간의 모든 거래를 병합 반환 (실패 월은 건너뜀) */
-async function fetchRange(ds, code, months) {
+/** 지정 기간의 모든 거래를 병합 반환 (과거 데이터는 캐시 재사용, 최신 데이터만 증분 업데이트) */
+async function fetchRange(ds, code, months, forceRefreshLatest = false) {
   let failed = 0, lastErr = "";
   const monthly = await pool(months, 6, async (ym) => {
-    try { return await fetchMonth(ds, code, ym); }
-    catch (e) { failed++; lastErr = e.message; return []; }
+    try {
+      // 최신 진행월에 대해서만 forceRefreshLatest 적용
+      const isLatest = !isFinalMonth(ym);
+      return await fetchMonth(ds, code, ym, isLatest && forceRefreshLatest);
+    } catch (e) {
+      failed++; lastErr = e.message; return [];
+    }
   });
   return { rows: monthly.flat(), failed, lastErr };
 }
@@ -240,30 +439,31 @@ const server = new McpServer({ name: "seoul-realty-insight", version: "0.2.0" })
 server.registerTool(
   "get_price_trend",
   {
-    title: "자치구 아파트 매매가 분기 트렌드",
+    title: "수도권 아파트 매매가 분기 트렌드",
     description:
-      "국토교통부 아파트 매매 실거래가로 서울 자치구의 분기별 평균가·중위가·평당가·거래량 " +
+      "국토교통부 아파트 매매 실거래가로 서울 및 경기도 시·구의 분기별 평균가·중위가·평당가·거래량 " +
       "시계열과 CAGR·변동성을 반환합니다. (아파트 매매 전용)",
     inputSchema: {
-      district: z.string().describe("서울 자치구 이름(예: '강남구') 또는 코드 5자리(예: '11680')"),
+      district: z.string().describe("지역 이름(예: '강남구', '분당구', '수지구', '과천시') 또는 법정동코드 5자리"),
       startYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").default("202301")
         .describe("시작 연월(YYYYMM). 실거래가는 200601부터"),
       endYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").optional().describe("종료 연월. 생략 시 이번 달"),
       minAreaM2: z.number().optional().describe("전용면적 하한(㎡)"),
       maxAreaM2: z.number().optional().describe("전용면적 상한(㎡)"),
+      forceRefreshLatest: z.boolean().optional().default(false).describe("최신 진행월(당월/전월) 데이터를 최신 일정까지 증분 업데이트할지 여부 (기존 과거 데이터는 100% 보존)"),
     },
   },
-  async ({ district, startYearMonth, endYearMonth, minAreaM2, maxAreaM2 }) => {
+  async ({ district, startYearMonth, endYearMonth, minAreaM2, maxAreaM2, forceRefreshLatest }) => {
     if (!MOLIT_KEY) return errorResult("환경변수 MOLIT_API_KEY 가 설정되지 않았습니다.");
     const gu = resolveGu(district);
-    if (!gu) return errorResult(`자치구 '${district}' 를 찾을 수 없습니다. (예: 강남구, 11680)`);
+    if (!gu) return errorResult(`지역 '${district}' 를 찾을 수 없습니다. (예: 강남구, 분당구, 과천시, 11680, 41135)`);
     const { start, end } = resolvePeriod(startYearMonth, endYearMonth);
     if (start > end) return errorResult("시작 연월이 종료 연월보다 늦습니다.");
     if (start < 200601) return errorResult("실거래가는 2006년 1월(200601)부터 제공됩니다.");
     const months = monthRange(start, end);
     if (months.length > 300) return errorResult(`조회 범위가 너무 넓습니다(${months.length}개월).`);
 
-    const { rows: all, failed, lastErr } = await fetchRange(DATASETS.sale, gu.code, months);
+    const { rows: all, failed, lastErr } = await fetchRange(DATASETS.sale, gu.code, months, forceRefreshLatest);
     if (failed === months.length) return errorResult(`모든 요청 실패: ${lastErr}`);
     let rows = all;
     if (minAreaM2 != null) rows = rows.filter((r) => r.area >= minAreaM2);
@@ -296,20 +496,21 @@ server.registerTool(
 server.registerTool(
   "get_jeonse_ratio",
   {
-    title: "자치구 전세가율 분기 추이",
+    title: "수도권 전세가율 분기 추이",
     description:
-      "국토부 매매+전월세 실거래가를 결합해 자치구의 분기별 전세가율(전세 ₩/㎡ ÷ 매매 ₩/㎡)과 " +
+      "국토부 매매+전월세 실거래가를 결합해 서울 및 경기도 시·구의 분기별 전세가율(전세 ₩/㎡ ÷ 매매 ₩/㎡)과 " +
       "월세 비중을 반환합니다. 전세가율은 갭투자·임대수익 판단의 핵심 참고 지표입니다.",
     inputSchema: {
-      district: z.string().describe("서울 자치구 이름 또는 코드 5자리"),
+      district: z.string().describe("지역 이름(예: '강남구', '분당구', '과천시') 또는 코드 5자리"),
       startYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").default("202301").describe("시작 연월(YYYYMM). 전월세는 201101 이후 신뢰도↑"),
       endYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").optional().describe("종료 연월. 생략 시 이번 달"),
+      forceRefreshLatest: z.boolean().optional().default(false).describe("최신 진행월(당월/전월) 데이터를 최신 일정까지 증분 업데이트할지 여부"),
     },
   },
-  async ({ district, startYearMonth, endYearMonth }) => {
+  async ({ district, startYearMonth, endYearMonth, forceRefreshLatest }) => {
     if (!MOLIT_KEY) return errorResult("환경변수 MOLIT_API_KEY 가 설정되지 않았습니다.");
     const gu = resolveGu(district);
-    if (!gu) return errorResult(`자치구 '${district}' 를 찾을 수 없습니다.`);
+    if (!gu) return errorResult(`지역 '${district}' 를 찾을 수 없습니다.`);
     const { start, end } = resolvePeriod(startYearMonth, endYearMonth);
     if (start > end) return errorResult("시작 연월이 종료 연월보다 늦습니다.");
     if (start < 200601) return errorResult("실거래가는 2006년 1월(200601)부터 제공됩니다.");
@@ -317,8 +518,8 @@ server.registerTool(
     if (months.length > 300) return errorResult(`조회 범위가 너무 넓습니다(${months.length}개월).`);
 
     const [sale, rent] = await Promise.all([
-      fetchRange(DATASETS.sale, gu.code, months),
-      fetchRange(DATASETS.rent, gu.code, months),
+      fetchRange(DATASETS.sale, gu.code, months, forceRefreshLatest),
+      fetchRange(DATASETS.rent, gu.code, months, forceRefreshLatest),
     ]);
     if (sale.failed === months.length && rent.failed === months.length)
       return errorResult(`모든 요청 실패: ${sale.lastErr || rent.lastErr}`);
@@ -498,21 +699,35 @@ function parseCsv(text) {
   return { header, rows };
 }
 
-const norm = (s) => String(s).replace(/\s|서울특별시|서울/g, "");
+const norm = (s) => String(s).replace(/\s|서울특별시|서울|경기도|경기/g, "");
 const listCsv = (dir) => {
   try { return fs.readdirSync(dir).filter((f) => /\.csv$/i.test(f)).map((f) => path.join(dir, f)); }
   catch { return []; }
 };
 const yearFromName = (f) => { const m = path.basename(f).match(/(19|20)\d{2}/); return m ? Number(m[0]) : null; };
 
-// 자치구 인구(2024년 주민등록인구 근사값, 명) — 범죄율 정규화용. populationOverride로 교체 가능.
-const GU_POP_2024 = {
+// 수도권(서울 25개 구 + 경기 시·군/구) 인구(2024년 주민등록인구 근사값, 명) — 범죄율 정규화용
+const REGION_POP_2024 = {
+  // 서울 25개 자치구
   종로구: 140000, 중구: 120000, 용산구: 210000, 성동구: 280000, 광진구: 340000,
   동대문구: 340000, 중랑구: 380000, 성북구: 420000, 강북구: 290000, 도봉구: 300000,
   노원구: 490000, 은평구: 460000, 서대문구: 300000, 마포구: 360000, 양천구: 430000,
   강서구: 560000, 구로구: 400000, 금천구: 230000, 영등포구: 380000, 동작구: 380000,
   관악구: 490000, 서초구: 410000, 강남구: 530000, 송파구: 650000, 강동구: 460000,
+  // 경기도 주요 시·군 및 일반구
+  "수원시 장안구": 270000, "수원시 권선구": 360000, "수원시 팔달구": 190000, "수원시 영통구": 360000, 수원시: 1180000,
+  "성남시 수정구": 230000, "성남시 중원구": 210000, "성남시 분당구": 470000, 분당구: 470000, 성남시: 910000,
+  "안양시 만안구": 230000, "안양시 동안구": 310000, 동안구: 310000, 안양시: 540000,
+  "안산시 상록구": 340000, "안산시 단원구": 290000, 안산시: 630000,
+  "고양시 덕양구": 490000, "고양시 일산동구": 290000, "고양시 일산서구": 280000, 일산동구: 290000, 일산서구: 280000, 고양시: 1060000,
+  "용인시 처인구": 260000, "용인시 기흥구": 430000, "용인시 수지구": 370000, 수지구: 370000, 용인시: 1060000,
+  과천시: 84000, 광명시: 280000, 하남시: 330000, 화성시: 960000, 부천시: 780000,
+  남양주시: 730000, 평택시: 590000, 시흥시: 520000, 파주시: 500000, 김포시: 490000,
+  의정부시: 460000, 광주시: 400000, 군포시: 260000, 오산시: 240000, 양주시: 270000,
+  이천시: 220000, 구리시: 190000, 안성시: 190000, 의왕시: 160000, 포천시: 140000,
+  양평군: 120000, 여주시: 110000, 동두천시: 90000, 가평군: 60000, 연천군: 40000,
 };
+const GU_POP_2024 = REGION_POP_2024;
 const CRIME5 = ["살인", "강도", "강간", "추행", "절도", "폭력"];
 
 // ---------------------------------------------------------------------------
@@ -709,10 +924,10 @@ const NEIS_URL = "https://open.neis.go.kr/hub/schoolInfo";
 // 자율형사립고·특목고 등을 폭넓게 잡는 키워드(필드명이 버전마다 달라 값 전체를 스캔)
 const SPECIAL_HS = ["자율", "특수목적", "외국어", "과학", "국제", "영재", "예술", "체육"];
 
-async function neisSchoolPage(pIndex) {
+async function neisSchoolPage(pIndex, lctnScNm = "서울특별시") {
   const params = new URLSearchParams({
     KEY: NEIS_KEY, Type: "json", pIndex: String(pIndex), pSize: "1000",
-    SCHUL_KND_SC_NM: "고등학교", LCTN_SC_NM: "서울특별시",
+    SCHUL_KND_SC_NM: "고등학교", LCTN_SC_NM: lctnScNm,
   });
   const res = await fetch(`${NEIS_URL}?${params}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -726,64 +941,94 @@ async function neisSchoolPage(pIndex) {
   return { rows, total };
 }
 
+async function fetchSchoolsForProvince(province = "seoul") {
+  const lctnScNm = province === "gyeonggi" ? "경기도" : "서울특별시";
+  const now = new Date();
+  const currentQuarterKey = `${now.getFullYear()}Q${quarterOf(now.getMonth() + 1)}`;
+  const schoolCacheDir = path.join(CACHE_DIR, "school-index");
+  const schoolCacheFile = path.join(schoolCacheDir, `${currentQuarterKey}_${province}.json`);
+
+  let rows = [];
+  if (fs.existsSync(schoolCacheFile)) {
+    try { rows = JSON.parse(fs.readFileSync(schoolCacheFile, "utf8")); }
+    catch { rows = []; }
+  }
+
+  if (!rows.length) {
+    const first = await neisSchoolPage(1, lctnScNm);
+    rows = first.rows;
+    const pages = Math.ceil(first.total / 1000);
+    for (let p = 2; p <= pages; p++) rows = rows.concat((await neisSchoolPage(p, lctnScNm)).rows);
+    if (rows.length) {
+      fs.mkdirSync(schoolCacheDir, { recursive: true });
+      fs.writeFileSync(schoolCacheFile, JSON.stringify(rows));
+    }
+  }
+  return rows;
+}
+
 server.registerTool(
   "get_school_index",
   {
-    title: "자치구 학군 지수(자사·특목고 밀도)",
+    title: "수도권 학군 지수(자사·특목고 밀도)",
     description:
-      "NEIS 학교기본정보로 서울 자치구별 고등학교 수와 자율·특목고 수를 집계해 학군 지수(proxy)를 " +
+      "NEIS 학교기본정보로 서울 및 경기도 시·구별 고등학교 수와 자율·특목고 수를 집계해 학군 지수(proxy)를 " +
       "반환합니다. '서울대 진학률'은 비공개라 자율·특목고 밀도로 근사합니다.",
     inputSchema: {
-      district: z.string().optional().describe("자치구 이름/코드(생략 시 25개 구 순위)"),
+      district: z.string().optional().describe("자치구/시·군 이름/코드(예: '강남구', '분당구', '과천시')"),
+      regionScope: z.enum(["서울", "경기", "수도권전체"]).default("서울").describe("district 생략 시 랭킹 범위(서울/경기/수도권전체)"),
     },
   },
-  async ({ district }) => {
+  async ({ district, regionScope }) => {
     if (!NEIS_KEY) return errorResult("환경변수 NEIS_API_KEY 가 설정되지 않았습니다. open.neis.go.kr 에서 발급하세요.");
     const gu = district ? resolveGu(district) : null;
-    // 3개월(분기) 단위 캐시 처리 (학군 데이터는 3개월 단위 취합)
-    const now = new Date();
-    const currentQuarterKey = `${now.getFullYear()}Q${quarterOf(now.getMonth() + 1)}`;
-    const schoolCacheDir = path.join(CACHE_DIR, "school-index");
-    const schoolCacheFile = path.join(schoolCacheDir, `${currentQuarterKey}.json`);
+    if (district && !gu) return errorResult(`지역 '${district}' 를 찾을 수 없습니다.`);
+
+    const targetProvince = gu ? gu.province : (regionScope === "경기" ? "gyeonggi" : regionScope === "수도권전체" ? "all" : "seoul");
 
     let rows = [];
-    if (fs.existsSync(schoolCacheFile)) {
-      try { rows = JSON.parse(fs.readFileSync(schoolCacheFile, "utf8")); }
-      catch { rows = []; }
-    }
-
-    if (!rows.length) {
-      try {
-        const first = await neisSchoolPage(1);
-        rows = first.rows;
-        const pages = Math.ceil(first.total / 1000);
-        for (let p = 2; p <= pages; p++) rows = rows.concat((await neisSchoolPage(p)).rows);
-        if (rows.length) {
-          fs.mkdirSync(schoolCacheDir, { recursive: true });
-          fs.writeFileSync(schoolCacheFile, JSON.stringify(rows));
-        }
-      } catch (e) { return errorResult(`NEIS 조회 실패 — ${e.message}`); }
+    try {
+      if (targetProvince === "all") {
+        const [sRows, gRows] = await Promise.all([fetchSchoolsForProvince("seoul"), fetchSchoolsForProvince("gyeonggi")]);
+        rows = [...sRows, ...gRows];
+      } else {
+        rows = await fetchSchoolsForProvince(targetProvince);
+      }
+    } catch (e) {
+      return errorResult(`NEIS 조회 실패 — ${e.message}`);
     }
     if (!rows.length) return errorResult("NEIS에서 학교 목록을 받지 못했습니다.");
 
-    // 자치구별 집계
-    const stat = {}; // guName -> {total, special}
-    for (const name of Object.keys(SEOUL_GU)) stat[name] = { total: 0, special: 0, schools: [] };
+    // 대상 구 집합 결정
+    const targetGuNames = gu
+      ? [gu.name]
+      : (targetProvince === "gyeonggi"
+          ? Object.keys(CANONICAL_REGIONS).filter((k) => CANONICAL_REGIONS[k].startsWith("41"))
+          : targetProvince === "all"
+          ? Object.keys(CANONICAL_REGIONS)
+          : Object.keys(SEOUL_GU));
+
+    // 시·구별 집계
+    const stat = {};
+    for (const name of targetGuNames) stat[name] = { total: 0, special: 0, schools: [] };
+
+    // 정밀 매칭을 위해 이름 긴 순서로 정렬된 지역 키 목록
+    const matchKeys = [...targetGuNames].sort((a, b) => b.length - a.length);
+
     for (const r of rows) {
       const addr = String(r.ORG_RDNMA ?? r.ORG_RDNZC ?? "");
-      const gname = Object.keys(SEOUL_GU).find((n) => addr.includes(n));
-      if (!gname) continue;
-      const blob = Object.values(r).map(String).join(" ");        // 모든 필드값 스캔
+      const matchedName = matchKeys.find((n) => addr.includes(n) || (n.includes(" ") && addr.includes(n.split(" ")[1])));
+      if (!matchedName || !stat[matchedName]) continue;
+      const blob = Object.values(r).map(String).join(" ");
       const isSpecial = SPECIAL_HS.some((k) => blob.includes(k)) && !blob.includes("특성화");
-      stat[gname].total++;
-      if (isSpecial) { stat[gname].special++; stat[gname].schools.push(String(r.SCHUL_NM ?? "")); }
+      stat[matchedName].total++;
+      if (isSpecial) { stat[matchedName].special++; stat[matchedName].schools.push(String(r.SCHUL_NM ?? "")); }
     }
 
     const build = (name) => {
-      const s = stat[name];
-      // 학군지수 = 자율·특목고 밀도(특목·자율 수 × 3 + 일반고 수 × 1), 상대 비교용 원점수
+      const s = stat[name] || { total: 0, special: 0, schools: [] };
       const index = s.special * 3 + (s.total - s.special);
-      return { 자치구: name, 고교수: s.total, 자율특목고수: s.special, 학군지수: index, 자율특목고: s.schools };
+      return { 지역: name, 고교수: s.total, 자율특목고수: s.special, 학군지수: index, 자율특목고: s.schools };
     };
 
     if (gu) {
@@ -796,11 +1041,12 @@ server.registerTool(
         ],
       };
     }
-    const all = Object.keys(SEOUL_GU).map(build).sort((a, b) => b.학군지수 - a.학군지수);
-    const lines = all.map((s, i) => `${String(i + 1).padStart(2)}. ${s.자치구}  지수 ${s.학군지수} (고교 ${s.고교수} · 자율특목 ${s.자율특목고수})`);
+
+    const all = targetGuNames.map(build).filter((s) => s.고교수 > 0).sort((a, b) => b.학군지수 - a.학군지수);
+    const lines = all.map((s, i) => `${String(i + 1).padStart(2)}. ${s.지역.padEnd(8)}  지수 ${s.학군지수} (고교 ${s.고교수} · 자율특목 ${s.자율특목고수})`);
     return {
       content: [
-        { type: "text", text: `🎓 자치구 학군 지수 순위 (자율·특목고 밀도 기준)\n\n${lines.join("\n")}` },
+        { type: "text", text: `🎓 수도권 학군 지수 순위 (${regionScope}, 자율·특목고 밀도 기준)\n\n${lines.join("\n")}` },
         { type: "text", text: JSON.stringify(all.map(({ 자율특목고, ...r }) => r), null, 2) },
       ],
     };
@@ -963,34 +1209,52 @@ async function collectJeonse(codes, months) {
   });
   return m.size ? m : null;
 }
-async function collectSchool() {
+async function collectSchool(targets) {
   if (!NEIS_KEY) return null;
   try {
+    const hasGyeonggi = targets ? targets.some((t) => t.code && t.code.startsWith("41")) : true;
+    const hasSeoul = targets ? targets.some((t) => t.code && t.code.startsWith("11")) : true;
+
     let rows = [];
-    const first = await neisSchoolPage(1); rows = first.rows;
-    const pages = Math.ceil(first.total / 1000);
-    for (let p = 2; p <= pages; p++) rows = rows.concat((await neisSchoolPage(p)).rows);
+    if (hasSeoul && hasGyeonggi) {
+      const [s, g] = await Promise.all([fetchSchoolsForProvince("seoul"), fetchSchoolsForProvince("gyeonggi")]);
+      rows = [...s, ...g];
+    } else if (hasGyeonggi) {
+      rows = await fetchSchoolsForProvince("gyeonggi");
+    } else {
+      rows = await fetchSchoolsForProvince("seoul");
+    }
+
+    const targetNames = targets ? targets.map((t) => t.name) : Object.keys(SEOUL_GU);
     const acc = {};
-    for (const n of Object.keys(SEOUL_GU)) acc[n] = { t: 0, s: 0 };
+    for (const n of targetNames) acc[n] = { t: 0, s: 0 };
+
+    const matchKeys = [...targetNames].sort((a, b) => b.length - a.length);
     for (const r of rows) {
-      const g = Object.keys(SEOUL_GU).find((n) => String(r.ORG_RDNMA ?? "").includes(n));
-      if (!g) continue;
+      const addr = String(r.ORG_RDNMA ?? r.ORG_RDNZC ?? "");
+      const matchedName = matchKeys.find((n) => addr.includes(n) || (n.includes(" ") && addr.includes(n.split(" ")[1])));
+      if (!matchedName || !acc[matchedName]) continue;
       const blob = Object.values(r).map(String).join(" ");
-      acc[g].t++; if (SPECIAL_HS.some((k) => blob.includes(k)) && !blob.includes("특성화")) acc[g].s++;
+      acc[matchedName].t++;
+      if (SPECIAL_HS.some((k) => blob.includes(k)) && !blob.includes("특성화")) acc[matchedName].s++;
     }
     const m = new Map();
     for (const [g, v] of Object.entries(acc)) if (v.t) m.set(g, v.s * 3 + (v.t - v.s));
     return m.size ? m : null;
   } catch { return null; }
 }
-function collectCrime(year, pop) {
+function collectCrime(year, pop, targetNames) {
   const files = listCsv(path.join(DATA_DIR, "crime"));
   if (!files.length) return null;
   const file = files.find((f) => year && yearFromName(f) === year) || files.sort((a, b) => (yearFromName(b) || 0) - (yearFromName(a) || 0))[0];
   let header, rows;
   try { ({ header, rows } = readCsvSmart(file)); } catch { return null; }
   const guCols = {};
-  header.forEach((h, i) => { const nh = norm(h); for (const n of Object.keys(SEOUL_GU)) if (nh === norm(n)) guCols[n] = i; });
+  const names = targetNames || Object.keys(CANONICAL_REGIONS);
+  header.forEach((h, i) => {
+    const nh = norm(h);
+    for (const n of names) if (nh === norm(n) || nh.includes(norm(n))) guCols[n] = i;
+  });
   if (!Object.keys(guCols).length) return null;
   const catCols = header.map((h, i) => ({ h, i })).filter(({ h }) => /분류|죄종|구분/.test(h)).map((x) => x.i);
   const sums = {}; for (const g of Object.keys(guCols)) sums[g] = 0;
@@ -1011,7 +1275,8 @@ function collectFromCsvMap(sub, valueOf) {
   const m = valueOf(files);
   return m && m.size ? m : null;
 }
-function collectIncome(year) {
+function collectIncome(year, targetNames) {
+  const names = targetNames || Object.keys(CANONICAL_REGIONS);
   return collectFromCsvMap("income", (files) => {
     const latest = new Map(); // gu -> {year, v}
     for (const file of files) {
@@ -1021,7 +1286,7 @@ function collectIncome(year) {
       const yc = header.map((h, i) => ({ y: (h.match(/(19|20)\d{2}/) || [])[0], i })).filter((x) => x.y).map((x) => ({ year: +x.y, i: x.i }));
       const iInc = header.findIndex((h) => /소득|금액/.test(h)), iY = header.findIndex((h) => /연도|년도|시점|기간|year/i.test(h));
       for (const row of rows) {
-        const g = Object.keys(SEOUL_GU).find((n) => norm(row[iR] || "") === norm(n) || String(row[iR] || "").includes(n));
+        const g = names.find((n) => norm(row[iR] || "") === norm(n) || String(row[iR] || "").includes(n));
         if (!g) continue;
         const push = (y, v) => { if (!year || y === year) { const c = latest.get(g); if (!c || y >= c.year) latest.set(g, { year: y, v }); } };
         if (yc.length) for (const x of yc) { const v = Number(String(row[x.i] || "").replace(/[,\s]/g, "")); if (v) push(x.year, v); }
@@ -1031,19 +1296,21 @@ function collectIncome(year) {
     const m = new Map(); for (const [g, o] of latest) m.set(g, o.v); return m;
   });
 }
-function collectLiving(from, to) {
+function collectLiving(from, to, targetNames) {
+  const names = targetNames || Object.keys(CANONICAL_REGIONS);
   return collectFromCsvMap("living_pop", (files) => {
     const agg = new Map(); // gu -> Map(ym->{sum,n})
     for (const file of files) {
       let header, rows; try { ({ header, rows } = readCsvSmart(file)); } catch { continue; }
       const iD = header.findIndex((h) => /기준일|일자|날짜|date/i.test(h));
-      const iG = header.findIndex((h) => /자치구코드|자치구|구코드|gu/i.test(h));
+      const iG = header.findIndex((h) => /자치구코드|자치구|시군구코드|구코드|시군|gu/i.test(h));
       const iP = header.findIndex((h) => /총생활인구|생활인구수|인구수|population/i.test(h));
       if (iD < 0 || iG < 0 || iP < 0) continue;
       for (const row of rows) {
         const ym = Number(String(row[iD] || "").slice(0, 6)); if (!ym) continue;
         if (from && ym < from) continue; if (to && ym > to) continue;
-        const g = CODE_TO_GU[String(row[iG] || "").trim()] || Object.keys(SEOUL_GU).find((n) => norm(n) === norm(row[iG] || ""));
+        const guRaw = String(row[iG] || "").trim();
+        const g = CODE_TO_GU[guRaw] || names.find((n) => norm(n) === norm(guRaw) || guRaw.includes(n));
         if (!g) continue;
         const v = Number(String(row[iP] || "").replace(/[,\s]/g, "")); if (!Number.isFinite(v)) continue;
         if (!agg.has(g)) agg.set(g, new Map());
@@ -1070,7 +1337,7 @@ server.registerTool(
       "종합 순위를 반환합니다. 가중치는 입력으로 조정 가능하며, 가용한 지표만 사용합니다. " +
       "⚠️ 투자 조언이 아니라 지표 종합입니다.",
     inputSchema: {
-      districts: z.array(z.string()).optional().describe("대상 자치구 목록(생략 시 25개 구 전체)"),
+      districts: z.array(z.string()).optional().describe("대상 자치구 목록(생략 시 서울 25개 구 기본, 경기도 구/시 지정 가능)"),
       priceFrom: z.string().regex(/^\d{6}$/, "YYYYMM").default("202301").describe("가격/전세가율 CAGR 산정 시작 연월"),
       crimeYear: z.number().optional().describe("범죄 기준 연도(생략 시 최신 파일)"),
       incomeYear: z.number().optional().describe("소득 기준 연도(생략 시 최신)"),
@@ -1096,11 +1363,11 @@ server.registerTool(
     const [price, jeonse, school, living, income] = await Promise.all([
       collectPrice(targets, months),
       collectJeonse(targets, months),
-      collectSchool(),
-      Promise.resolve(collectLiving(null, null)),
-      Promise.resolve(collectIncome(incomeYear)),
+      collectSchool(targets),
+      Promise.resolve(collectLiving(null, null, names)),
+      Promise.resolve(collectIncome(incomeYear, names)),
     ]);
-    const crime = collectCrime(crimeYear, GU_POP_2024);
+    const crime = collectCrime(crimeYear, GU_POP_2024, names);
     const raw = { price, jeonse, school, living, income, crime };
 
     // 커버리지: 대상 구에 대해 2개 이상 값이 있는 지표만 사용

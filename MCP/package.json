@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start:trade": "node trade-server.js",
-    "start:realty": "node realestate-server.js"
+    "start:realty": "node realestate-server.js",
+    "daily:sync": "node daily_pipeline_sync.js"
   },
   "keywords": [
     "mcp",
