@@ -17,6 +17,9 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { XMLParser } from "fast-xml-parser";
 import { z } from "zod";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // .env 파일 자동 로드

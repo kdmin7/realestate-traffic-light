@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
       --bg-page: #f8fafc;
@@ -42,9 +43,10 @@
       font-family: 'Noto Sans KR', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       padding: 24px;
       line-height: 1.6;
+      font-size: 17px;
     }
     .container {
-      max-width: 1720px;
+      max-width: 1840px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -62,7 +64,7 @@
       border-top: 4px solid var(--accent-blue);
     }
     .header-title h1 {
-      font-size: 1.85rem;
+      font-size: 2.1rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -87,7 +89,7 @@
     .header-meta {
       display: flex;
       gap: 20px;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       color: var(--text-sub);
     }
     .header-meta strong {
@@ -113,13 +115,13 @@
       box-shadow: var(--card-shadow-hover);
       border-color: var(--card-border-hover);
     }
-    .macro-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
-    .macro-value { font-size: 1.65rem; font-weight: 800; color: var(--accent-blue); letter-spacing: -0.02em; }
-    .macro-desc { font-size: 0.8rem; color: var(--text-sub); }
+    .macro-label { font-size: 1.05rem; color: var(--text-muted); font-weight: 600; }
+    .macro-value { font-size: 1.85rem; font-weight: 800; color: var(--accent-blue); letter-spacing: -0.02em; }
+    .macro-desc { font-size: 1.05rem; color: var(--text-sub); }
 
     .district-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
       gap: 20px;
     }
     .card {
@@ -147,7 +149,7 @@
       padding-bottom: 12px;
     }
     .card-title {
-      font-size: 1.35rem;
+      font-size: 1.7rem;
       font-weight: 800;
       color: var(--text-main);
       display: flex;
@@ -160,7 +162,7 @@
       gap: 6px;
       padding: 6px 14px;
       border-radius: 9999px;
-      font-size: 0.85rem;
+      font-size: 1.05rem;
       font-weight: 800;
       letter-spacing: -0.01em;
     }
@@ -177,7 +179,7 @@
     .stat-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
+      font-size: 1.05rem;
     }
     .stat-row .lbl { color: var(--text-sub); font-weight: 500; }
     .stat-row .val { font-weight: 700; color: var(--text-main); }
@@ -195,7 +197,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
+      font-size: 1.05rem;
     }
     .meter-row strong { font-weight: 700; }
     .bar-bg {
@@ -220,7 +222,7 @@
       box-shadow: var(--card-shadow);
     }
     .chart-section h3 {
-      font-size: 1.25rem;
+      font-size: 1.45rem;
       margin-bottom: 20px;
       font-weight: 800;
       color: var(--text-main);
@@ -292,14 +294,14 @@
       box-shadow: var(--card-shadow);
     }
     .scoreboard-banner-text h2 {
-      font-size: 1.5rem;
+      font-size: 1.7rem;
       font-weight: 800;
       color: var(--text-main);
       margin-bottom: 6px;
       letter-spacing: -0.02em;
     }
     .scoreboard-banner-text p {
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       color: var(--text-sub);
     }
     .preset-group {
@@ -313,7 +315,7 @@
       color: var(--text-sub);
       padding: 9px 16px;
       border-radius: 10px;
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -354,7 +356,7 @@
       gap: 8px;
     }
     .weight-panel-title span {
-      font-size: 0.88rem;
+      font-size: 1rem;
       color: var(--text-muted);
       font-weight: 500;
     }
@@ -375,7 +377,7 @@
     .slider-label {
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
+      font-size: 1.05rem;
       color: var(--text-sub);
       font-weight: 700;
     }
@@ -425,7 +427,7 @@
       color: var(--text-sub);
       padding: 8px 18px;
       border-radius: 20px;
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
@@ -462,7 +464,7 @@
       background: transparent;
       border: none;
       color: var(--text-main);
-      font-size: 0.92rem;
+      font-size: 1.05rem;
       font-weight: 600;
       outline: none;
       width: 100%;
@@ -490,7 +492,7 @@
     .board-table th {
       background: #f8fafc;
       color: var(--text-sub);
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 800;
       padding: 16px 18px;
       border-bottom: 2px solid var(--card-border);
@@ -503,7 +505,7 @@
     .board-table td {
       padding: 16px 18px;
       border-bottom: 1px solid #f1f5f9;
-      font-size: 0.92rem;
+      font-size: 1.05rem;
       vertical-align: middle;
       color: var(--text-main);
     }
@@ -518,7 +520,7 @@
       height: 32px;
       border-radius: 10px;
       font-weight: 800;
-      font-size: 0.92rem;
+      font-size: 1.05rem;
     }
     .rank-1 { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: 1px solid #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
     .rank-2 { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #334155; border: 1px solid #cbd5e1; }
@@ -529,7 +531,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-size: 1.25rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--accent-blue);
       letter-spacing: -0.02em;
@@ -549,7 +551,7 @@
     }
     .metric-pill {
       display: inline-block;
-      font-size: 0.85rem;
+      font-size: 1.05rem;
       font-weight: 700;
       padding: 4px 9px;
       border-radius: 6px;
@@ -597,7 +599,7 @@
       background: var(--accent-blue-light);
       border: 1px solid #bfdbfe;
       color: var(--accent-blue);
-      font-size: 0.88rem;
+      font-size: 1rem;
       padding: 4px 14px;
       border-radius: 20px;
       font-weight: 800;
@@ -620,7 +622,7 @@
       gap: 12px;
     }
     .period-sec-title {
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--text-main);
       display: flex;
@@ -638,7 +640,7 @@
       color: var(--text-sub);
       padding: 7px 12px;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
@@ -672,7 +674,7 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
     .date-input-wrap label {
-      font-size: 0.8rem;
+      font-size: 1.05rem;
       color: var(--text-muted);
       font-weight: 700;
     }
@@ -680,7 +682,7 @@
       background: transparent;
       border: none;
       color: var(--text-main);
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 700;
       outline: none;
       cursor: pointer;
@@ -695,7 +697,7 @@
       border: none;
       color: #ffffff;
       font-weight: 800;
-      font-size: 0.88rem;
+      font-size: 1rem;
       padding: 9px 18px;
       border-radius: 8px;
       cursor: pointer;
@@ -707,6 +709,14 @@
       transform: translateY(-1px);
       box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
     }
+    .raw-markdown-body h1 { font-size: 1.8rem; margin-bottom: 16px; font-weight: 800; }
+    .raw-markdown-body h2 { font-size: 1.5rem; margin-top: 24px; margin-bottom: 12px; font-weight: 800; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;}
+    .raw-markdown-body p { margin-bottom: 12px; font-size: 1.05rem; }
+    .raw-markdown-body hr { border: none; border-top: 1px dashed var(--card-border); margin: 20px 0; }
+    .raw-markdown-body table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; }
+    .raw-markdown-body th { background: #f8fafc; padding: 12px; font-weight: 800; border-bottom: 2px solid var(--card-border); }
+    .raw-markdown-body td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+    .raw-markdown-body tr:hover td { background: #f8fafc; }
   </style>
 </head>
 <body>
@@ -714,7 +724,8 @@
     <!-- Header -->
     <header class="header">
       <div class="header-title">
-        <h1>🚦 부동산 신호등 — 수도권(서울·경기) 실시간 모니터링 & 통합 스코어보드 <span class="badge-live">LIVE MCP</span></h1>
+        <h1 style="font-size: 2.8rem; margin-bottom: 4px;">🚦 부동산 신호등 <span class="badge-live" style="font-size: 1rem; padding: 6px 16px; vertical-align: middle;">LIVE MCP</span></h1>
+        <p style="font-size: 1.15rem; color: var(--text-sub); font-weight: 600; letter-spacing: -0.02em; padding-left: 4px;">수도권(서울·경기) 실시간 모니터링 & 통합 스코어보드</p>
       </div>
       <div class="header-meta">
         <div>기준일: <strong>2026년 9월 9일 (매일 실시간 증분 갱신)</strong></div>
@@ -730,6 +741,9 @@
       </button>
       <button class="tab-btn" onclick="switchTab('live')">
         🚦 실시간 신호등 대시보드
+      </button>
+      <button class="tab-btn" onclick="switchTab('raw')">
+        📋 RAW 데이터 탐색기
       </button>
     </div>
 
@@ -759,7 +773,7 @@
             <span>📅 데이터 조회 기간 설정</span>
             <span class="period-badge-active" id="activePeriodBadge">2023.01 ~ 2026.08 (최근 3년 기준)</span>
           </div>
-          <span style="font-size:0.85rem; color:var(--text-muted);">국토부 실거래가·전세가율 및 시장 사이클 시계열 반영</span>
+          <span style="font-size:0.95rem; color:var(--text-muted);">국토부 실거래가·전세가율 및 시장 사이클 시계열 반영</span>
         </div>
         
         <div class="period-controls-grid">
@@ -1010,7 +1024,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">426건 (7월: 313 / 8월: 113)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">22.5억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">25.0억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">아시아선수촌아파트 (65.0억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">아시아선수촌아파트 (65.0억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 70%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.4</strong></div>
@@ -1028,7 +1042,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">384건 (7월: 260 / 8월: 124)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">16.8억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">17.4억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">파크뷰 (41.5억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">파크뷰 (41.5억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 82%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.7</strong></div>
@@ -1046,7 +1060,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">227건 (7월: 163 / 8월: 64)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">31.0억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">29.6억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">신현대12차 (112.5억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">신현대12차 (112.5억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 90%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.8</strong></div>
@@ -1064,7 +1078,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">96건 (7월: 68 / 8월: 28)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">20.2억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">21.8억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">과천푸르지오써밋 (32.0억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">과천푸르지오써밋 (32.0억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 85%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.7</strong></div>
@@ -1082,7 +1096,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">195건 (7월: 135 / 8월: 60)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">23.6억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">27.8억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">래미안원베일리 (90.0억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">래미안원베일리 (90.0억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 85%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.7</strong></div>
@@ -1100,7 +1114,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">290건 (7월: 205 / 8월: 85)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">10.5억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">11.2억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">성복역롯데캐슬골드타운 (16.2억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">성복역롯데캐슬골드타운 (16.2억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 68%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.3</strong></div>
@@ -1118,7 +1132,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">88건 (7월: 60 / 8월: 28)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">26.3억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">22.1억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">한남더힐 (120.0억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">한남더힐 (120.0억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 75%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.5</strong></div>
@@ -1136,7 +1150,7 @@
             <div class="stat-row"><span class="lbl">최근 실거래 건수</span><span class="val">142건 (7월: 101 / 8월: 41)</span></div>
             <div class="stat-row"><span class="lbl">전체 평균 거래가</span><span class="val">18.8억</span></div>
             <div class="stat-row"><span class="lbl">전용 84㎡ 기준 평균</span><span class="val" style="color: var(--accent-cyan);">19.6억</span></div>
-            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.85rem;">갤러리아포레 (92.0억)</span></div>
+            <div class="stat-row"><span class="lbl">신고 최고가 아파트</span><span class="val" style="font-size:0.95rem;">갤러리아포레 (92.0억)</span></div>
           </div>
           <div class="score-meter">
             <div class="meter-row"><span style="color: #60a5fa; width: 60px;">트렌드</span><div class="bar-bg"><div class="bar-fill" style="width: 65%; background: #38bdf8;"></div></div><strong style="color: #60a5fa;">+1.3</strong></div>
@@ -1154,6 +1168,53 @@
 
     </div>
 
+    <!-- =======================================================================
+         TAB 3: RAW 데이터 탐색기
+         ======================================================================= -->
+    <div id="tab-raw" class="tab-content">
+      <div class="scoreboard-banner">
+        <div class="scoreboard-banner-text">
+          <h2>📄 지역별 원자재(RAW) 실거래가 탐색기</h2>
+          <p>수집된 마크다운 원본 파일을 대시보드 내에서 바로 열람할 수 있습니다. (GitHub Pages 등 웹 서버 환경에서 동작합니다)</p>
+        </div>
+      </div>
+      <div class="period-panel">
+        <div class="filter-bar" style="justify-content: flex-start; gap: 20px;">
+          <div class="date-input-wrap">
+            <label>지역 선택</label>
+            <select id="rawDistrict">
+              <option value="gangnam">강남구</option>
+              <option value="seocho">서초구</option>
+              <option value="songpa">송파구</option>
+              <option value="yongsan">용산구</option>
+              <option value="seongdong">성동구</option>
+              <option value="mapo">마포구</option>
+              <option value="jongno">종로구</option>
+              <option value="yangcheon">양천구</option>
+              <option value="yeongdeungpo">영등포구</option>
+              <option value="bundang">성남시 분당구</option>
+              <option value="gwacheon">과천시</option>
+              <option value="suji">용인시 수지구</option>
+            </select>
+          </div>
+          <div class="date-input-wrap">
+            <label>일정(버전) 선택</label>
+            <select id="rawVersion">
+              <option value="raw">최신 누적 (raw.md)</option>
+              <option value="raw_2026W37">2026년 37주차</option>
+              <option value="raw_2026W33">2026년 33주차</option>
+            </select>
+          </div>
+          <button class="btn-apply-period" onclick="fetchAndRenderRaw()">불러오기</button>
+        </div>
+      </div>
+      <div class="board-container" style="padding: 30px; min-height: 500px;">
+        <div id="rawContentArea" class="raw-markdown-body">
+          <p style="color: var(--text-muted); text-align: center; padding-top: 50px;">위에서 지역과 일정을 선택한 후 '불러오기' 버튼을 눌러주세요.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -1166,10 +1227,33 @@
         document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
         document.getElementById('tab-scoreboard').classList.add('active');
         updateScoreboardCharts();
-      } else {
+      } else if (tabId === 'live') {
         document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
         document.getElementById('tab-live').classList.add('active');
         initLiveChart();
+      } else if (tabId === 'raw') {
+        document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+        document.getElementById('tab-raw').classList.add('active');
+      }
+    }
+
+    async function fetchAndRenderRaw() {
+      const district = document.getElementById('rawDistrict').value;
+      const version = document.getElementById('rawVersion').value;
+      const fileName = `${district}_${version}.md`;
+      const contentArea = document.getElementById('rawContentArea');
+      
+      contentArea.innerHTML = `<p style="text-align:center;">데이터를 불러오는 중입니다...</p>`;
+      
+      try {
+        const res = await fetch(`data/re-data-collector/${fileName}`);
+        if (!res.ok) {
+          throw new Error('파일을 찾을 수 없습니다.');
+        }
+        const text = await res.text();
+        contentArea.innerHTML = marked.parse(text);
+      } catch (err) {
+        contentArea.innerHTML = `<p style="color: var(--red); text-align:center;">데이터 불러오기 실패: <strong>${fileName}</strong> 파일을 찾을 수 없습니다.</p>`;
       }
     }
 
