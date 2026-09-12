@@ -58,16 +58,15 @@ re-data-collector  →  re-trend-risk-analyst  →  re-timing-judge  →  re-bri
 
 ## MCP 데이터 서버 (`MCP/`)
 
-`MCP/` 폴더에는 파이프라인과 별개로 개발된 로컬 MCP 서버 2개가 있다 (Node 18+, stdio 트랜스포트):
+`MCP/` 폴더에는 파이프라인과 연동된 로컬 MCP 서버가 있다 (Node 18+, stdio 트랜스포트):
 
-- **realestate-server.js (seoul-realty)** — 서울 25개 자치구의 실거래가·전세가율·금리·학군·범죄율·생활인구·소득 + 종합 스코어, 총 8개 도구. 등록 시 `mcp__seoul-realty__*`로 노출되며 re-data-collector의 1차 데이터 소스가 된다 (에이전트 정의의 tools에 이미 포함됨 — 미등록 상태면 해당 도구만 조용히 비활성).
-- **trade-server.js (semiconductor-trade)** — 관세청 반도체 수출입 실적 조회. 부동산 파이프라인과 무관한 별도 서버.
+- **realestate-server.js (seoul-realty)** — 수도권 거시분석(금리/학군/범죄/인구/소득) + 유형별 실거래(아파트/오피스텔/빌라/단독/상업) + 청약 + 재무계산기 + A2A 위치/역세권/투자가치/삶의질/맞춤추천, 총 27개 도구. 등록 시 `mcp__seoul-realty__*`로 노출되며 re-data-collector 및 후속 에이전트의 핵심 데이터 소스가 된다.
 
 등록 명령(경로는 이 저장소 기준으로 갱신된 것):
 ```
 claude mcp add seoul-realty -e MOLIT_API_KEY=... -e ECOS_API_KEY=... -e NEIS_API_KEY=... -- node C:\practice\geminiCLI\realestate_prj\MCP\realestate-server.js
 ```
-API 키는 사용자 소유이며 절대 커밋하지 않는다. REST 도구(실거래가·전세가율·금리·학군)는 키만 있으면 되고, 범죄·생활인구·소득 도구는 `MCP/data/` 아래 CSV 파일을 요구한다(현재 비어 있음). 상세 문서: `MCP/README-seoul-realty.md`, `MCP/TRANSFER-GUIDE.md`.
+API 키는 사용자 소유이며 절대 커밋하지 않는다. REST 도구(실거래가·전세가율·금리·학군)는 키만 있으면 되고, 범죄·생활인구·소득 도구는 `MCP/data/` 아래 CSV 파일을 요구한다(현재 비어 있음). 상세 문서: `MCP/README.md`, `MCP/TRANSFER-GUIDE.md`.
 
 ## 설계 원칙 (수정 시 유지할 것)
 

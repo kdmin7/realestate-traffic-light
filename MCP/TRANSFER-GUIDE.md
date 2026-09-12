@@ -7,13 +7,10 @@
 
 ```
 MCP-transfer.zip
-├─ trade-server.js            반도체 수출입 MCP (관세청)
-├─ realestate-server.js       서울 부동산 인사이트 MCP (8 tools)
+├─ realestate-server.js       서울·수도권 부동산 인사이트 MCP (22 tools)
 ├─ package.json / package-lock.json
 ├─ .gitignore
-├─ README.md                  반도체 서버 문서
-├─ README-seoul-realty.md     부동산 서버 문서
-├─ dashboard.html             반도체 수출입 대시보드
+├─ README.md                  부동산 서버 문서
 ├─ design.html                부동산 서버 설계도
 ├─ data/{crime,living_pop,income}/   (빈 폴더 — CSV는 새 PC에서 다시 내려받기)
 └─ conversation.jsonl         이 대화 전체 기록
@@ -39,12 +36,7 @@ npm install
 > 예전에 `C:\Users\User\...` ↔ `C:\Users\LG\...` 문제가 있었죠. 아래 경로를 **새 PC 실제 경로**로 바꾸세요.
 
 ```bash
-# 반도체 서버
-claude mcp add semiconductor-trade \
-  -e CUSTOMS_API_KEY=관세청_키 \
-  -- node <새경로>\trade-server.js
-
-# 부동산 서버
+# 부동산 서버 등록
 claude mcp add seoul-realty \
   -e MOLIT_API_KEY=국토부_키 \
   -e ECOS_API_KEY=한국은행_키 \

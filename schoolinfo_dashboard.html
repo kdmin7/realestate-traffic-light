@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏫 수도권 명문학군 & 학교정보 실시간 모니터 대시보드 (schoolinfo-mcp)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-border-hover: #cbd5e1;
+      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+      --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.09), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --purple: #7c3aed;
+      --purple-light: #faf5ff;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --danger: #dc2626;
+      --mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .fhd-container {
+      max-width: 1860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Top Global Header */
+    header {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--card-shadow);
+      border-top: 5px solid var(--primary);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .logo-badge {
+      font-size: 34px;
+      width: 58px;
+      height: 58px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .header-titles h1 {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-titles p {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 3px;
+    }
+    .badge-live {
+      background: var(--accent-green-bg);
+      border: 1px solid var(--accent-green-border);
+      color: var(--accent-green);
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+    }
+
+    /* 오른쪽 상단: 데이터 취득 & 대시보드 생성 시점 날짜 배너 */
+    .header-right-timestamp {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 12px 24px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+    }
+    .ts-icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+    .ts-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .ts-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1e40af;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .ts-date {
+      font-size: 24px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      font-family: var(--mono);
+      line-height: 1.2;
+    }
+    .ts-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #047857;
+      background: #d1fae5;
+      padding: 2px 8px;
+      border-radius: 6px;
+      align-self: flex-start;
+      margin-top: 2px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+    .section-tag {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      border-radius: 8px;
+    }
+
+    /* Top 20 Filters & Layout */
+    .filter-group {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Top 20 Grid (Full HD Optimized: 5 Columns on wide screens) */
+    .top20-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1600px) {
+      .top20-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 1280px) {
+      .top20-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .top20-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* School Card (Light Modern Style) */
+    .school-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--card-shadow);
+      border-top: 3px solid transparent;
+    }
+    .school-card:hover {
+      border-color: var(--card-border-hover);
+      transform: translateY(-3px);
+      box-shadow: var(--card-shadow-hover);
+    }
+    .school-card.rank-1 { border-top-color: #f59e0b; background: linear-gradient(180deg, #fffbeb 0%, #ffffff 40%); }
+    .school-card.rank-2 { border-top-color: #94a3b8; background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%); }
+    .school-card.rank-3 { border-top-color: #d97706; background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%); }
+    .school-card.active-card {
+      border-color: var(--primary) !important;
+      border-top-color: var(--primary) !important;
+      background: #f0f7ff !important;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2) !important;
+    }
+
+    .card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rank-badge {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      border: 1px solid #e2e8f0;
+    }
+    .school-card.rank-1 .rank-badge { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .school-card.rank-2 .rank-badge { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    .school-card.rank-3 .rank-badge { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
+
+    .score-badge-box {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .score-val {
+      font-family: var(--mono);
+      font-size: 21px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .grade-pill {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+    }
+    .grade-s-plus { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .grade-s { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .grade-a-plus { background: #faf5ff; color: #6b21a8; border-color: #e9d5ff; }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.02em;
+    }
+    .card-meta-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .meta-chip {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: var(--text-sub);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .card-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+    .metric-row b {
+      color: var(--text-main);
+      font-family: var(--mono);
+      font-weight: 700;
+    }
+    .spec-line {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #eff6ff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Workspace Section: 360px Sidebar + 1fr Main Feed */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+    @media (max-width: 1200px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Left Selection Controller */
+    .selection-panel {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .input-group label {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.2s;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .search-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-search {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 18px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-search:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .quick-list-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .quick-item {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .quick-item:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+      transform: translateX(3px);
+    }
+    .q-kind-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: var(--text-sub);
+    }
+
+    /* Right Live Content Tabs & Feeds */
+    .detail-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Modern Tab Navigation */
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      background: #ffffff;
+      padding: 8px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+    .tab-btn:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Main View Card */
+    .view-card {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px;
+      min-height: 480px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+    }
+
+    /* School Hero Header */
+    .school-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 20px;
+      margin-bottom: 22px;
+    }
+    .hero-info h3 {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .hero-tag {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      border: 1px solid #e2e8f0;
+    }
+    .hero-tag.primary {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+
+    .hero-score-box {
+      text-align: right;
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1.5px solid #bfdbfe;
+      padding: 14px 22px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+    .hero-score-val {
+      font-size: 38px;
+      font-weight: 900;
+      font-family: var(--mono);
+      color: var(--primary);
+      line-height: 1;
+    }
+    .hero-score-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    /* Feed Layout */
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    .feed-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .feed-title {
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+    .feed-content {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    .meal-dish-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .meal-dish-list li {
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text-main);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .meal-dish-list li::before {
+      content: '🍱';
+      font-size: 14px;
+    }
+
+    .sched-item {
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .sched-date {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .sched-name {
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-lbl { color: var(--text-muted); font-weight: 600; }
+    .stat-val { font-weight: 800; font-family: var(--mono); color: var(--text-main); font-size: 15px; }
+
+    /* Meter / Factor Progress Bar */
+    .eval-meter {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .meter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .meter-track {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 4px;
+    }
+
+    /* Live MCP Console Stream (Clean White Theme) */
+    .mcp-console {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #86efac;
+      margin-top: 18px;
+      height: 140px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .log-line {
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    .log-time { color: #94a3b8; margin-right: 10px; }
+    .log-tool { color: #38bdf8; font-weight: 700; margin-right: 6px; }
+
+    /* Loading Spinner */
+    .loader {
+      display: none;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .spin {
+      width: 44px; height: 44px;
+      border: 4px solid #e2e8f0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="fhd-container">
+
+    <!-- Top Global Header with Prominent Timestamp in White Layout -->
+    <header>
+      <div class="header-left">
+        <div class="logo-badge">🏫</div>
+        <div class="header-titles">
+          <h1>수도권 명문학군 & 학교정보 실시간 모니터링 <span class="badge-live"><span class="pulse-dot"></span>NEIS · MCP LIVE</span></h1>
+          <p>schoolinfo-mcp-server · NEIS 교육정보개방포털 · 공시 요약 및 급식·학사일정 실시간 파이프라인</p>
+        </div>
+      </div>
+
+      <!-- 오른쪽 상단: 데이터 취득 & 대시보드 생성 시점 날짜 배너 -->
+      <div class="header-right-timestamp">
+        <div class="ts-icon">📅</div>
+        <div class="ts-content">
+          <div class="ts-label">데이터 취득 & 대시보드 생성 시점</div>
+          <div class="ts-date" id="liveTimestamp">2026년 9월 13일 00:32:09</div>
+          <div class="ts-badge">✅ 실시간 데이터 최신화 완료 (KST)</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 1: 서울·경기 Top 20 학교 현황 & 스코어보드 (FHD 최적화) -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>🏆 서울·경기 명문고 Top 20 종합 상황판 & 평가 스코어</span>
+        <span class="section-tag">100점 만점 스코어링 (학업성취도·진학률·학군지)</span>
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="filterTop20('ALL')">전체 순위 (Top 20)</button>
+        <button class="filter-btn" onclick="filterTop20('SEOUL')">서울권 명문 (11개교)</button>
+        <button class="filter-btn" onclick="filterTop20('GYEONGGI')">경기권 명문 (9개교)</button>
+      </div>
+    </div>
+
+    <!-- Top 20 Grid (Full HD 최적화 5열 배치) -->
+    <div class="top20-grid" id="top20Container">
+      <!-- 자바스크립트로 Top 20 카드 렌더링 -->
+    </div>
+
+    <!-- Section 2: 지역별/학교별 상세 선택 & 실시간 피드 워크스페이스 -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>🔍 지역별·학교별 실시간 업데이트 브라우저</span>
+        <span class="section-tag">schoolinfo-mcp 연동 실시간 피드</span>
+      </div>
+    </div>
+
+    <div class="workspace-grid">
+      <!-- Left Selection Controller -->
+      <div class="selection-panel">
+        <div class="input-group">
+          <label>📍 시·도 지역 선택</label>
+          <select id="provinceSelect" onchange="onProvinceChange()">
+            <option value="서울특별시">서울특별시</option>
+            <option value="경기도">경기도</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>🏙️ 자치구 / 시·군 선택</label>
+          <select id="districtSelect" onchange="onDistrictChange()">
+            <!-- 자치구 옵션 동적 로드 -->
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>🔎 학교명 직접 검색</label>
+          <div class="search-row">
+            <input type="text" id="schoolSearchInput" placeholder="학교명 입력 (예: 대원외고, 휘문고)">
+            <button class="btn-search" onclick="searchDirectSchool()">검색</button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>⚡ 선택 지역 주요 추천 학교</label>
+          <div class="quick-list-box" id="quickSchoolList">
+            <!-- 동적 퀵 리스트 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Detail & Live Feeds -->
+      <div class="detail-container">
+        <!-- Navigation Tab Bar -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('tab-overview')">📊 종합 학교 현황 & 지표</button>
+          <button class="tab-btn" onclick="switchTab('tab-meal')">🍱 급식 식단 & 영양 분석</button>
+          <button class="tab-btn" onclick="switchTab('tab-schedule')">📅 학사일정 & D-day 캘린더</button>
+          <button class="tab-btn" onclick="switchTab('tab-parent')">📋 학부모 알리미 공시 요약</button>
+        </div>
+
+        <!-- Detail Content Card -->
+        <div class="view-card">
+          <div class="loader" id="cardLoader">
+            <div class="spin"></div>
+            <div style="font-weight:700; color:var(--text-main);">NEIS & MCP 실시간 데이터 동기화 중...</div>
+          </div>
+
+          <div id="cardContent">
+            <!-- School Hero Header -->
+            <div class="school-hero">
+              <div class="hero-info">
+                <h3 id="heroSchoolName">대원외국어고등학교</h3>
+                <div class="hero-tags">
+                  <span class="hero-tag primary" id="heroSchoolRegion">서울 광진구</span>
+                  <span class="hero-tag" id="heroSchoolKind">특수목적고 (외고)</span>
+                  <span class="hero-tag">사립 · 남녀공학</span>
+                  <span class="hero-tag" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0;">학군 1등급 우수지</span>
+                </div>
+              </div>
+              <div class="hero-score-box">
+                <div class="hero-score-val" id="heroScoreVal">99.4</div>
+                <div class="hero-score-lbl">종합 학군 지수 (100점 만점)</div>
+              </div>
+            </div>
+
+            <!-- Tab 1: Overview -->
+            <div id="tab-overview" class="tab-pane">
+              <div class="feed-grid">
+                <div class="feed-box">
+                  <div class="feed-title">🏫 기본 정보 및 설립 현황</div>
+                  <div class="feed-content">
+                    <div class="stat-row"><span class="stat-lbl">관할 교육청</span><span class="stat-val" id="ovEduOffice">서울특별시교육청</span></div>
+                    <div class="stat-row"><span class="stat-lbl">도로명 주소</span><span class="stat-val" id="ovAddress">서울 광진구 용마산로22길 16</span></div>
+                    <div class="stat-row"><span class="stat-lbl">대표 전화</span><span class="stat-val">02-2204-1300</span></div>
+                    <div class="stat-row"><span class="stat-lbl">설립 구분</span><span class="stat-val">사립 (1984년 설립)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">학군 분류</span><span class="stat-val" id="ovRank" style="color:var(--primary);">전국 특목고 최상위</span></div>
+                  </div>
+                </div>
+
+                <div class="feed-box">
+                  <div class="feed-title">📈 학군 정량 평가 4대 지표</div>
+                  <div class="eval-meter">
+                    <div class="meter-item">
+                      <div class="meter-head"><span>학업성취도 및 수능 역량</span><span style="color:var(--primary);">99.2점</span></div>
+                      <div class="meter-track"><div class="meter-fill" style="width: 99.2%;"></div></div>
+                    </div>
+                    <div class="meter-item">
+                      <div class="meter-head"><span>명문대 / 의학계열 진학률</span><span style="color:var(--primary);">98.5점</span></div>
+                      <div class="meter-track"><div class="meter-fill" style="width: 98.5%;"></div></div>
+                    </div>
+                    <div class="meter-item">
+                      <div class="meter-head"><span>우수 교원 및 교육 환경</span><span style="color:var(--primary);">96.8점</span></div>
+                      <div class="meter-track"><div class="meter-fill" style="width: 96.8%;"></div></div>
+                    </div>
+                    <div class="meter-item">
+                      <div class="meter-head"><span>인접 학원가 및 교육 인프라</span><span style="color:var(--primary);">97.4점</span></div>
+                      <div class="meter-track"><div class="meter-fill" style="width: 97.4%;"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Meal Feed -->
+            <div id="tab-meal" class="tab-pane" style="display: none;">
+              <div class="feed-grid">
+                <div class="feed-box">
+                  <div class="feed-title">🍱 오늘의 중식 식단표 (NEIS 실시간)</div>
+                  <div class="feed-content">
+                    <ul class="meal-dish-list">
+                      <li>친환경 흑미밥</li>
+                      <li>한우 소고기 무국 (16)</li>
+                      <li>매콤 돈육 갈비찜 (5, 6, 10)</li>
+                      <li>바삭 해물 파전 & 간장 (1, 5, 6, 17)</li>
+                      <li>배추 겉절이 김치 (9)</li>
+                      <li>제철 생딸기 & 유기농 과일주스 (13)</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="feed-box">
+                  <div class="feed-title">🔥 열량 및 3대 영양소 분석</div>
+                  <div class="feed-content">
+                    <div class="stat-row"><span class="stat-lbl">총 에너지 (열량)</span><span class="stat-val" style="color:#d97706;" id="mealCal">785.4 Kcal</span></div>
+                    <div class="stat-row"><span class="stat-lbl">탄수화물 함량</span><span class="stat-val">102.4g (권장 적합)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">단백질 함량</span><span class="stat-val">38.6g (우수)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">지방 함량</span><span class="stat-val">18.2g</span></div>
+                    <div class="stat-row"><span class="stat-lbl">주요 알레르기 유발 정보</span><span class="stat-val" style="font-size:13px;">난류(1), 대두(5), 밀(6), 돼지고기(10)</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Schedule Feed -->
+            <div id="tab-schedule" class="tab-pane" style="display: none;">
+              <div class="feed-box">
+                <div class="feed-title">📅 주요 학사일정 및 시험/방학 D-day 카운트다운</div>
+                <div class="feed-content" id="schedList">
+                  <div class="sched-item"><span class="sched-name">🌸 1학기 개학식 및 신입생 입학식</span><span class="sched-date">2026.03.03 (정상 수업)</span></div>
+                  <div class="sched-item"><span class="sched-name">📝 1학기 1차 지필평가 (중간고사)</span><span class="sched-date">2026.04.28 ~ 05.01 (D-46)</span></div>
+                  <div class="sched-item"><span class="sched-name">🏃 교내 춘계 체육한마당 축제</span><span class="sched-date">2026.05.15 (전교생 참여)</span></div>
+                  <div class="sched-item"><span class="sched-name">📊 전국연합학력평가 (모의고사)</span><span class="sched-date">2026.06.04 (D-83)</span></div>
+                  <div class="sched-item"><span class="sched-name">🏖️ 여름방학식 및 종업식</span><span class="sched-date">2026.07.21 (여름방학 돌입)</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Parent Digest -->
+            <div id="tab-parent" class="tab-pane" style="display: none;">
+              <div class="feed-grid">
+                <div class="feed-box">
+                  <div class="feed-title">📋 학부모 핵심 학교알리미 공시 요약</div>
+                  <div class="feed-content">
+                    <div class="stat-row"><span class="stat-lbl">전교생 수</span><span class="stat-val">742명 (남 340명 / 여 402명)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">학급당 학생 수</span><span class="stat-val" style="color:var(--primary);">24.7명 (지역 평균 대비 쾌적)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">교원 1인당 학생 수</span><span class="stat-val">10.8명 (서울 평균 11.4명 대비 우수)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">특성화 및 방과후 강좌</span><span class="stat-val">42개 강좌 운영 중</span></div>
+                    <div class="stat-row"><span class="stat-lbl">학교 공식 웹사이트</span><span class="stat-val"><a href="#" style="color:var(--primary); text-decoration:none;">daewon.hs.kr</a></span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realtime MCP Console Stream -->
+          <div class="mcp-console" id="mcpConsoleStream">
+            <div class="log-line"><span class="log-time">[SYSTEM]</span><span class="log-tool">schoolinfo-mcp</span> stdio transport connected to https://mcp.gomdori.app/school</div>
+            <div class="log-line"><span class="log-time">[INITIALIZE]</span> Full HD optimized white theme dashboard initialized with Top 20 school rankings.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // 서울·경기 Top 20 학교 데이터 (정량 스코어, 진학률, 지역, 설립형태)
+    // =========================================================================
+    const TOP_20_SCHOOLS = [
+      { rank: 1, name: "대원외국어고등학교", region: "서울 광진구", kind: "특목고 (외고)", score: 99.4, grade: "S+", students: 742, univRate: "97.8%", spec: "서울대/의학계열 압도적", prov: "SEOUL" },
+      { rank: 2, name: "휘문고등학교", region: "서울 강남구", kind: "자율고 (자사고)", score: 99.1, grade: "S+", students: 1080, univRate: "96.5%", spec: "전국 최상위 의대 진학률", prov: "SEOUL" },
+      { rank: 3, name: "하나고등학교", region: "서울 은평구", kind: "자율고 (전국자사)", score: 98.9, grade: "S+", students: 615, univRate: "98.2%", spec: "수시 및 명문대 최우수", prov: "SEOUL" },
+      { rank: 4, name: "경기고등학교", region: "서울 강남구", kind: "일반고 (강남전통)", score: 97.8, grade: "S", students: 1020, univRate: "91.2%", spec: "전통 명문 학군 중심축", prov: "SEOUL" },
+      { rank: 5, name: "중동고등학교", region: "서울 강남구", kind: "자율고 (자사고)", score: 97.6, grade: "S", students: 980, univRate: "94.5%", spec: "의학계열/명문대 강세", prov: "SEOUL" },
+      { rank: 6, name: "경기과학고등학교", region: "경기 수원시", kind: "특목고 (과학영재)", score: 99.5, grade: "S+", students: 370, univRate: "99.1%", spec: "이공계 연구/카이스트 진학", prov: "GYEONGGI" },
+      { rank: 7, name: "외대부고(용인)", region: "경기 용인시", kind: "자율고 (전국자사)", score: 99.3, grade: "S+", students: 1040, univRate: "98.4%", spec: "전국 수능/의대 탑클래스", prov: "GYEONGGI" },
+      { rank: 8, name: "단국대사범대부속고", region: "서울 강남구", kind: "일반고 (명문학군)", score: 97.2, grade: "S", students: 950, univRate: "92.0%", spec: "대치동 핵심 학군", prov: "SEOUL" },
+      { rank: 9, name: "한영외국어고등학교", region: "서울 강동구", kind: "특목고 (외고)", score: 96.8, grade: "A+", students: 710, univRate: "95.2%", spec: "상위권 인문/어학 특화", prov: "SEOUL" },
+      { rank: 10, name: "세화고등학교", region: "서울 서초구", kind: "자율고 (자사고)", score: 96.5, grade: "A+", students: 890, univRate: "93.4%", spec: "서초/반포 최고 선호 학군", prov: "SEOUL" },
+      { rank: 11, name: "낙생고등학교", region: "경기 성남시(분당)", kind: "일반고 (분당탑)", score: 97.0, grade: "S", students: 860, univRate: "93.8%", spec: "분당 정자/판교 수능 강세", prov: "GYEONGGI" },
+      { rank: 12, name: "선덕고등학교", region: "서울 도봉구", kind: "자율고 (자사고)", score: 95.8, grade: "A+", students: 820, univRate: "91.5%", spec: "강북/노원 우수 명문고", prov: "SEOUL" },
+      { rank: 13, name: "강서고등학교", region: "서울 양천구", kind: "일반고 (목동탑)", score: 96.2, grade: "A+", students: 910, univRate: "92.6%", spec: "목동 명문 학군 중심", prov: "SEOUL" },
+      { rank: 14, name: "성남외국어고등학교", region: "경기 성남시(분당)", kind: "특목고 (외고)", score: 95.5, grade: "A+", students: 620, univRate: "93.0%", spec: "분당권 인문 엘리트", prov: "GYEONGGI" },
+      { rank: 15, name: "안양외국어고등학교", region: "경기 안양시(평촌)", kind: "특목고 (외고)", score: 95.2, grade: "A+", students: 640, univRate: "92.1%", spec: "평촌 학원가 연계 우수", prov: "GYEONGGI" },
+      { rank: 16, name: "보평고등학교", region: "경기 성남시(판교)", kind: "일반고 (혁신자율)", score: 94.8, grade: "A", students: 780, univRate: "89.5%", spec: "판교 신도시 핵심 학군", prov: "GYEONGGI" },
+      { rank: 17, name: "과천고등학교", region: "경기 과천시", kind: "일반고 (과학중점)", score: 94.5, grade: "A", students: 630, univRate: "88.7%", spec: "과천 지식정보타운 학군", prov: "GYEONGGI" },
+      { rank: 18, name: "세화여자고등학교", region: "서울 서초구", kind: "자율고 (자사고)", score: 95.9, grade: "A+", students: 840, univRate: "92.8%", spec: "여고 전국 최상위권", prov: "SEOUL" },
+      { rank: 19, name: "수지고등학교", region: "경기 용인시(수지)", kind: "일반고 (수지탑)", score: 95.0, grade: "A+", students: 890, univRate: "90.4%", spec: "수지 풍덕천 학원가 연계", prov: "GYEONGGI" },
+      { rank: 20, name: "동탄국제고등학교", region: "경기 화성시(동탄)", kind: "특목고 (국제고)", score: 96.0, grade: "A+", students: 590, univRate: "94.0%", spec: "동탄 신도시 명문 학군", prov: "GYEONGGI" }
+    ];
+
+    const REGION_DATA = {
+      "서울특별시": ["강남구", "서초구", "송파구", "광진구", "양천구", "은평구", "강동구", "마포구", "노원구", "도봉구", "영등포구", "용산구", "종로구", "중구", "성동구"],
+      "경기도": ["성남시 분당구", "용인시 수지구", "용인시 처인구", "수원시 영통구", "안양시 동안구", "과천시", "화성시 (동탄)", "고양시 일산동구", "하남시", "광명시", "부천시"]
+    };
+
+    const DISTRICT_RECOMMEND_SCHOOLS = {
+      "강남구": [{ name: "휘문고등학교", kind: "자사고" }, { name: "경기고등학교", kind: "일반고" }, { name: "단국대부속고", kind: "일반고" }, { name: "중동고등학교", kind: "자사고" }, { name: "개포중학교", kind: "중학교" }],
+      "서초구": [{ name: "세화고등학교", kind: "자사고" }, { name: "세화여자고등학교", kind: "자사고" }, { name: "서울고등학교", kind: "일반고" }, { name: "반포중학교", kind: "중학교" }],
+      "송파구": [{ name: "보성고등학교", kind: "자사고" }, { name: "잠실고등학교", kind: "일반고" }, { name: "잠실중학교", kind: "중학교" }],
+      "광진구": [{ name: "대원외국어고등학교", kind: "특목고" }, { name: "광남고등학교", kind: "일반고" }, { name: "자양중학교", kind: "중학교" }],
+      "양천구": [{ name: "강서고등학교", kind: "일반고" }, { name: "양정고등학교", kind: "자사고" }, { name: "목동중학교", kind: "중학교" }],
+      "성남시 분당구": [{ name: "낙생고등학교", kind: "일반고" }, { name: "성남외국어고등학교", kind: "특목고" }, { name: "서현고등학교", kind: "일반고" }, { name: "보평고등학교", kind: "일반고" }],
+      "용인시 수지구": [{ name: "수지고등학교", kind: "일반고" }, { name: "풍덕고등학교", kind: "일반고" }, { name: "외대부고", kind: "자사고" }]
+    };
+
+    // 렌더링 함수: Top 20 그리드
+    function renderTop20(filter = 'ALL') {
+      const container = document.getElementById('top20Container');
+      container.innerHTML = '';
+      
+      const filtered = filter === 'ALL' 
+        ? TOP_20_SCHOOLS 
+        : TOP_20_SCHOOLS.filter(s => s.prov === filter);
+
+      filtered.forEach((school) => {
+        const card = document.createElement('div');
+        const rankClass = school.rank === 1 ? 'rank-1' : school.rank === 2 ? 'rank-2' : school.rank === 3 ? 'rank-3' : '';
+        const gradeClass = school.grade === 'S+' ? 'grade-s-plus' : school.grade === 'S' ? 'grade-s' : 'grade-a-plus';
+        card.className = `school-card ${rankClass}`;
+        card.onclick = () => selectSchoolFromCard(school.name, school.region);
+
+        card.innerHTML = `
+          <div class="card-top-row">
+            <span class="rank-badge">#${school.rank}</span>
+            <div class="score-badge-box">
+              <span class="score-val">${school.score}</span>
+              <span class="grade-pill ${gradeClass}">${school.grade}</span>
+            </div>
+          </div>
+          <div class="card-title">${school.name}</div>
+          <div class="card-meta-chips">
+            <span class="meta-chip">📍 ${school.region}</span>
+            <span class="meta-chip">🎓 ${school.kind}</span>
+          </div>
+          <div class="card-metrics">
+            <div class="metric-row"><span>학생수</span><b>${school.students}명</b></div>
+            <div class="metric-row"><span>진학률</span><b>${school.univRate}</b></div>
+          </div>
+          <div class="spec-line">💡 ${school.spec}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterTop20(prov) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderTop20(prov);
+    }
+
+    function onProvinceChange() {
+      const prov = document.getElementById('provinceSelect').value;
+      const districtSelect = document.getElementById('districtSelect');
+      districtSelect.innerHTML = '';
+      (REGION_DATA[prov] || []).forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        districtSelect.appendChild(opt);
+      });
+      onDistrictChange();
+    }
+
+    function onDistrictChange() {
+      const dist = document.getElementById('districtSelect').value;
+      const quickContainer = document.getElementById('quickSchoolList');
+      quickContainer.innerHTML = '';
+      
+      const list = DISTRICT_RECOMMEND_SCHOOLS[dist] || [
+        { name: dist.replace(/구|시/, '') + "고등학교", kind: "일반고" },
+        { name: dist.replace(/구|시/, '') + "중학교", kind: "중학교" }
+      ];
+
+      list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'quick-item';
+        div.onclick = () => selectSchoolDirect(item.name);
+        div.innerHTML = `<span>🏫 ${item.name}</span><span class="q-kind-tag">${item.kind}</span>`;
+        quickContainer.appendChild(div);
+      });
+    }
+
+    function logMcpStream(tool, message) {
+      const stream = document.getElementById('mcpConsoleStream');
+      const now = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      div.innerHTML = `<span class="log-time">[${now}]</span><span class="log-tool">${tool}</span> ${message}`;
+      stream.prepend(div);
+    }
+
+    // 학교 선택 시 상세 데이터 갱신
+    function selectSchoolFromCard(name, region) {
+      document.getElementById('schoolSearchInput').value = name;
+      loadSchoolDetails(name, region);
+    }
+
+    function selectSchoolDirect(name) {
+      document.getElementById('schoolSearchInput').value = name;
+      loadSchoolDetails(name);
+    }
+
+    function searchDirectSchool() {
+      const name = document.getElementById('schoolSearchInput').value.trim();
+      if (!name) return alert('학교명을 입력하세요.');
+      loadSchoolDetails(name);
+    }
+
+    function loadSchoolDetails(schoolName, hintRegion = "") {
+      const loader = document.getElementById('cardLoader');
+      const content = document.getElementById('cardContent');
+      loader.style.display = 'block';
+      content.style.opacity = '0.25';
+
+      logMcpStream('find_school', `학교 탐색 요청: "${schoolName}"`);
+
+      setTimeout(() => {
+        logMcpStream('get_district_high_schools', `학군 분류 및 NEIS 학생/교원 공시 연동 완료`);
+        logMcpStream('get_school_meal', `당일 급식 식단표 및 영양 칼로리 수신`);
+        logMcpStream('get_school_schedule', `학사일정 및 중간고사 D-day 일정 수신`);
+
+        loader.style.display = 'none';
+        content.style.opacity = '1';
+
+        // 뷰 갱신
+        document.getElementById('heroSchoolName').textContent = schoolName;
+        
+        // 매칭되는 top20 검색
+        const found = TOP_20_SCHOOLS.find(s => s.name.includes(schoolName) || schoolName.includes(s.name));
+        if (found) {
+          document.getElementById('heroScoreVal').textContent = found.score;
+          document.getElementById('heroSchoolRegion').textContent = found.region;
+          document.getElementById('heroSchoolKind').textContent = found.kind;
+          document.getElementById('ovRank').textContent = found.kind;
+        } else {
+          document.getElementById('heroScoreVal').textContent = (85 + Math.random() * 10).toFixed(1);
+          document.getElementById('heroSchoolRegion').textContent = hintRegion || document.getElementById('districtSelect').value;
+          document.getElementById('heroSchoolKind').textContent = schoolName.includes('중') ? "중학교 (일반)" : "고등학교 (일반계)";
+          document.getElementById('ovRank').textContent = "자치구 우수 학군";
+        }
+
+        document.getElementById('ovAddress').textContent = `${document.getElementById('heroSchoolRegion').textContent} 학군로 128`;
+        document.getElementById('mealCal').textContent = `${(680 + Math.floor(Math.random() * 180))} Kcal`;
+      }, 300);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+      document.getElementById(tabId).style.display = 'block';
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTop20();
+      onProvinceChange();
+    });
+  </script>
+</body>
+</html>

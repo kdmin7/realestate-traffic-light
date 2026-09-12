@@ -141,14 +141,15 @@ export async function updateRawDataIncremental(slug) {
   console.log(`- 증분 수집 대상 월: ${targetMonths.join(', ')} (과거 완료 월은 API 호출 없이 100% 보존)`);
 
   const newTrades = [];
-  for (const ym of targetMonths) {
+  const monthPromises = targetMonths.map(async (ym) => {
     console.log(`  -> 국토부 API 증분 조회 (${info.short} ${ym})...`);
     const trades = await fetchMolitTradeMonth(info.code, ym);
     console.log(`     조회 건수: ${trades.length}건`);
+    const results = [];
     for (const t of trades) {
       const dealDate = `${t.dealYear}-${String(t.dealMonth).padStart(2, '0')}-${String(t.dealDay).padStart(2, '0')}`;
       if (!lastDealDate || dealDate >= lastDealDate) {
-        newTrades.push({
+        results.push({
           apt: t.aptNm,
           dong: t.umdNm,
           area: Number(t.excluUseAr),
@@ -159,6 +160,11 @@ export async function updateRawDataIncremental(slug) {
         });
       }
     }
+    return results;
+  });
+  const tradesArrays = await Promise.all(monthPromises);
+  for (const trades of tradesArrays) {
+    newTrades.push(...trades);
   }
 
   console.log(`- 마지막 업데이트 이후 최신 일정 신규 거래 건수: ${newTrades.length}건`);
@@ -242,9 +248,8 @@ if (process.argv[1] && process.argv[1].endsWith('update_raw_incremental.js')) {
   const targetSlug = process.argv[2] || 'gangnam';
   if (targetSlug === 'all') {
     (async () => {
-      for (const slug of Object.keys(DISTRICT_MAP)) {
-        await updateRawDataIncremental(slug);
-      }
+      const allPromises = Object.keys(DISTRICT_MAP).map(slug => updateRawDataIncremental(slug));
+      await Promise.all(allPromises);
     })();
   } else {
     updateRawDataIncremental(targetSlug);

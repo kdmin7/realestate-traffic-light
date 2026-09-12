@@ -93,9 +93,7 @@ async function main() {
 
   console.log(`📊 금리 데이터: 한국은행 기준금리 ${baseRateVal}% | 주택담보대출 금리 ${mortgageVal}%`);
 
-  const results = [];
-
-  for (const dist of DISTRICTS) {
+  const distPromises = DISTRICTS.map(async (dist) => {
     console.log(`🔎 [${dist.name}] 국토부 실거래 데이터 수집 중...`);
     const [trades07, trades08] = await Promise.all([
       fetchMolitTrade(dist.code, '202607'),
@@ -164,7 +162,7 @@ async function main() {
       signalIcon = '🟢';
     }
 
-    results.push({
+    return {
       ...dist,
       tradeCount,
       trades07Count: trades07.length,
@@ -179,8 +177,10 @@ async function main() {
       signalClass,
       signalColor,
       signalIcon
-    });
-  }
+    };
+  });
+
+  const results = await Promise.all(distPromises);
 
   console.log('✅ 공공데이터 수집 완료. 대시보드 HTML 생성 중...');
 

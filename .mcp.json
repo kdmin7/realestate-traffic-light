@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "seoul-realty": {
+      "command": "node",
+      "args": [
+        "C:/practice/geminiCLI/realestate_prj/MCP/realestate-server.js"
+      ]
+    },
+    "schoolinfo": {
+      "command": "node",
+      "args": [
+        "C:/practice/geminiCLI/realestate_prj/MCP/check_schools.js"
+      ]
+    }
+  }
+}

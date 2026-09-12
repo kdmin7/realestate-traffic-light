@@ -1,15 +1,16 @@
 {
   "name": "korea-public-data-mcp",
   "version": "1.0.0",
-  "description": "대한민국 공공데이터 기반 MCP 서버 모음 — 반도체 수출입(관세청), 서울 부동산 인사이트(국토부·한국은행·경찰청·서울시)",
+  "description": "대한민국 공공데이터 기반 수도권 부동산 인사이트 MCP 서버 (국토교통부·한국은행·경찰청·서울시)",
   "type": "module",
   "bin": {
-    "semiconductor-trade-mcp": "trade-server.js",
-    "seoul-realty-mcp": "realestate-server.js"
+    "seoul-realty-mcp": "realestate-server.js",
+    "schoolinfo-mcp": "check_schools.js"
   },
   "scripts": {
-    "start:trade": "node trade-server.js",
+    "start": "node realestate-server.js",
     "start:realty": "node realestate-server.js",
+    "start:school": "node check_schools.js",
     "daily:sync": "node daily_pipeline_sync.js"
   },
   "keywords": [
@@ -18,7 +19,6 @@
     "공공데이터",
     "부동산",
     "실거래가",
-    "관세청",
     "국토교통부",
     "한국은행",
     "korea-public-data"

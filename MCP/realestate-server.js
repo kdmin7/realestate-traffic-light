@@ -20,6 +20,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// check_schools.js (schoolinfo-mcp 및 NEIS 연동) 서비스 모듈 임포트
+import {
+  searchSchools,
+  getDistrictHighSchoolsData,
+  getSchoolMealData,
+  getSchoolScheduleData,
+  getParentDigestData,
+  callRemoteMcp as callRemoteSchoolMcp,
+} from "./check_schools.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // .env 파일 자동 로드
@@ -53,6 +63,7 @@ const DATASETS = {
       area: Number(it.excluUseAr),
       y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
       apt: str(it.aptNm), dong: str(it.umdNm),
+      floor: Number(it.floor),
     }),
     valid: (r) => Number.isFinite(r.amount) && r.area > 0,
   },
@@ -65,8 +76,118 @@ const DATASETS = {
       area: Number(it.excluUseAr),
       y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
       apt: str(it.aptNm), dong: str(it.umdNm),
+      floor: Number(it.floor),
     }),
     valid: (r) => Number.isFinite(r.deposit) && r.area > 0,
+  },
+  // --- tae0y/real-estate-mcp 확장 데이터셋 ---
+  officetel_sale: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade",
+    cacheSub: "offi-trade",
+    map: (it) => ({
+      name: str(it.offiNm),
+      dong: str(it.umdNm),
+      amount: manwon(it.dealAmount),
+      area: Number(it.excluUseAr),
+      floor: Number(it.floor),
+      buildYear: Number(it.buildYear),
+      dealType: str(it.dealingGbn),
+      canceled: str(it.cdealType) === "O",
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.amount) && r.area > 0 && !r.canceled,
+  },
+  officetel_rent: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent",
+    cacheSub: "offi-rent",
+    map: (it) => ({
+      name: str(it.offiNm),
+      dong: str(it.umdNm),
+      deposit: manwon(it.deposit),
+      monthly: manwon(it.monthlyRent),
+      area: Number(it.excluUseAr),
+      floor: Number(it.floor),
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.deposit) && r.area > 0,
+  },
+  villa_sale: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade",
+    cacheSub: "villa-trade",
+    map: (it) => ({
+      name: str(it.mhouseNm),
+      dong: str(it.umdNm),
+      houseType: str(it.houseType),
+      amount: manwon(it.dealAmount),
+      area: Number(it.excluUseAr),
+      floor: Number(it.floor),
+      buildYear: Number(it.buildYear),
+      dealType: str(it.dealingGbn),
+      canceled: str(it.cdealType) === "O",
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.amount) && r.area > 0 && !r.canceled,
+  },
+  villa_rent: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcRHRent/getRTMSDataSvcRHRent",
+    cacheSub: "villa-rent",
+    map: (it) => ({
+      name: str(it.mhouseNm),
+      dong: str(it.umdNm),
+      houseType: str(it.houseType),
+      deposit: manwon(it.deposit),
+      monthly: manwon(it.monthlyRent),
+      area: Number(it.excluUseAr),
+      floor: Number(it.floor),
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.deposit) && r.area > 0,
+  },
+  single_sale: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcSHTrade/getRTMSDataSvcSHTrade",
+    cacheSub: "single-trade",
+    map: (it) => ({
+      houseType: str(it.houseType),
+      dong: str(it.umdNm),
+      amount: manwon(it.dealAmount),
+      area: Number(it.totArea || it.plottageAr || 0),
+      buildYear: Number(it.buildYear),
+      dealType: str(it.dealingGbn),
+      canceled: str(it.cdealType) === "O",
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.amount) && r.area > 0 && !r.canceled,
+  },
+  single_rent: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcSHRent/getRTMSDataSvcSHRent",
+    cacheSub: "single-rent",
+    map: (it) => ({
+      houseType: str(it.houseType),
+      dong: str(it.umdNm),
+      deposit: manwon(it.deposit),
+      monthly: manwon(it.monthlyRent),
+      area: Number(it.totArea || 0),
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.deposit) && r.area > 0,
+  },
+  commercial_sale: {
+    url: "http://apis.data.go.kr/1613000/RTMSDataSvcNrgTrade/getRTMSDataSvcNrgTrade",
+    cacheSub: "commercial-trade",
+    map: (it) => ({
+      buildingType: str(it.buildingType),
+      buildingUse: str(it.buildingUse),
+      landUse: str(it.landUse),
+      dong: str(it.umdNm),
+      amount: manwon(it.dealAmount),
+      area: Number(it.buildingAr || 0),
+      floor: Number(it.floor),
+      buildYear: Number(it.buildYear),
+      dealType: str(it.dealingGbn),
+      canceled: str(it.cdealtype) === "O",
+      y: Number(it.dealYear), m: Number(it.dealMonth), d: Number(it.dealDay),
+    }),
+    valid: (r) => Number.isFinite(r.amount) && r.area > 0 && !r.canceled,
   },
 };
 
@@ -263,7 +384,9 @@ function isFinalMonth(ym) {
 }
 
 function rowKey(r) {
-  return `${r.y}-${r.m}-${r.d}_${r.apt}_${r.amount}_${r.area}_${r.floor}_${r.dong || ""}`;
+  const nm = r.apt || r.name || r.houseType || r.buildingUse || "";
+  const val = r.amount ?? r.deposit ?? 0;
+  return `${r.y}-${r.m}-${r.d}_${nm}_${val}_${r.area}_${r.floor || ""}_${r.dong || ""}`;
 }
 
 function mergeRows(existingRows, newRows) {
@@ -973,19 +1096,66 @@ async function fetchSchoolsForProvince(province = "seoul") {
 server.registerTool(
   "get_school_index",
   {
-    title: "수도권 학군 지수(자사·특목고 밀도)",
+    title: "수도권 학군 지수(자사·특목고 밀도 및 학교 분석)",
     description:
-      "NEIS 학교기본정보로 서울 및 경기도 시·구별 고등학교 수와 자율·특목고 수를 집계해 학군 지수(proxy)를 " +
-      "반환합니다. '서울대 진학률'은 비공개라 자율·특목고 밀도로 근사합니다.",
+      "check_schools.js 및 NEIS 학교기본정보를 결합하여 서울 및 경기도 시·구별 고등학교 수와 자율·특목고 수를 집계해 학군 지수(proxy)를 " +
+      "반환하고 세부 학교 정보를 연동 제공합니다. '서울대 진학률'은 비공개라 자율·특목고 밀도로 근사합니다.",
     inputSchema: {
       district: z.string().optional().describe("자치구/시·군 이름/코드(예: '강남구', '분당구', '과천시')"),
       regionScope: z.enum(["서울", "경기", "수도권전체"]).default("서울").describe("district 생략 시 랭킹 범위(서울/경기/수도권전체)"),
     },
   },
   async ({ district, regionScope }) => {
-    if (!NEIS_KEY) return errorResult("환경변수 NEIS_API_KEY 가 설정되지 않았습니다. open.neis.go.kr 에서 발급하세요.");
     const gu = district ? resolveGu(district) : null;
     if (district && !gu) return errorResult(`지역 '${district}' 를 찾을 수 없습니다.`);
+
+    // 1. 단일 자치구 조회 시 check_schools.js의 상세 학군 데이터 우선 연동
+    if (gu) {
+      try {
+        const provinceNm = gu.province === "gyeonggi" ? "경기도" : "서울특별시";
+        const districtSchoolData = await getDistrictHighSchoolsData({ district: gu.name, province: provinceNm });
+        if (districtSchoolData && !districtSchoolData.isError) {
+          const detailParsed = JSON.parse(districtSchoolData.content[1]?.text || "{}");
+          const counts = detailParsed.counts || {};
+          const specCnt = (counts.specialized || 0) + (counts.autonomous || 0);
+          const totCnt = detailParsed.total_schools || 0;
+          const schoolIndex = specCnt * 3 + (totCnt - specCnt);
+          const specialNames = [
+            ...(detailParsed.schools?.specialized || []).map((s) => s.name),
+            ...(detailParsed.schools?.autonomous || []).map((s) => s.name),
+          ];
+
+          const payload = {
+            지역: gu.name,
+            시도: provinceNm,
+            고교수: totCnt,
+            자율특목고수: specCnt,
+            학군지수: schoolIndex,
+            자율특목고: specialNames,
+            상세학군분류: counts,
+            데이터출처: "check_schools.js (schoolinfo-mcp & NEIS 연동)",
+          };
+
+          return {
+            content: [
+              {
+                type: "text",
+                text:
+                  `🎓 [${gu.name}] 학군 분석 리포트 (check_schools 연동)\n` +
+                  `• 총 고등학교: ${totCnt}개교 (특목고 ${counts.specialized || 0}개교, 자율고 ${counts.autonomous || 0}개교, 일반고 ${counts.general || 0}개교)\n` +
+                  `• 학군 지수: ${schoolIndex}점 (자사·특목고 가중치 적용)\n` +
+                  (specialNames.length ? `• 주요 명문/특목·자율고: ${specialNames.join(", ")}` : "• 특목/자율고 없음"),
+              },
+              { type: "text", text: JSON.stringify(payload, null, 2) },
+            ],
+          };
+        }
+      } catch {
+        // 폴백으로 진행
+      }
+    }
+
+    if (!NEIS_KEY) return errorResult("환경변수 NEIS_API_KEY 가 설정되지 않았습니다. open.neis.go.kr 에서 발급하세요.");
 
     const targetProvince = gu ? gu.province : (regionScope === "경기" ? "gyeonggi" : regionScope === "수도권전체" ? "all" : "seoul");
 
@@ -1049,7 +1219,7 @@ server.registerTool(
     const lines = all.map((s, i) => `${String(i + 1).padStart(2)}. ${s.지역.padEnd(8)}  지수 ${s.학군지수} (고교 ${s.고교수} · 자율특목 ${s.자율특목고수})`);
     return {
       content: [
-        { type: "text", text: `🎓 수도권 학군 지수 순위 (${regionScope}, 자율·특목고 밀도 기준)\n\n${lines.join("\n")}` },
+        { type: "text", text: `🎓 수도권 학군 지수 순위 (${regionScope}, 자율·특목고 밀도 기준 · check_schools 연동)\n\n${lines.join("\n")}` },
         { type: "text", text: JSON.stringify(all.map(({ 자율특목고, ...r }) => r), null, 2) },
       ],
     };
@@ -1432,12 +1602,1109 @@ server.registerTool(
   }
 );
 
+// ===========================================================================
+// tae0y/real-estate-mcp 연동 확장 도구 (14+ Tools)
+// https://github.com/tae0y/real-estate-mcp
+// ===========================================================================
+
+const ODCLOUD_KEY = process.env.ODCLOUD_API_KEY || process.env.DATA_GO_KR_API_KEY || MOLIT_KEY;
+
+function summarizeTradeRecords(rows, isRent = false) {
+  if (!rows || !rows.length) return null;
+  const vals = rows
+    .map((r) => (isRent ? (r.monthly > 0 ? r.monthly : r.deposit) : r.amount))
+    .filter((v) => Number.isFinite(v) && v > 0);
+  if (!vals.length) return null;
+  const sorted = [...vals].sort((a, b) => a - b);
+  const sum = vals.reduce((a, b) => a + b, 0);
+  const perPyeongs = rows
+    .map((r) => {
+      const v = isRent ? r.deposit : r.amount;
+      return r.area > 0 ? (v / r.area) * 3.3058 : NaN;
+    })
+    .filter(Number.isFinite);
+
+  return {
+    total_count: rows.length,
+    min_10k: sorted[0],
+    max_10k: sorted[sorted.length - 1],
+    avg_10k: +(sum / vals.length).toFixed(1),
+    median_10k: median(vals),
+    median_pyeong_10k: perPyeongs.length ? +median(perPyeongs).toFixed(1) : null,
+  };
+}
+
+function resolveRegionOrCode(input) {
+  if (!input) return null;
+  const trimmed = String(input).trim();
+  if (/^\d{5}$/.test(trimmed)) {
+    const gu = resolveGu(trimmed);
+    return gu || { code: trimmed, name: trimmed, province: trimmed.startsWith("11") ? "seoul" : "gyeonggi" };
+  }
+  return resolveGu(trimmed);
+}
+
+// ---------------------------------------------------------------------------
+// 1. get_region_code (지역코드 조회)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_region_code",
+  {
+    title: "지역 법정동코드 5자리 조회",
+    description: "지역명(서울 자치구, 경기 시·군·구 등)을 입력받아 국토부 실거래가 조회용 5자리 법정동코드(LAWD_CD)를 반환합니다.",
+    inputSchema: {
+      region_name: z.string().describe("지역 이름 (예: '강남구', '분당구', '수지구', '과천시', '마포구')"),
+    },
+  },
+  async ({ region_name }) => {
+    const gu = resolveRegionOrCode(region_name);
+    if (!gu) return errorResult(`지역 '${region_name}'에 해당하는 법정동코드를 찾을 수 없습니다.`);
+    return {
+      content: [
+        { type: "text", text: `📍 [${gu.name}] 법정동코드: ${gu.code} (${gu.province})` },
+        { type: "text", text: JSON.stringify({ name: gu.name, code: gu.code, province: gu.province }, null, 2) },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// 공통 실거래가 도구 핸들러
+// ---------------------------------------------------------------------------
+async function handlePropertyQuery(ds, label, region_code, year_month, num_of_rows = 100, isRent = false) {
+  if (!MOLIT_KEY) return errorResult("환경변수 MOLIT_API_KEY 가 설정되지 않았습니다.");
+  const gu = resolveRegionOrCode(region_code);
+  if (!gu) return errorResult(`지역코드 또는 지역명 '${region_code}' 를 인식할 수 없습니다.`);
+
+  const ym = String(year_month).trim();
+  if (!/^\d{6}$/.test(ym)) return errorResult("year_month 는 6자리 YYYYMM 형식이어야 합니다 (예: 202501).");
+
+  try {
+    const allRows = await fetchMonth(ds, gu.code, ym);
+    const rows = allRows.slice(0, num_of_rows);
+    const summary = summarizeTradeRecords(allRows, isRent);
+
+    if (!rows.length) {
+      return { content: [{ type: "text", text: `📭 [${gu.name}] ${ym} ${label} 실거래 데이터가 없습니다.` }] };
+    }
+
+    const lines = rows.slice(0, 30).map((r) => {
+      const dt = `${r.y}.${String(r.m).padStart(2, "0")}.${String(r.d).padStart(2, "0")}`;
+      const nm = r.name || r.apt || r.buildingUse || r.houseType || "부동산";
+      const dong = r.dong ? `(${r.dong})` : "";
+      const ar = r.area ? `${r.area.toFixed(1)}㎡` : "";
+      const fl = r.floor ? `${r.floor}층` : "";
+      if (isRent) {
+        const cost = r.monthly > 0 ? `보증금 ${r.deposit.toLocaleString()}만 / 월 ${r.monthly.toLocaleString()}만` : `전세 ${r.deposit.toLocaleString()}만원`;
+        return `• [${dt}] ${nm} ${dong} ${ar} ${fl} → ${cost}`;
+      } else {
+        const amt = `${(r.amount / 10000).toFixed(2)}억(${r.amount.toLocaleString()}만원)`;
+        return `• [${dt}] ${nm} ${dong} ${ar} ${fl} → ${amt}`;
+      }
+    });
+
+    const summaryText = summary
+      ? `\n📊 [요약 통계] 총 ${summary.total_count}건 | 중위가: ${(summary.median_10k / 10000).toFixed(2)}억 | 평균: ${(summary.avg_10k / 10000).toFixed(2)}억 | 최저: ${(summary.min_10k / 10000).toFixed(2)}억 ~ 최고: ${(summary.max_10k / 10000).toFixed(2)}억`
+      : "";
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `🏠 [${gu.name} · ${gu.code}] ${ym} ${label} 실거래가 조회 결과 (총 ${allRows.length}건 중 ${rows.length}건 표시)\n${summaryText}\n\n` + lines.join("\n"),
+        },
+        {
+          type: "text",
+          text: JSON.stringify({ region: gu.name, code: gu.code, ym, summary, total_fetched: allRows.length, items: rows }, null, 2),
+        },
+      ],
+    };
+  } catch (err) {
+    return errorResult(`조회 실패: ${err.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2. get_apartment_trades & get_apartment_rent
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_apartment_trades",
+  {
+    title: "아파트 매매 실거래가 조회",
+    description: "국토부 API를 통해 지정 지역 및 연월의 아파트 매매 실거래가 목록과 요약 통계(중위가, 최저/최고가 등)를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드(예: '11680') 또는 자치구 이름(예: '강남구', '분당구')"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM 형식, 예: '202501')"),
+      num_of_rows: z.number().optional().default(100).describe("최대 반환 건수 (기본값: 100)"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.sale, "아파트 매매", region_code, year_month, num_of_rows, false)
+);
+
+server.registerTool(
+  "get_apartment_rent",
+  {
+    title: "아파트 전월세 실거래가 조회",
+    description: "국토부 API를 통해 지정 지역 및 연월의 아파트 전월세 실거래가 목록과 요약 통계를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 자치구 이름"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM 형식, 예: '202501')"),
+      num_of_rows: z.number().optional().default(100).describe("최대 반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.rent, "아파트 전월세", region_code, year_month, num_of_rows, true)
+);
+
+// ---------------------------------------------------------------------------
+// 3. get_officetel_trades & get_officetel_rent
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_officetel_trades",
+  {
+    title: "오피스텔 매매 실거래가 조회",
+    description: "국토교통부 오피스텔 매매 신고 자료 API를 통해 실거래가 내역과 요약 통계를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명 (예: '11440', '마포구')"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM, 예: '202501')"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.officetel_sale, "오피스텔 매매", region_code, year_month, num_of_rows, false)
+);
+
+server.registerTool(
+  "get_officetel_rent",
+  {
+    title: "오피스텔 전월세 실거래가 조회",
+    description: "국토교통부 오피스텔 전월세 자료 API를 통해 실거래가 내역과 보증금/월세 요약 통계를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.officetel_rent, "오피스텔 전월세", region_code, year_month, num_of_rows, true)
+);
+
+// ---------------------------------------------------------------------------
+// 4. get_villa_trades & get_villa_rent (연립다세대)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_villa_trades",
+  {
+    title: "연립다세대(빌라) 매매 실거래가 조회",
+    description: "국토교통부 연립다세대 매매 실거래가 자료 API를 통해 빌라 매매 내역과 요약 통계를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명 (예: '11680', '강남구')"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.villa_sale, "연립다세대(빌라) 매매", region_code, year_month, num_of_rows, false)
+);
+
+server.registerTool(
+  "get_villa_rent",
+  {
+    title: "연립다세대(빌라) 전월세 실거래가 조회",
+    description: "국토교통부 연립다세대 전월세 자료 API를 통해 빌라 전월세 실거래가 내역을 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.villa_rent, "연립다세대(빌라) 전월세", region_code, year_month, num_of_rows, true)
+);
+
+// ---------------------------------------------------------------------------
+// 5. get_single_house_trades & get_single_house_rent (단독/다가구)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_single_house_trades",
+  {
+    title: "단독·다가구 매매 실거래가 조회",
+    description: "국토교통부 단독/다가구 매매 실거래가 자료 API를 통해 실거래가 내역과 요약 통계를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.single_sale, "단독/다가구 매매", region_code, year_month, num_of_rows, false)
+);
+
+server.registerTool(
+  "get_single_house_rent",
+  {
+    title: "단독·다가구 전월세 실거래가 조회",
+    description: "국토교통부 단독/다가구 전월세 자료 API를 통해 전월세 실거래가 내역을 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.single_rent, "단독/다가구 전월세", region_code, year_month, num_of_rows, true)
+);
+
+// ---------------------------------------------------------------------------
+// 6. get_commercial_trade (상업업무용)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_commercial_trade",
+  {
+    title: "상업·업무용 부동산 매매 실거래가 조회",
+    description: "국토교통부 상업업무용 부동산 매매 신고 자료 API를 통해 상가/빌딩/오피스 매매 실거래가를 반환합니다.",
+    inputSchema: {
+      region_code: z.string().describe("5자리 법정동코드 또는 지역명 (예: '11110', '종로구')"),
+      year_month: z.string().regex(/^\d{6}$/).describe("조회 연월 (YYYYMM)"),
+      num_of_rows: z.number().optional().default(100).describe("반환 건수"),
+    },
+  },
+  async ({ region_code, year_month, num_of_rows }) =>
+    handlePropertyQuery(DATASETS.commercial_sale, "상업/업무용 매매", region_code, year_month, num_of_rows, false)
+);
+
+// ---------------------------------------------------------------------------
+// 7. 청약홈 분양정보 (get_apt_subscription_info)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "get_apt_subscription_info",
+  {
+    title: "아파트 분양 및 청약 공고 조회",
+    description: "한국부동산원 청약홈 아파트 분양 공고 목록(주택명, 공급위치, 모집공고일, 청약접수일정, 당첨자발표일 등)을 조회합니다.",
+    inputSchema: {
+      page: z.number().optional().default(1).describe("페이지 번호 (기본: 1)"),
+      per_page: z.number().optional().default(20).describe("페이지당 조회 건수 (기본: 20)"),
+      search_house_name: z.string().optional().describe("특정 단지명(주택명) 필터 검색어"),
+    },
+  },
+  async ({ page, per_page, search_house_name }) => {
+    if (!ODCLOUD_KEY) return errorResult("공공데이터포털 API 키(MOLIT_API_KEY 또는 ODCLOUD_API_KEY)가 설정되지 않았습니다.");
+    const key = ODCLOUD_KEY.includes("%") ? decodeURIComponent(ODCLOUD_KEY) : ODCLOUD_KEY;
+    const url = `https://api.odcloud.kr/api/15101046/v1/uddi:14a46595-03dd-47d3-a418-d64e52820598?page=${page}&perPage=${per_page}&serviceKey=${encodeURIComponent(key)}`;
+
+    try {
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      let items = data.data || [];
+      if (search_house_name) {
+        items = items.filter((it) => String(it["주택명"] || "").includes(search_house_name));
+      }
+
+      if (!items.length) {
+        return { content: [{ type: "text", text: `📭 조회된 청약 공고가 없습니다.` }] };
+      }
+
+      const lines = items.map((it) => {
+        const name = it["주택명"] || "미상";
+        const loc = it["공급위치"] || "";
+        const rcvDate = `${it["청약접수시작일"] || ""} ~ ${it["청약접수종료일"] || ""}`;
+        const winDate = it["당첨자발표일"] || "";
+        return `• 🏢 [${name}] ${loc}\n  - 청약일정: ${rcvDate} | 당첨자 발표: ${winDate}`;
+      });
+
+      return {
+        content: [
+          { type: "text", text: `📋 한국부동산원 청약홈 분양 공고 (${items.length}건)\n\n` + lines.join("\n\n") },
+          { type: "text", text: JSON.stringify({ page, per_page, total_match: items.length, items }, null, 2) },
+        ],
+      };
+    } catch (e) {
+      return errorResult(`청약 정보 조회 실패: ${e.message}`);
+    }
+  }
+);
+
+// ---------------------------------------------------------------------------
+// 8. 부동산 재무·대출 계산기 (Finance Tools)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "calculate_loan_payment",
+  {
+    title: "주택담보대출 원리금 균등상환(EMI) 계산기",
+    description: "대출원금(만원), 연이율(%), 상환기간(년)을 바탕으로 월 납입 원리금, 총 상환액, 총 발생 이자를 정밀 계산합니다.",
+    inputSchema: {
+      principal_10k: z.number().min(1).describe("대출 원금 (만원 단위, 예: 30000 = 3억원)"),
+      annual_rate_pct: z.number().min(0).describe("연 이자율 (%, 예: 4.2)"),
+      years: z.number().min(1).max(50).describe("대출 기간 (년 단위, 예: 30, 40)"),
+    },
+  },
+  async ({ principal_10k, annual_rate_pct, years }) => {
+    const r = annual_rate_pct / 100 / 12;
+    const n = years * 12;
+    let monthly_10k = 0;
+    if (r === 0) {
+      monthly_10k = principal_10k / n;
+    } else {
+      const growth = Math.pow(1 + r, n);
+      monthly_10k = (principal_10k * r * growth) / (growth - 1);
+    }
+    const total_paid_10k = monthly_10k * n;
+    const total_interest_10k = total_paid_10k - principal_10k;
+
+    const principalWon = principal_10k * 10000;
+    const monthlyWon = Math.round(monthly_10k * 10000);
+    const totalInterestWon = Math.round(total_interest_10k * 10000);
+    const totalPaidWon = Math.round(total_paid_10k * 10000);
+
+    const report =
+      `💳 [대출 원리금 균등상환 시뮬레이션]\n` +
+      `• 대출 원금: ${(principal_10k / 10000).toFixed(2)}억원 (${principalWon.toLocaleString()}원)\n` +
+      `• 연 이자율: ${annual_rate_pct}% (만기: ${years}년 / ${n}개월)\n\n` +
+      `💰 월 원리금 납입액: ${monthlyWon.toLocaleString()}원 (${monthly_10k.toFixed(1)}만원)\n` +
+      `📈 총 대출 이자: ${totalInterestWon.toLocaleString()}원 (${total_interest_10k.toFixed(1)}만원)\n` +
+      `💵 만기 총 상환액: ${totalPaidWon.toLocaleString()}원 (${total_paid_10k.toFixed(1)}만원)`;
+
+    return {
+      content: [
+        { type: "text", text: report },
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              principal_10k,
+              annual_rate_pct,
+              years,
+              monthly_payment_10k: +monthly_10k.toFixed(2),
+              monthly_payment_won: monthlyWon,
+              total_interest_10k: +total_interest_10k.toFixed(2),
+              total_paid_10k: +total_paid_10k.toFixed(2),
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "calculate_monthly_cashflow",
+  {
+    title: "월간 잉여 현금흐름 및 DSR 스트레스 시뮬레이터",
+    description: "월 소득, 생활비, 월 대출상환액, 임대소득을 종합하여 실질적인 월 잉여 현금흐름과 주거비 부담율(DSR 추정)을 분석합니다.",
+    inputSchema: {
+      monthly_income_10k: z.number().describe("월 실수령 총소득 (만원 단위, 예: 600)"),
+      monthly_expenses_10k: z.number().describe("월 고정 생활비/소비지출 (만원 단위, 예: 250)"),
+      monthly_loan_payment_10k: z.number().describe("월 대출 원리금 상환액 (만원 단위, 예: 180)"),
+      monthly_rent_income_10k: z.number().optional().default(0).describe("월 임대/부수입 (만원 단위, 예: 50)"),
+    },
+  },
+  async ({ monthly_income_10k, monthly_expenses_10k, monthly_loan_payment_10k, monthly_rent_income_10k }) => {
+    const total_in = monthly_income_10k + (monthly_rent_income_10k || 0);
+    const total_out = monthly_expenses_10k + monthly_loan_payment_10k;
+    const net_surplus = total_in - total_out;
+    const dsr_approx = monthly_income_10k > 0 ? (monthly_loan_payment_10k / monthly_income_10k) * 100 : 0;
+    const saving_ratio = total_in > 0 ? (net_surplus / total_in) * 100 : 0;
+
+    let healthStatus = "🟢 양호 (여유로운 현금흐름)";
+    if (dsr_approx > 40) healthStatus = "🔴 위험 (DSR 40% 초과, 가계 건전성 악화 주의)";
+    else if (dsr_approx > 30) healthStatus = "🟡 주의 (대출 원리금 비중 30% 초과)";
+
+    const text =
+      `💼 [월간 현금흐름 & 재무 건전성 진단]\n` +
+      `• 총 수입: ${total_in.toLocaleString()}만원 (기본소득 ${monthly_income_10k}만 + 부수입 ${monthly_rent_income_10k}만)\n` +
+      `• 총 지출: ${total_out.toLocaleString()}만원 (생활비 ${monthly_expenses_10k}만 + 대출원리금 ${monthly_loan_payment_10k}만)\n\n` +
+      `💵 월 잉여 현금: ${net_surplus.toLocaleString()}만원 (저축/투자 가능 여력)\n` +
+      `📊 추정 DSR(소득대비 대출상환비율): ${dsr_approx.toFixed(1)}%\n` +
+      `📈 저축률: ${saving_ratio.toFixed(1)}%\n` +
+      `🛡️ 재무 상태: ${healthStatus}`;
+
+    return {
+      content: [
+        { type: "text", text },
+        {
+          type: "text",
+          text: JSON.stringify(
+            { total_in, total_out, net_surplus, dsr_approx: +dsr_approx.toFixed(2), saving_ratio: +saving_ratio.toFixed(2) },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "calculate_compound_growth",
+  {
+    title: "자산 복리 성장 시뮬레이터 (매수 vs 투자 비교)",
+    description: "초기 자본금, 월 적립액, 연간 기대수익률, 투자 기간을 바탕으로 복리 자산 축적 시뮬레이션을 수행합니다.",
+    inputSchema: {
+      initial_capital_10k: z.number().min(0).describe("초기 투자 자본금 (만원 단위, 예: 10000 = 1억원)"),
+      monthly_saving_10k: z.number().min(0).describe("월 추가 적립 투자금 (만원 단위, 예: 150)"),
+      annual_return_pct: z.number().describe("연간 기대 수익률 (%, 예: 7.0)"),
+      years: z.number().min(1).max(50).describe("투자 기간 (년 단위, 예: 10)"),
+    },
+  },
+  async ({ initial_capital_10k, monthly_saving_10k, annual_return_pct, years }) => {
+    const r = annual_return_pct / 100 / 12;
+    const months = years * 12;
+    let balance = initial_capital_10k;
+    const yearlySnapshots = [];
+
+    for (let m = 1; m <= months; m++) {
+      balance = balance * (1 + r) + monthly_saving_10k;
+      if (m % 12 === 0) {
+        const y = m / 12;
+        yearlySnapshots.push({
+          year: `${y}년차`,
+          자산_억: +(balance / 10000).toFixed(2),
+          자산_만원: Math.round(balance),
+        });
+      }
+    }
+
+    const total_invested_10k = initial_capital_10k + monthly_saving_10k * months;
+    const total_gain_10k = balance - total_invested_10k;
+
+    const lines = yearlySnapshots.map((s) => `• ${s.year}: ${s.자산_억}억원 (${s.자산_만원.toLocaleString()}만원)`);
+
+    const text =
+      `📈 [복리 투자 자산 축적 시뮬레이션]\n` +
+      `• 초기자본: ${(initial_capital_10k / 10000).toFixed(2)}억원 | 월 적립: ${monthly_saving_10k.toLocaleString()}만원 | 기대수익률: 연 ${annual_return_pct}%\n` +
+      `• ${years}년 후 최종 자산: ${(balance / 10000).toFixed(2)}억원 (${Math.round(balance).toLocaleString()}만원)\n` +
+      `• 원금 총합: ${(total_invested_10k / 10000).toFixed(2)}억 | 순 복리수익: ${(total_gain_10k / 10000).toFixed(2)}억원\n\n` +
+      `📅 연도별 자산 성장 추이:\n` +
+      lines.join("\n");
+
+    return {
+      content: [
+        { type: "text", text },
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              final_asset_10k: Math.round(balance),
+              total_invested_10k,
+              total_gain_10k: Math.round(total_gain_10k),
+              snapshots: yearlySnapshots,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ===========================================================================
+// gum798/A2A-MCP-RealEstate 연동 확장 도구
+// https://github.com/gum798/A2A-MCP-RealEstate
+// 위치 기반 역세권 분석, 투자가치/삶의질 평가 및 맞춤형 부동산 추천 엔진
+// ===========================================================================
+
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371.0;
+  const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return +(R * c).toFixed(2);
+}
+
+const SUBWAY_STATIONS_DATA = {
+  강남역: { lat: 37.4979, lon: 127.0276, lines: ["2호선", "신분당선"] },
+  역삼역: { lat: 37.5, lon: 127.0366, lines: ["2호선"] },
+  선릉역: { lat: 37.5044, lon: 127.049, lines: ["2호선", "수인분당선"] },
+  삼성역: { lat: 37.5081, lon: 127.0631, lines: ["2호선"] },
+  종각역: { lat: 37.5703, lon: 126.9821, lines: ["1호선"] },
+  명동역: { lat: 37.5636, lon: 126.9838, lines: ["4호선"] },
+  홍대입구역: { lat: 37.5567, lon: 126.9244, lines: ["2호선", "6호선", "공항철도"] },
+  신촌역: { lat: 37.5551, lon: 126.9366, lines: ["2호선"] },
+  이대역: { lat: 37.5564, lon: 126.9458, lines: ["2호선"] },
+  서울역: { lat: 37.5547, lon: 126.9706, lines: ["1호선", "4호선", "공항철도", "KTX"] },
+  용산역: { lat: 37.5299, lon: 126.9646, lines: ["1호선", "경의중앙선", "KTX"] },
+  여의도역: { lat: 37.5219, lon: 126.9245, lines: ["5호선", "9호선"] },
+  당산역: { lat: 37.5344, lon: 126.9025, lines: ["2호선", "9호선"] },
+  영등포역: { lat: 37.5156, lon: 126.9077, lines: ["1호선", "KTX"] },
+  목동역: { lat: 37.526, lon: 126.8643, lines: ["5호선"] },
+  오목교역: { lat: 37.5244, lon: 126.8752, lines: ["5호선"] },
+  김포공항역: { lat: 37.5629, lon: 126.8014, lines: ["5호선", "9호선", "공항철도", "김포골드라인", "서해선"] },
+  수원역: { lat: 37.2656, lon: 127.0011, lines: ["1호선", "수인분당선", "KTX"] },
+  판교역: { lat: 37.3951, lon: 127.1116, lines: ["신분당선", "경강선"] },
+  분당역: { lat: 37.3896, lon: 127.1226, lines: ["수인분당선"] },
+  서현역: { lat: 37.385, lon: 127.1233, lines: ["수인분당선"] },
+  정자역: { lat: 37.3667, lon: 127.1084, lines: ["수인분당선", "신분당선"] },
+  미금역: { lat: 37.3501, lon: 127.1066, lines: ["수인분당선", "신분당선"] },
+  수지구청역: { lat: 37.3223, lon: 127.0978, lines: ["신분당선"] },
+  과천역: { lat: 37.4331, lon: 126.9967, lines: ["4호선"] },
+  잠실역: { lat: 37.5133, lon: 127.1, lines: ["2호선", "8호선"] },
+  가락시장역: { lat: 37.4926, lon: 127.1186, lines: ["3호선", "8호선"] },
+  건대입구역: { lat: 37.5403, lon: 127.0703, lines: ["2호선", "7호선"] },
+  왕십리역: { lat: 37.5618, lon: 127.0372, lines: ["2호선", "5호선", "경의중앙선", "수인분당선"] },
+  청량리역: { lat: 37.5802, lon: 127.0479, lines: ["1호선", "경의중앙선", "수인분당선", "경춘선", "KTX"] },
+  동대문역: { lat: 37.5712, lon: 127.0096, lines: ["1호선", "4호선"] },
+  을지로3가역: { lat: 37.5663, lon: 126.9928, lines: ["2호선", "3호선"] },
+  충무로역: { lat: 37.5635, lon: 126.9936, lines: ["3호선", "4호선"] },
+  사당역: { lat: 37.4766, lon: 126.9814, lines: ["2호선", "4호선"] },
+  교대역: { lat: 37.4934, lon: 127.0146, lines: ["2호선", "3호선"] },
+  서초역: { lat: 37.4837, lon: 127.0108, lines: ["2호선"] },
+  고속터미널역: { lat: 37.5048, lon: 127.0049, lines: ["3호선", "7호선", "9호선"] },
+  압구정역: { lat: 37.5271, lon: 127.0284, lines: ["3호선"] },
+  신사역: { lat: 37.5163, lon: 127.0205, lines: ["3호선", "신분당선"] },
+  합정역: { lat: 37.5494, lon: 126.9138, lines: ["2호선", "6호선"] },
+  마포역: { lat: 37.5396, lon: 126.9458, lines: ["5호선"] },
+  공덕역: { lat: 37.5444, lon: 126.9515, lines: ["5호선", "6호선", "경의중앙선", "공항철도"] },
+};
+
+const KNOWN_LANDMARK_COORDS = {
+  강남: { lat: 37.4979, lon: 127.0276 },
+  역삼: { lat: 37.5, lon: 127.0366 },
+  대치: { lat: 37.4946, lon: 127.0636 },
+  개포: { lat: 37.4828, lon: 127.0673 },
+  압구정: { lat: 37.5271, lon: 127.0284 },
+  청담: { lat: 37.5253, lon: 127.0531 },
+  서초: { lat: 37.4837, lon: 127.0108 },
+  반포: { lat: 37.5048, lon: 127.0049 },
+  송파: { lat: 37.5145, lon: 127.1058 },
+  잠실: { lat: 37.5133, lon: 127.1 },
+  가락: { lat: 37.4926, lon: 127.1186 },
+  용산: { lat: 37.5299, lon: 126.9646 },
+  한남: { lat: 37.5347, lon: 127.0024 },
+  이촌: { lat: 37.5222, lon: 126.9744 },
+  마포: { lat: 37.5567, lon: 126.9244 },
+  합정: { lat: 37.5494, lon: 126.9138 },
+  공덕: { lat: 37.5444, lon: 126.9515 },
+  상암: { lat: 37.5775, lon: 126.8913 },
+  성동: { lat: 37.5635, lon: 127.0368 },
+  성수: { lat: 37.5445, lon: 127.0559 },
+  옥수: { lat: 37.5414, lon: 127.0177 },
+  양천: { lat: 37.526, lon: 126.8643 },
+  목동: { lat: 37.526, lon: 126.8643 },
+  영등포: { lat: 37.5156, lon: 126.9077 },
+  여의도: { lat: 37.5219, lon: 126.9245 },
+  당산: { lat: 37.5344, lon: 126.9025 },
+  분당: { lat: 37.385, lon: 127.1233 },
+  판교: { lat: 37.3951, lon: 127.1116 },
+  정자: { lat: 37.3667, lon: 127.1084 },
+  수지: { lat: 37.3223, lon: 127.0978 },
+  과천: { lat: 37.4331, lon: 126.9967 },
+  평촌: { lat: 37.3943, lon: 126.9568 },
+  일산: { lat: 37.6584, lon: 126.7701 },
+  광명: { lat: 37.4786, lon: 126.8646 },
+};
+
+function resolveCoords(address, lat, lon) {
+  if (lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)) {
+    return { lat, lon, source: "direct" };
+  }
+  if (!address) return null;
+  const clean = String(address).trim();
+  for (const [k, coord] of Object.entries(KNOWN_LANDMARK_COORDS)) {
+    if (clean.includes(k)) {
+      return { ...coord, source: `matched:${k}` };
+    }
+  }
+  // 기본값 서울시청 중심
+  return { lat: 37.5665, lon: 126.978, source: "default:seoul" };
+}
+
+function scoreToGrade(score) {
+  if (score >= 90) return "S (최상)";
+  if (score >= 80) return "A (우수)";
+  if (score >= 70) return "B (양호)";
+  if (score >= 60) return "C (보통)";
+  return "D (주의)";
+}
+
+// ---------------------------------------------------------------------------
+// A2A 도구 1: 가장 가까운 지하철역 검색 (find_nearest_subway_stations)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "find_nearest_subway_stations",
+  {
+    title: "가장 가까운 지하철역 및 거리 분석",
+    description: "주소명 또는 좌표(위경도)를 기준으로 반경 내 가장 가까운 지하철역 목록과 직선거리(km/m), 노선 정보를 계산하여 역세권 입지를 분석합니다.",
+    inputSchema: {
+      address: z.string().optional().describe("조회할 주소나 지역명 (예: '강남구 대치동', '목동 현대아파트', '분당구 정자동')"),
+      lat: z.number().optional().describe("위도 (선택)"),
+      lon: z.number().optional().describe("경도 (선택)"),
+      limit: z.number().optional().default(5).describe("반환할 최근접 역 개수 (기본: 5)"),
+    },
+  },
+  async ({ address, lat, lon, limit = 5 }) => {
+    const coords = resolveCoords(address, lat, lon);
+    if (!coords) return errorResult("주소 또는 좌표(lat, lon) 정보가 필요합니다.");
+
+    const list = Object.entries(SUBWAY_STATIONS_DATA).map(([name, info]) => {
+      const distKm = calculateDistanceKm(coords.lat, coords.lon, info.lat, info.lon);
+      return {
+        station_name: name,
+        distance_km: distKm,
+        distance_m: Math.round(distKm * 1000),
+        lines: info.lines,
+        coordinates: { lat: info.lat, lon: info.lon },
+      };
+    });
+
+    list.sort((a, b) => a.distance_km - b.distance_km);
+    const nearest = list.slice(0, limit);
+    const closest = nearest[0];
+
+    const isSuperStation = closest.distance_m <= 500;
+    const isWalkingStation = closest.distance_m <= 1000;
+    const stationGrade = isSuperStation ? "초역세권 (도보 7분 이내)" : isWalkingStation ? "역세권 (도보 15분 이내)" : "비역세권 (버스/환승 필요)";
+
+    const lines = nearest.map(
+      (s, i) => `${i + 1}. 🚇 ${s.station_name} (${s.lines.join(", ")}) - ${s.distance_m}m (${s.distance_km}km)`
+    );
+
+    const report =
+      `📍 [역세권 입지 분석]\n` +
+      `• 기준 위치: ${address || "좌표 (" + coords.lat + ", " + coords.lon + ")"}\n` +
+      `• 최근접 역: ${closest.station_name} (${closest.distance_m}m)\n` +
+      `• 역세권 등급: ${stationGrade}\n\n` +
+      `[최근접 지하철역 Top ${nearest.length}]\n` +
+      lines.join("\n");
+
+    return {
+      content: [
+        { type: "text", text: report },
+        {
+          type: "text",
+          text: JSON.stringify(
+            { query: { address, coordinates: coords }, nearest_stations: nearest, closest_station: closest, station_grade: stationGrade },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// A2A 도구 2: 위치 점수 계산 (calculate_location_score)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "calculate_location_score",
+  {
+    title: "부동산 위치 및 입지 점수 종합 산출",
+    description: "지하철역 거리(km), 편의시설 개수, 공원/녹지 거리(km)를 기반으로 위치 종합 점수(0~100)와 입지 등급을 정량 평가합니다.",
+    inputSchema: {
+      subway_distance_km: z.number().min(0).describe("가장 가까운 지하철역까지의 거리 (km 단위, 예: 0.4)"),
+      facilities_count: z.number().optional().default(15).describe("반경 1km 내 편의시설 개수 (기본: 15)"),
+      park_distance_km: z.number().optional().default(0.5).describe("가장 가까운 공원/녹지까지의 거리 (km 단위, 기본: 0.5)"),
+    },
+  },
+  async ({ subway_distance_km, facilities_count = 15, park_distance_km = 0.5 }) => {
+    // 1. 교통 점수 (40%)
+    let transportScore = 40;
+    if (subway_distance_km <= 0.4) transportScore = 100;
+    else if (subway_distance_km <= 0.8) transportScore = 85;
+    else if (subway_distance_km <= 1.2) transportScore = 70;
+    else if (subway_distance_km <= 2.0) transportScore = 55;
+
+    // 2. 편의성 점수 (35%)
+    let convenienceScore = 40;
+    if (facilities_count >= 30) convenienceScore = 100;
+    else if (facilities_count >= 20) convenienceScore = 85;
+    else if (facilities_count >= 10) convenienceScore = 70;
+    else if (facilities_count >= 5) convenienceScore = 55;
+
+    // 3. 환경 점수 (25%)
+    let envScore = 40;
+    if (park_distance_km <= 0.3) envScore = 100;
+    else if (park_distance_km <= 0.6) envScore = 85;
+    else if (park_distance_km <= 1.0) envScore = 70;
+    else if (park_distance_km <= 1.5) envScore = 55;
+
+    const totalScore = +(transportScore * 0.4 + convenienceScore * 0.35 + envScore * 0.25).toFixed(1);
+    const grade = scoreToGrade(totalScore);
+
+    const text =
+      `🎯 [입지 점수 종합 평가]\n` +
+      `• 종합 위치 점수: ${totalScore}점 / 100점 (${grade})\n` +
+      `• 🚆 교통 접근성 (40% 가중치): ${transportScore}점 (지하철역 ${Math.round(subway_distance_km * 1000)}m)\n` +
+      `• 🛒 생활 인프라 편의성 (35% 가중치): ${convenienceScore}점 (편의시설 ${facilities_count}개)\n` +
+      `• 🌳 쾌적성/공원 환경 (25% 가중치): ${envScore}점 (녹지 거리 ${Math.round(park_distance_km * 1000)}m)`;
+
+    return {
+      content: [
+        { type: "text", text },
+        {
+          type: "text",
+          text: JSON.stringify(
+            { total_score: totalScore, grade, breakdown: { transport: transportScore, convenience: convenienceScore, environment: envScore } },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// A2A 도구 3: 투자가치 평가 (evaluate_investment_value)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "evaluate_investment_value",
+  {
+    title: "부동산 투자가치 정량 평가 (Investment Score)",
+    description: "매물 가격(만원), 전용면적(㎡), 층수, 건축년도, 지하철역 거리(km)를 분석하여 가격 적정성, 감가상각 여력, 층수/입지 프리미엄을 반영한 투자가치 점수를 산출합니다.",
+    inputSchema: {
+      price_10k: z.number().min(100).describe("매매 가격 (만원 단위, 예: 120000 = 12억원)"),
+      area_m2: z.number().min(10).describe("전용면적 (㎡ 단위, 예: 84.9)"),
+      floor: z.number().optional().default(10).describe("해당 매물 층수 (예: 12)"),
+      total_floor: z.number().optional().default(20).describe("건물 전체 층수 (예: 25)"),
+      building_year: z.number().optional().default(2015).describe("준공 건축년도 (예: 2018)"),
+      subway_distance_km: z.number().optional().default(0.5).describe("지하철역 거리 (km 단위, 예: 0.5)"),
+    },
+  },
+  async ({ price_10k, area_m2, floor = 10, total_floor = 20, building_year = 2015, subway_distance_km = 0.5 }) => {
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - building_year;
+    const pyeong = area_m2 / 3.3058;
+    const pricePerPyeong_10k = +(price_10k / pyeong).toFixed(1);
+
+    // 1. 가격 경쟁력 점수 (30%)
+    let priceScore = 70;
+    if (pricePerPyeong_10k < 3000) priceScore = 95;
+    else if (pricePerPyeong_10k < 4500) priceScore = 85;
+    else if (pricePerPyeong_10k < 6500) priceScore = 75;
+    else priceScore = 65;
+
+    // 2. 연식 및 미래 잠재력 (25%): 5년 이내 신축 또는 30년 이상 재건축 연한 도래 시 고득점
+    let futureScore = 60;
+    if (age <= 5) futureScore = 95; // 신축 프리미엄
+    else if (age <= 10) futureScore = 85; // 준신축
+    else if (age >= 30) futureScore = 90; // 재건축 기대감
+    else if (age <= 20) futureScore = 75; // 기축 양호
+    else futureScore = 60;
+
+    // 3. 층수 점수 (15%): 중상층 로열층 여부
+    const floorRatio = total_floor > 0 ? floor / total_floor : 0.5;
+    let floorScore = 70;
+    if (floorRatio >= 0.4 && floorRatio <= 0.8) floorScore = 95; // 로열층
+    else if (floorRatio > 0.8) floorScore = 85; // 탑층 부근
+    else if (floor >= 3) floorScore = 75; // 중저층
+    else floorScore = 60; // 1~2층 저층
+
+    // 4. 교통 역세권 (30%)
+    let transportScore = 50;
+    if (subway_distance_km <= 0.4) transportScore = 95;
+    else if (subway_distance_km <= 0.8) transportScore = 85;
+    else if (subway_distance_km <= 1.2) transportScore = 70;
+
+    const totalScore = +(priceScore * 0.3 + futureScore * 0.25 + floorScore * 0.15 + transportScore * 0.3).toFixed(1);
+    const grade = scoreToGrade(totalScore);
+
+    const report =
+      `💰 [부동산 투자가치 평가 결과]\n` +
+      `• 투자가치 점수: ${totalScore}점 (${grade})\n` +
+      `• 평당 가격: ${pricePerPyeong_10k.toLocaleString()}만원/평 (전용 ${area_m2}㎡ / ${pyeong.toFixed(1)}평)\n` +
+      `• 연식: ${age}년차 (${building_year}년식, ${age <= 5 ? "신축 프리미엄" : age >= 30 ? "재건축 가치" : "기축"})\n` +
+      `• 층수 분석: ${floor}층 / ${total_floor}층 (${floorScore >= 90 ? "로열층 우수" : "일반층"})\n` +
+      `• 역세권 분석: 도보 ${Math.round(subway_distance_km * 1000)}m (점수: ${transportScore}점)`;
+
+    return {
+      content: [
+        { type: "text", text: report },
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              total_score: totalScore,
+              grade,
+              price_per_pyeong_10k: pricePerPyeong_10k,
+              age,
+              breakdown: { price_competitiveness: priceScore, future_potential: futureScore, floor_premium: floorScore, transit_access: transportScore },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+
+
+// ---------------------------------------------------------------------------
+// A2A 도구 4: 삶의 질 평가 (evaluate_life_quality)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "evaluate_life_quality",
+  {
+    title: "실거주 삶의 질 가치 평가 (Life Quality Score)",
+    description: "실거주자의 만족도에 영향을 미치는 교통, 생활인프라, 공원 녹지, 건물 연식, 학군 및 학교 교육 환경(check_schools 연동)을 바탕으로 삶의 질 지수를 정량 평가합니다.",
+    inputSchema: {
+      subway_distance_km: z.number().min(0).describe("지하철역 거리 (km 단위)"),
+      facilities_count: z.number().optional().default(20).describe("반경 내 편의시설 개수"),
+      park_distance_km: z.number().optional().default(0.4).describe("공원 거리 (km 단위)"),
+      building_year: z.number().optional().default(2018).describe("건축 준공연도"),
+      district: z.string().optional().describe("자치구명(선택, 입력 시 check_schools 학군 데이터 자동 반영)"),
+    },
+  },
+  async ({ subway_distance_km, facilities_count = 20, park_distance_km = 0.4, building_year = 2018, district }) => {
+    const age = new Date().getFullYear() - building_year;
+
+    // 1. 편의 인프라 (25%)
+    let convScore = facilities_count >= 25 ? 95 : facilities_count >= 15 ? 85 : facilities_count >= 8 ? 70 : 50;
+    // 2. 통근/교통 편의 (25%)
+    let transitScore = subway_distance_km <= 0.5 ? 95 : subway_distance_km <= 1.0 ? 80 : subway_distance_km <= 1.5 ? 65 : 45;
+    // 3. 녹지 환경 쾌적성 (20%)
+    let envScore = park_distance_km <= 0.3 ? 95 : park_distance_km <= 0.6 ? 85 : park_distance_km <= 1.0 ? 70 : 50;
+    // 4. 단지 컨디션 (15%)
+    let buildingScore = age <= 5 ? 95 : age <= 10 ? 85 : age <= 20 ? 75 : 55;
+
+    // 5. 학군 및 교육 인프라 (15%): check_schools.js 연동
+    let schoolScore = 75;
+    let schoolSummary = "일반 보통 수준";
+    if (district) {
+      try {
+        const gu = resolveGu(district);
+        const prov = gu?.province === "gyeonggi" ? "경기도" : "서울특별시";
+        const highSchools = await getDistrictHighSchoolsData({ district: gu?.name || district, province: prov });
+        if (highSchools && !highSchools.isError) {
+          const detail = JSON.parse(highSchools.content[1]?.text || "{}");
+          const spec = (detail.counts?.specialized || 0) + (detail.counts?.autonomous || 0);
+          if (spec >= 5) { schoolScore = 98; schoolSummary = `최상급 명문 학군 (자율/특목고 ${spec}개교)`; }
+          else if (spec >= 3) { schoolScore = 90; schoolSummary = `우수 학군 (자율/특목고 ${spec}개교)`; }
+          else if (spec >= 1) { schoolScore = 80; schoolSummary = `양호 학군 (자율/특목고 ${spec}개교)`; }
+          else { schoolScore = 70; schoolSummary = `일반 학군 (일반고 ${detail.counts?.general || 0}개교)`; }
+        }
+      } catch {
+        // 기본값 유지
+      }
+    }
+
+    const totalScore = +(convScore * 0.25 + transitScore * 0.25 + envScore * 0.20 + buildingScore * 0.15 + schoolScore * 0.15).toFixed(1);
+    const grade = scoreToGrade(totalScore);
+
+    const report =
+      `🌿 [실거주 삶의 질 평가 결과 (check_schools 연동)]\n` +
+      `• 삶의 질 지수: ${totalScore}점 (${grade})\n` +
+      `• 🛒 생활 편의성 (25%): ${convScore}점 (주변 편의시설 ${facilities_count}개)\n` +
+      `• 🚆 대중교통 통근 편의 (25%): ${transitScore}점 (역거리 ${Math.round(subway_distance_km * 1000)}m)\n` +
+      `• 🏞️ 녹지/휴식 환경 (20%): ${envScore}점 (공원 거리 ${Math.round(park_distance_km * 1000)}m)\n` +
+      `• 🏢 주거 시설 쾌적성 (15%): ${buildingScore}점 (${building_year}년 준공, ${age}년차)\n` +
+      `• 🎓 학군 및 교육 환경 (15%): ${schoolScore}점 (${schoolSummary})`;
+
+    return {
+      content: [
+        { type: "text", text: report },
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              total_score: totalScore,
+              grade,
+              breakdown: {
+                convenience: convScore,
+                transit: transitScore,
+                environment: envScore,
+                building: buildingScore,
+                education_school: schoolScore,
+              },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// A2A 도구 5: 종합 부동산 맞춤 추천 (recommend_property)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "recommend_property",
+  {
+    title: "성향별 종합 부동산 추천 및 판정 (A2A Recommendation)",
+    description: "사용자의 투자 성향(투자형 'investment', 실거주형 'life_quality', 학군/자녀교육형 'education', 균형형 'balanced')에 맞춰 투자가치, 삶의 질, 학군 데이터를 종합 합성하고 추천 점수를 산출합니다.",
+    inputSchema: {
+      property_name: z.string().describe("매물명 또는 단지명 (예: '반포자이', '마포래미안푸르지오')"),
+      price_10k: z.number().describe("매매 가격 (만원 단위, 예: 150000)"),
+      area_m2: z.number().describe("전용면적 (㎡ 단위, 예: 84.5)"),
+      user_preference: z.enum(["investment", "life_quality", "education", "balanced"]).default("balanced").describe("사용자 성향 ('investment': 자산증식, 'life_quality': 거주만족, 'education': 학군/자녀교육, 'balanced': 균형)"),
+      building_year: z.number().optional().default(2018).describe("준공 연도"),
+      subway_distance_km: z.number().optional().default(0.5).describe("지하철역 거리(km)"),
+      district: z.string().optional().describe("자치구/지역명(예: '강남구', '서초구', '송파구', '양천구', '노원구')"),
+    },
+  },
+  async ({ property_name, price_10k, area_m2, user_preference = "balanced", building_year = 2018, subway_distance_km = 0.5, district }) => {
+    // 투자가치 계산
+    const pyeong = area_m2 / 3.3058;
+    const pricePerPyeong_10k = +(price_10k / pyeong).toFixed(1);
+    const age = new Date().getFullYear() - building_year;
+
+    let investScore = 75;
+    if (pricePerPyeong_10k < 4000) investScore += 10;
+    if (subway_distance_km <= 0.5) investScore += 10;
+    if (age <= 5 || age >= 30) investScore += 5;
+    investScore = Math.min(100, Math.max(40, investScore));
+
+    // 삶의 질 계산
+    let lifeScore = 70;
+    if (subway_distance_km <= 0.6) lifeScore += 15;
+    if (age <= 10) lifeScore += 15;
+    lifeScore = Math.min(100, Math.max(40, lifeScore));
+
+    // 학군 점수 (check_schools.js 연동)
+    let schoolScore = 75;
+    let schoolNote = "보통 학군";
+    if (district) {
+      try {
+        const gu = resolveGu(district);
+        const prov = gu?.province === "gyeonggi" ? "경기도" : "서울특별시";
+        const highSchools = await getDistrictHighSchoolsData({ district: gu?.name || district, province: prov });
+        if (highSchools && !highSchools.isError) {
+          const detail = JSON.parse(highSchools.content[1]?.text || "{}");
+          const spec = (detail.counts?.specialized || 0) + (detail.counts?.autonomous || 0);
+          if (spec >= 5) { schoolScore = 98; schoolNote = `S급 최상위 학군 (자율/특목고 ${spec}개교)`; }
+          else if (spec >= 3) { schoolScore = 90; schoolNote = `A급 우수 학군 (자율/특목고 ${spec}개교)`; }
+          else if (spec >= 1) { schoolScore = 80; schoolNote = `B급 양호 학군 (자율/특목고 ${spec}개교)`; }
+          else { schoolScore = 70; schoolNote = `C급 일반 학군 (일반고 ${detail.counts?.general || 0}개교)`; }
+        }
+      } catch {
+        // 기본값 유지
+      }
+    }
+
+    // 가중치 적용
+    let weightInvest = 0.4, weightLife = 0.4, weightSchool = 0.2;
+    let prefLabel = "균형 추구형 (투자 40% + 거주 40% + 학군 20%)";
+    if (user_preference === "investment") {
+      weightInvest = 0.6; weightLife = 0.25; weightSchool = 0.15;
+      prefLabel = "자산 증식형 (투자 60% + 거주 25% + 학군 15%)";
+    } else if (user_preference === "life_quality") {
+      weightInvest = 0.25; weightLife = 0.55; weightSchool = 0.2;
+      prefLabel = "실거주 만족형 (투자 25% + 거주 55% + 학군 20%)";
+    } else if (user_preference === "education") {
+      weightInvest = 0.25; weightLife = 0.25; weightSchool = 0.5;
+      prefLabel = "학군/자녀 교육 집중형 (학군 50% + 거주 25% + 투자 25%)";
+    }
+
+    const compositeScore = +(investScore * weightInvest + lifeScore * weightLife + schoolScore * weightSchool).toFixed(1);
+    const grade = scoreToGrade(compositeScore);
+
+    let actionSignal = "🟢 강력 추천 (매수 적극 고려)";
+    if (compositeScore < 70) actionSignal = "🔴 관망 권고 (가격 또는 입지 재검토)";
+    else if (compositeScore < 80) actionSignal = "🟡 조건부 추천 (호가 조정 및 현장 확인 필요)";
+
+    const report =
+      `🏆 [A2A 부동산 맞춤 추천 리포트: ${property_name} (check_schools 학군 연동)]\n` +
+      `• 매물 조건: ${(price_10k / 10000).toFixed(2)}억원 | 전용 ${area_m2}㎡ (${pyeong.toFixed(1)}평) | ${building_year}년식\n` +
+      `• 분석 성향: ${prefLabel}\n\n` +
+      `📊 [종합 점수]: ${compositeScore}점 / 100점 (${grade})\n` +
+      `• 💰 투자가치 점수: ${investScore}점 (평당 ${pricePerPyeong_10k.toLocaleString()}만원)\n` +
+      `• 🌿 삶의질 점수: ${lifeScore}점 (역거리 ${Math.round(subway_distance_km * 1000)}m)\n` +
+      `• 🎓 학군 점수: ${schoolScore}점 (${schoolNote})\n\n` +
+      `🚦 판정 신호: ${actionSignal}`;
+
+    return {
+      content: [
+        { type: "text", text: report },
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              property_name,
+              district: district || "미지정",
+              price_10k,
+              user_preference,
+              composite_score: compositeScore,
+              grade,
+              investment_score: investScore,
+              life_quality_score: lifeScore,
+              education_score: schoolScore,
+              action_signal: actionSignal,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// check_schools 연동 도구: 학교 및 학습 데이터 직접 조회 브릿지
+// ---------------------------------------------------------------------------
+server.registerTool(
+  "find_school_learning",
+  {
+    title: "학교 및 학습 정보 조회 (check_schools 연동)",
+    description: "check_schools.js 및 schoolinfo-mcp를 통해 특정 학교의 기본정보, 공시, 급식 식단, 학사일정을 통합 조회합니다.",
+    inputSchema: {
+      school_name: z.string().describe("학교명 (예: '개포중학교', '휘문고등학교', '자양중학교')"),
+      query_type: z.enum(["all", "info", "meal", "schedule", "digest"]).default("all").describe("조회할 학습/학교 정보 유형 ('all': 전체 종합, 'info': 기본정보, 'meal': 급식, 'schedule': 학사일정, 'digest': 학부모공시)"),
+    },
+  },
+  async ({ school_name, query_type = "all" }) => {
+    try {
+      const results = {};
+
+      if (query_type === "all" || query_type === "info") {
+        const srch = await searchSchools({ name: school_name });
+        results.info = srch?.content?.[0]?.text;
+      }
+      if (query_type === "all" || query_type === "digest") {
+        const dig = await getParentDigestData({ school_name });
+        results.digest = dig?.content?.[0]?.text;
+      }
+      if (query_type === "all" || query_type === "meal") {
+        const ml = await getSchoolMealData({ school_name });
+        results.meal = ml?.content?.[0]?.text;
+      }
+      if (query_type === "all" || query_type === "schedule") {
+        const sc = await getSchoolScheduleData({ school_name });
+        results.schedule = sc?.content?.[0]?.text;
+      }
+
+      const report =
+        `🏫 [${school_name}] 학교 및 학습 정보 조회 결과 (check_schools.js 연동)\n\n` +
+        Object.entries(results)
+          .map(([k, v]) => `[${k.toUpperCase()}]\n${v || "데이터 없음"}`)
+          .join("\n\n--------------------\n\n");
+
+      return {
+        content: [
+          { type: "text", text: report },
+          { type: "text", text: JSON.stringify({ school_name, query_type, results }, null, 2) },
+        ],
+      };
+    } catch (e) {
+      return { isError: true, content: [{ type: "text", text: `❌ 학교 및 학습 정보 조회 실패: ${e.message}` }] };
+    }
+  }
+);
+
 // ---------------------------------------------------------------------------
 // 실행
 // ---------------------------------------------------------------------------
 
 async function main() {
   await server.connect(new StdioServerTransport());
-  console.error("서울 부동산 인사이트 MCP Server(Phase 2 완성, 8 tools) 실행 중. (stdio)");
+  console.error("서울·수도권 종합 부동산 인사이트 MCP Server (tae0y + A2A-MCP + check_schools 연동 완성, 28 tools) 실행 중. (stdio)");
 }
-main().catch((e) => { console.error("치명적 오류:", e); process.exit(1); });
+main().catch((e) => {
+  console.error("치명적 오류:", e);
+  process.exit(1);
+});
+
+

@@ -16,13 +16,14 @@ async function runDailySync() {
   console.log(`======================================================\n`);
 
   const targetRegions = ['gangnam', 'songpa', 'seocho', 'yongsan', 'seongdong', 'bundang', 'gwacheon', 'suji'];
-  for (const slug of targetRegions) {
+  const updatePromises = targetRegions.map(async (slug) => {
     try {
       await updateRawDataIncremental(slug);
     } catch (e) {
       console.error(`[오류] ${slug} 증분 수집 중 에러:`, e.message);
     }
-  }
+  });
+  await Promise.all(updatePromises);
 
   if (fs.existsSync(indexPath)) {
     let html = fs.readFileSync(indexPath, 'utf8');
