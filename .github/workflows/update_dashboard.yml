@@ -38,13 +38,30 @@
               node MCP/daily_pipeline_sync.js
 
           - name: Commit and Push Changes
+            id: commit
             run: |
               git config --global user.name "github-actions[bot]"
               git config --global user.email "github-actions[bot]@users.noreply.github.com"
               git add data/ index.html
               if git diff --staged --quiet; then
                 echo "변경 사항이 없어 커밋을 건너뜁니다."
+                echo "changed=false" >> $GITHUB_OUTPUT
               else
                 git commit -m "chore(auto): update weekly real estate dashboard $(date +'%Y-%m-%d')"
                 git push
+                echo "changed=true" >> $GITHUB_OUTPUT
               fi
+
+          - name: Send Email Notification
+            if: steps.commit.outputs.changed == 'true'
+            uses: dawidd6/action-send-mail@v3
+            with:
+              server_address: smtp.gmail.com
+              server_port: 465
+              secure: true
+              username: ${{ secrets.SMTP_USER }}
+              password: ${{ secrets.SMTP_PASS }}
+              subject: "🚦 오늘의 부동산 신호등 업데이트 (실시간 대시보드)"
+              to: ${{ secrets.SMTP_USER }}
+              from: "부동산 신호등 알리미"
+              html_body: "file://index.html"
