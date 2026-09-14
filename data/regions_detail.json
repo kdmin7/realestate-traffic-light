@@ -1,0 +1,2204 @@
+[
+  {
+    "name": "강남구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 29.2,
+    "avgPrice": 31.4,
+    "trades": "240건 (7월: 163 / 8월: 77)",
+    "trend": "+1.8",
+    "risk": "+1.2",
+    "schoolScore": 98.5,
+    "schoolRank": "서울 1위 (최상위)",
+    "topSchools": [
+      "휘문고",
+      "중동고",
+      "단대부고",
+      "대치초",
+      "대청중"
+    ],
+    "academyZone": "대치동 학원가 (학원 1,050개소 이상, 전국 최대 규모)",
+    "cashflow": {
+      "ltv40_loan": "11.68억",
+      "monthly_interest": "427만원",
+      "rent_income": "280만원",
+      "net_cashflow": "-147만원 (적자)"
+    },
+    "landmarks": [
+      {
+        "name": "신현대12차 (압구정)",
+        "area": "182㎡",
+        "price": "112.5억",
+        "jeonse": "28.0억",
+        "jeonseRate": "24.9%",
+        "signal": "주의"
+      },
+      {
+        "name": "래미안대치팰리스",
+        "area": "84㎡",
+        "price": "34.5억",
+        "jeonse": "17.0억",
+        "jeonseRate": "49.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "도곡렉슬",
+        "area": "84㎡",
+        "price": "31.2억",
+        "jeonse": "14.5억",
+        "jeonseRate": "46.5%",
+        "signal": "주의"
+      },
+      {
+        "name": "개포자이프레지던스",
+        "area": "84㎡",
+        "price": "29.8억",
+        "jeonse": "14.0억",
+        "jeonseRate": "47.0%",
+        "signal": "주의"
+      },
+      {
+        "name": "은마아파트 (대치)",
+        "area": "84㎡",
+        "price": "27.5억",
+        "jeonse": "7.5억",
+        "jeonseRate": "27.3%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "압구정·개포 중심의 신고가 행진 속 토지거래허가구역 유지. 금리 4%대 환경에서 갭투자보다는 현금 여력 충분한 1주택 갈아타기 위주 접근 권고."
+  },
+  {
+    "name": "서초구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 28.2,
+    "avgPrice": 24.0,
+    "trades": "207건 (7월: 136 / 8월: 71)",
+    "trend": "+1.8",
+    "risk": "+1.2",
+    "schoolScore": 97.2,
+    "schoolRank": "서울 2위 (최상위)",
+    "topSchools": [
+      "세화고",
+      "세화여고",
+      "서울고",
+      "반포중",
+      "신반포중"
+    ],
+    "academyZone": "반포 삼호가든 사거리 학원가 & 서초동 법조·교육특구",
+    "cashflow": {
+      "ltv40_loan": "11.28억",
+      "monthly_interest": "412만원",
+      "rent_income": "275만원",
+      "net_cashflow": "-137만원 (적자)"
+    },
+    "landmarks": [
+      {
+        "name": "래미안퍼스티지",
+        "area": "84㎡",
+        "price": "41.0억",
+        "jeonse": "18.5억",
+        "jeonseRate": "45.1%",
+        "signal": "주의"
+      },
+      {
+        "name": "아크로리버파크",
+        "area": "84㎡",
+        "price": "43.5억",
+        "jeonse": "19.0억",
+        "jeonseRate": "43.7%",
+        "signal": "주의"
+      },
+      {
+        "name": "래미안원베일리",
+        "area": "84㎡",
+        "price": "45.0억",
+        "jeonse": "19.5억",
+        "jeonseRate": "43.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "반포자이",
+        "area": "84㎡",
+        "price": "38.5억",
+        "jeonse": "16.5억",
+        "jeonseRate": "42.9%",
+        "signal": "주의"
+      },
+      {
+        "name": "방배그랑자이",
+        "area": "84㎡",
+        "price": "28.5억",
+        "jeonse": "13.5억",
+        "jeonseRate": "47.4%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "반포 한강변 신축 초고가 굳히기 단계. 대출 의존도가 높을 경우 월 이자비용 부담이 극심하므로 자기자본 70% 이상 보유자에게 유리."
+  },
+  {
+    "name": "송파구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 24.9,
+    "avgPrice": 22.3,
+    "trades": "449건 (7월: 314 / 8월: 135)",
+    "trend": "+1.4",
+    "risk": "+0.8",
+    "schoolScore": 92.4,
+    "schoolRank": "서울 상위 5위",
+    "topSchools": [
+      "보성고",
+      "잠실고",
+      "잠신고",
+      "가락중",
+      "오륜중"
+    ],
+    "academyZone": "방이동 학원가 및 잠실 리센츠·트리지움 학원가",
+    "cashflow": {
+      "ltv40_loan": "9.96억",
+      "monthly_interest": "364만원",
+      "rent_income": "240만원",
+      "net_cashflow": "-124만원 (적자)"
+    },
+    "landmarks": [
+      {
+        "name": "잠실엘스",
+        "area": "84㎡",
+        "price": "34.8억",
+        "jeonse": "13.5억",
+        "jeonseRate": "38.8%",
+        "signal": "주의"
+      },
+      {
+        "name": "리센츠",
+        "area": "84㎡",
+        "price": "35.7억",
+        "jeonse": "15.2억",
+        "jeonseRate": "42.6%",
+        "signal": "주의"
+      },
+      {
+        "name": "헬리오시티",
+        "area": "84㎡",
+        "price": "30.0억",
+        "jeonse": "13.0억",
+        "jeonseRate": "43.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "파크리오",
+        "area": "84㎡",
+        "price": "24.2억",
+        "jeonse": "11.5억",
+        "jeonseRate": "47.5%",
+        "signal": "주의"
+      },
+      {
+        "name": "올림픽선수기자촌",
+        "area": "121㎡",
+        "price": "37.9억",
+        "jeonse": "15.0억",
+        "jeonseRate": "39.6%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "잠실 엘·리·트 및 헬리오시티 거래량 반등 후 숨고르기 장세. 잠실 MICE 개발 호재가 받쳐주나 전세가율 40% 초반으로 레버리지 관망 필요."
+  },
+  {
+    "name": "용산구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 21.9,
+    "avgPrice": 25.9,
+    "trades": "106건 (7월: 71 / 8월: 35)",
+    "trend": "+1.6",
+    "risk": "+1.1",
+    "schoolScore": 86.8,
+    "schoolRank": "서울 중상위",
+    "topSchools": [
+      "용산고",
+      "중경고",
+      "오산고",
+      "용강중",
+      "신광여중"
+    ],
+    "academyZone": "이촌동 로컬 학원가 및 대치/목동 셔틀 생활권",
+    "cashflow": {
+      "ltv40_loan": "8.76억",
+      "monthly_interest": "320만원",
+      "rent_income": "225만원",
+      "net_cashflow": "-95만원 (적자)"
+    },
+    "landmarks": [
+      {
+        "name": "나인원한남",
+        "area": "244㎡",
+        "price": "255.0억",
+        "jeonse": "85.0억",
+        "jeonseRate": "33.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "한남더힐",
+        "area": "177㎡",
+        "price": "120.0억",
+        "jeonse": "40.0억",
+        "jeonseRate": "33.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "용산센트럴파크",
+        "area": "102㎡",
+        "price": "31.5억",
+        "jeonse": "16.0억",
+        "jeonseRate": "50.8%",
+        "signal": "주의"
+      },
+      {
+        "name": "이촌한강자이",
+        "area": "84㎡",
+        "price": "27.0억",
+        "jeonse": "12.5억",
+        "jeonseRate": "46.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "래미안용산더센트럴",
+        "area": "84㎡",
+        "price": "23.5억",
+        "jeonse": "12.0억",
+        "jeonseRate": "51.1%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "용산국제업무지구 및 한남뉴타운 사업 순항으로 초고가 시장 형성. 공급 희소성 높아 하방경직성은 강력하나 진입장벽 높음."
+  },
+  {
+    "name": "성동구",
+    "province": "seoul",
+    "zone": "마용성",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 19.3,
+    "avgPrice": 18.8,
+    "trades": "152건 (7월: 102 / 8월: 50)",
+    "trend": "+1.3",
+    "risk": "+0.4",
+    "schoolScore": 88.3,
+    "schoolRank": "서울 중상위 (상승세)",
+    "topSchools": [
+      "한양대사대부고",
+      "성동고",
+      "무학여고",
+      "옥정중",
+      "광희중"
+    ],
+    "academyZone": "옥수·금호 에듀존 및 왕십리 뉴타운 학원가",
+    "cashflow": {
+      "ltv40_loan": "7.72억",
+      "monthly_interest": "282만원",
+      "rent_income": "210만원",
+      "net_cashflow": "-72만원 (안정권)"
+    },
+    "landmarks": [
+      {
+        "name": "아크로서울포레스트",
+        "area": "159㎡",
+        "price": "98.0억",
+        "jeonse": "45.0억",
+        "jeonseRate": "45.9%",
+        "signal": "주의"
+      },
+      {
+        "name": "트리마제",
+        "area": "84㎡",
+        "price": "38.0억",
+        "jeonse": "18.0억",
+        "jeonseRate": "47.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "옥수리버젠",
+        "area": "84㎡",
+        "price": "21.5억",
+        "jeonse": "11.2억",
+        "jeonseRate": "52.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "e편한세상옥수파크힐스",
+        "area": "84㎡",
+        "price": "20.8억",
+        "jeonse": "11.0억",
+        "jeonseRate": "52.9%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "행당두산위브",
+        "area": "84㎡",
+        "price": "13.8억",
+        "jeonse": "7.8억",
+        "jeonseRate": "56.5%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "성수 전략정비구역 프리미엄과 옥수·금호의 강남 접근성이 결합된 우량 입지. 전세가율 50% 이상 유지되어 실수요 매수 추천."
+  },
+  {
+    "name": "마포구",
+    "province": "seoul",
+    "zone": "마용성",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 17.1,
+    "avgPrice": 14.3,
+    "trades": "238건 (7월: 149 / 8월: 89)",
+    "trend": "+1.3",
+    "risk": "+0.4",
+    "schoolScore": 89.1,
+    "schoolRank": "서울 상위권",
+    "topSchools": [
+      "숭문고",
+      "서울여고",
+      "마포고",
+      "상암중",
+      "신수중"
+    ],
+    "academyZone": "대흥동 백범로 학원가 (서강대 인근 신흥 맹모특구)",
+    "cashflow": {
+      "ltv40_loan": "6.84억",
+      "monthly_interest": "250만원",
+      "rent_income": "195만원",
+      "net_cashflow": "-55만원 (우수)"
+    },
+    "landmarks": [
+      {
+        "name": "마포래미안푸르지오",
+        "area": "84㎡",
+        "price": "20.5억",
+        "jeonse": "11.0억",
+        "jeonseRate": "53.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "마포프레스티지자이",
+        "area": "84㎡",
+        "price": "22.2억",
+        "jeonse": "12.0억",
+        "jeonseRate": "54.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "신촌그랑자이",
+        "area": "84㎡",
+        "price": "18.8억",
+        "jeonse": "10.5억",
+        "jeonseRate": "55.9%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "래미안웰스트림",
+        "area": "84㎡",
+        "price": "21.0억",
+        "jeonse": "11.5억",
+        "jeonseRate": "54.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "상암월드컵파크7단지",
+        "area": "84㎡",
+        "price": "12.5억",
+        "jeonse": "7.2억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "대흥동 학원가 확장과 여의도·광화문 직주근접 수요 풍부. 실거주 만족도와 환금성이 매우 뛰어난 서울 대표 안정 자산."
+  },
+  {
+    "name": "광진구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 17.5,
+    "avgPrice": 16.2,
+    "trades": "135건 (7월: 85 / 8월: 50)",
+    "trend": "+1.2",
+    "risk": "+0.5",
+    "schoolScore": 93.0,
+    "schoolRank": "서울 최상위 (광남학군)",
+    "topSchools": [
+      "광남고",
+      "대원외고",
+      "자양고",
+      "광남중",
+      "양진중"
+    ],
+    "academyZone": "광장동 극동·현대 명문 학원가",
+    "cashflow": {
+      "ltv40_loan": "7.00억",
+      "monthly_interest": "256만원",
+      "rent_income": "190만원",
+      "net_cashflow": "-66만원"
+    },
+    "landmarks": [
+      {
+        "name": "광장극동2차",
+        "area": "84㎡",
+        "price": "17.8억",
+        "jeonse": "7.5억",
+        "jeonseRate": "42.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "광장힐스테이트",
+        "area": "84㎡",
+        "price": "21.5억",
+        "jeonse": "12.0억",
+        "jeonseRate": "55.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "자양우성1차",
+        "area": "84㎡",
+        "price": "14.5억",
+        "jeonse": "7.8억",
+        "jeonseRate": "53.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "구의현대2단지",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "9.0억",
+        "jeonseRate": "53.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "워커힐아파트",
+        "area": "162㎡",
+        "price": "35.0억",
+        "jeonse": "13.0억",
+        "jeonseRate": "37.1%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "광장동 명문 중·고교 학군 파워 지속. 강남권 진입 전 징검다리 3040 실수요자에게 가장 강력한 방어력을 지닌 학군지."
+  },
+  {
+    "name": "강동구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 15.6,
+    "avgPrice": 14.1,
+    "trades": "382건 (7월: 245 / 8월: 137)",
+    "trend": "+1.5",
+    "risk": "+0.5",
+    "schoolScore": 90.5,
+    "schoolRank": "서울 상위권 (한영학군)",
+    "topSchools": [
+      "한영외고",
+      "한영고",
+      "배재고",
+      "명일여고",
+      "고덕중"
+    ],
+    "academyZone": "명일동 고덕역 학원가",
+    "cashflow": {
+      "ltv40_loan": "6.24억",
+      "monthly_interest": "228만원",
+      "rent_income": "180만원",
+      "net_cashflow": "-48만원"
+    },
+    "landmarks": [
+      {
+        "name": "올림픽파크포레온 (둔촌주공)",
+        "area": "84㎡",
+        "price": "24.5억",
+        "jeonse": "9.5억",
+        "jeonseRate": "38.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "고덕그라시움",
+        "area": "84㎡",
+        "price": "17.8억",
+        "jeonse": "9.2억",
+        "jeonseRate": "51.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "고덕아르테온",
+        "area": "84㎡",
+        "price": "16.9억",
+        "jeonse": "8.8억",
+        "jeonseRate": "52.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "래미안솔베뉴",
+        "area": "84㎡",
+        "price": "16.2억",
+        "jeonse": "8.5억",
+        "jeonseRate": "52.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "둔촌푸르지오",
+        "area": "84㎡",
+        "price": "13.2억",
+        "jeonse": "7.5억",
+        "jeonseRate": "56.8%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "올림픽파크포레온 입주 충격 흡수 완료 후 신축 랜드마크 중심 가격 상승 견인. 9호선 연장 호재와 명일 학원가 메리트 뚜렷."
+  },
+  {
+    "name": "양천구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 18.5,
+    "avgPrice": 16.8,
+    "trades": "275건 (7월: 172 / 8월: 103)",
+    "trend": "+1.5",
+    "risk": "+0.9",
+    "schoolScore": 98.0,
+    "schoolRank": "서울 2대 학군 (목동)",
+    "topSchools": [
+      "강서고",
+      "양정고",
+      "진명여고",
+      "월촌중",
+      "목운중",
+      "신목중"
+    ],
+    "academyZone": "목동 오목교·앞단지·뒷단지 학원가 (학원 950개소 이상)",
+    "cashflow": {
+      "ltv40_loan": "7.40억",
+      "monthly_interest": "271만원",
+      "rent_income": "180만원",
+      "net_cashflow": "-91만원"
+    },
+    "landmarks": [
+      {
+        "name": "목동신시가지7단지",
+        "area": "84㎡",
+        "price": "26.5억",
+        "jeonse": "8.5억",
+        "jeonseRate": "32.1%",
+        "signal": "주의"
+      },
+      {
+        "name": "목동신시가지5단지",
+        "area": "84㎡",
+        "price": "24.8억",
+        "jeonse": "8.0억",
+        "jeonseRate": "32.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "목동트라팰리스",
+        "area": "112㎡",
+        "price": "23.5억",
+        "jeonse": "14.5억",
+        "jeonseRate": "61.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "목동힐스테이트",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "9.5억",
+        "jeonseRate": "56.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "목동신시가지14단지",
+        "area": "84㎡",
+        "price": "18.2억",
+        "jeonse": "6.8억",
+        "jeonseRate": "37.4%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "재건축 정비구역 지정 속도전에 따라 호가 급등. 전세가율 30%대 재건축 단지는 초기 실투자금 15억 이상 소요되므로 선별 투자."
+  },
+  {
+    "name": "동작구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 15.8,
+    "avgPrice": 14.5,
+    "trades": "210건 (7월: 138 / 8월: 72)",
+    "trend": "+1.3",
+    "risk": "+0.5",
+    "schoolScore": 85.4,
+    "schoolRank": "서울 중위권",
+    "topSchools": [
+      "경문고",
+      "동작고",
+      "숭의여고",
+      "중대부중",
+      "국사봉중"
+    ],
+    "academyZone": "노량진 학원가 및 반포/대치 셔틀 연계",
+    "cashflow": {
+      "ltv40_loan": "6.32억",
+      "monthly_interest": "231만원",
+      "rent_income": "185만원",
+      "net_cashflow": "-46만원"
+    },
+    "landmarks": [
+      {
+        "name": "아크로리버하임 (흑석)",
+        "area": "84㎡",
+        "price": "25.0억",
+        "jeonse": "12.5억",
+        "jeonseRate": "50.0%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "흑석한강자이",
+        "area": "84㎡",
+        "price": "17.5억",
+        "jeonse": "9.2억",
+        "jeonseRate": "52.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "보라매SK뷰",
+        "area": "84㎡",
+        "price": "15.8억",
+        "jeonse": "8.8억",
+        "jeonseRate": "55.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "사당롯데캐슬골든포레",
+        "area": "84㎡",
+        "price": "14.2억",
+        "jeonse": "8.0억",
+        "jeonseRate": "56.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "상도역롯데캐슬파크엘",
+        "area": "84㎡",
+        "price": "15.2억",
+        "jeonse": "8.5억",
+        "jeonseRate": "55.9%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "흑석뉴타운 11구역·9구역 개발과 강남(서초) 인접 효과. 여의도·강남 양방향 출퇴근 직장인 수요 견고."
+  },
+  {
+    "name": "영등포구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 15.2,
+    "avgPrice": 14.0,
+    "trades": "295건 (7월: 190 / 8월: 105)",
+    "trend": "+1.4",
+    "risk": "+0.6",
+    "schoolScore": 86.0,
+    "schoolRank": "서울 중위권 (여의도 우수)",
+    "topSchools": [
+      "여의도고",
+      "여의도여고",
+      "장훈고",
+      "여의도중",
+      "문래중"
+    ],
+    "academyZone": "여의도동 에듀존 및 문래/당산 학원가",
+    "cashflow": {
+      "ltv40_loan": "6.08억",
+      "monthly_interest": "222만원",
+      "rent_income": "180만원",
+      "net_cashflow": "-42만원"
+    },
+    "landmarks": [
+      {
+        "name": "브라이튼여의도",
+        "area": "84㎡",
+        "price": "38.0억",
+        "jeonse": "20.0억",
+        "jeonseRate": "52.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "아크로타워스퀘어 (영등포동)",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "9.5억",
+        "jeonseRate": "56.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "당산센트럴아이파크",
+        "area": "84㎡",
+        "price": "17.2억",
+        "jeonse": "9.8억",
+        "jeonseRate": "57.0%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "여의도시범아파트",
+        "area": "79㎡",
+        "price": "22.5억",
+        "jeonse": "5.5억",
+        "jeonseRate": "24.4%",
+        "signal": "주의"
+      },
+      {
+        "name": "문래자이",
+        "area": "84㎡",
+        "price": "14.8억",
+        "jeonse": "8.5억",
+        "jeonseRate": "57.4%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "여의도 금융특구 재건축 신통기획 추진 및 당산·영등포뉴타운의 정주여건 개선으로 투자 모멘텀 우수."
+  },
+  {
+    "name": "종로구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 14.8,
+    "avgPrice": 13.9,
+    "trades": "82건 (7월: 51 / 8월: 31)",
+    "trend": "+1.2",
+    "risk": "+0.4",
+    "schoolScore": 87.5,
+    "schoolRank": "서울 중상위 (전통 명문)",
+    "topSchools": [
+      "중앙고",
+      "경복고",
+      "대신고",
+      "배화여고",
+      "중앙중"
+    ],
+    "academyZone": "사직·무악 에듀클러스터 및 광화문 도심 연계",
+    "cashflow": {
+      "ltv40_loan": "5.92억",
+      "monthly_interest": "216만원",
+      "rent_income": "175만원",
+      "net_cashflow": "-41만원"
+    },
+    "landmarks": [
+      {
+        "name": "경희궁자이2단지",
+        "area": "84㎡",
+        "price": "21.5억",
+        "jeonse": "11.5억",
+        "jeonseRate": "53.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "경희궁자이3단지",
+        "area": "84㎡",
+        "price": "21.0억",
+        "jeonse": "11.2억",
+        "jeonseRate": "53.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "무악현대",
+        "area": "84㎡",
+        "price": "11.8억",
+        "jeonse": "6.8억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "인왕산아이파크",
+        "area": "84㎡",
+        "price": "12.8억",
+        "jeonse": "7.2억",
+        "jeonseRate": "56.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "평창동 롯데캐슬로잔",
+        "area": "194㎡",
+        "price": "23.5억",
+        "jeonse": "14.0억",
+        "jeonseRate": "59.6%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "광화문·시청 도심 직주근접 랜드마크 경희궁자이의 독보적 지위. 아파트 공급 희소성 높아 가격 하방 경직성 확실."
+  },
+  {
+    "name": "중구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 14.2,
+    "avgPrice": 13.5,
+    "trades": "98건 (7월: 63 / 8월: 35)",
+    "trend": "+1.1",
+    "risk": "+0.4",
+    "schoolScore": 84.8,
+    "schoolRank": "서울 중위권",
+    "topSchools": [
+      "환일고",
+      "이화여고",
+      "장충고",
+      "환일중",
+      "장충중"
+    ],
+    "academyZone": "약수·신당 학원가 및 종로 연계",
+    "cashflow": {
+      "ltv40_loan": "5.68억",
+      "monthly_interest": "208만원",
+      "rent_income": "170만원",
+      "net_cashflow": "-38만원"
+    },
+    "landmarks": [
+      {
+        "name": "남산센트럴자이",
+        "area": "115㎡",
+        "price": "18.5억",
+        "jeonse": "10.5억",
+        "jeonseRate": "56.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "신당e편한세상",
+        "area": "84㎡",
+        "price": "14.8억",
+        "jeonse": "8.5억",
+        "jeonseRate": "57.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "남산타운",
+        "area": "84㎡",
+        "price": "13.9억",
+        "jeonse": "7.8억",
+        "jeonseRate": "56.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "청구e편한세상",
+        "area": "84㎡",
+        "price": "14.2억",
+        "jeonse": "8.2억",
+        "jeonseRate": "57.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "동화동 대우아파트",
+        "area": "84㎡",
+        "price": "12.0억",
+        "jeonse": "6.9억",
+        "jeonseRate": "57.5%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "신당·약수 일대 리모델링 및 재개발 순항 중. 3호선·6호선 더블 역세권의 직주근접 실수요 탄탄."
+  },
+  {
+    "name": "서대문구",
+    "province": "seoul",
+    "zone": "서북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 12.5,
+    "avgPrice": 11.2,
+    "trades": "198건 (7월: 125 / 8월: 73)",
+    "trend": "+1.1",
+    "risk": "+0.4",
+    "schoolScore": 86.2,
+    "schoolRank": "서울 중위권",
+    "topSchools": [
+      "한성과학고",
+      "인창고",
+      "이대부고",
+      "연희중",
+      "신연중"
+    ],
+    "academyZone": "가재울뉴타운 및 신촌·이대 연계 학원가",
+    "cashflow": {
+      "ltv40_loan": "5.00억",
+      "monthly_interest": "183만원",
+      "rent_income": "150만원",
+      "net_cashflow": "-33만원 (우수)"
+    },
+    "landmarks": [
+      {
+        "name": "DMC파크뷰자이",
+        "area": "84㎡",
+        "price": "14.5억",
+        "jeonse": "8.2억",
+        "jeonseRate": "56.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "e편한세상신촌",
+        "area": "84㎡",
+        "price": "17.5억",
+        "jeonse": "9.8억",
+        "jeonseRate": "56.0%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "홍제원현대",
+        "area": "84㎡",
+        "price": "10.2억",
+        "jeonse": "6.0억",
+        "jeonseRate": "58.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "DMC센트럴아이파크",
+        "area": "84㎡",
+        "price": "13.2억",
+        "jeonse": "7.5억",
+        "jeonseRate": "56.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "독립문파크빌",
+        "area": "84㎡",
+        "price": "11.8억",
+        "jeonse": "6.8억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "북아현뉴타운 힐스테이트·자이 등 대단지 주거지 변모와 종로·광화문 출퇴근 최적지. 실거주 가성비 우수."
+  },
+  {
+    "name": "동대문구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 11.8,
+    "avgPrice": 10.4,
+    "trades": "245건 (7월: 160 / 8월: 85)",
+    "trend": "+1.2",
+    "risk": "+0.4",
+    "schoolScore": 83.5,
+    "schoolRank": "서울 중위권",
+    "topSchools": [
+      "경희고",
+      "대광고",
+      "청량고",
+      "전농중",
+      "장평중"
+    ],
+    "academyZone": "전농·답십리 뉴타운 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.72억",
+      "monthly_interest": "172만원",
+      "rent_income": "145만원",
+      "net_cashflow": "-27만원 (안정권)"
+    },
+    "landmarks": [
+      {
+        "name": "래미안크레시티 (전농)",
+        "area": "84㎡",
+        "price": "14.2억",
+        "jeonse": "8.0억",
+        "jeonseRate": "56.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "답십리래미안위브",
+        "area": "84㎡",
+        "price": "13.2억",
+        "jeonse": "7.5억",
+        "jeonseRate": "56.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "청량리역롯데캐슬SKY-L65",
+        "area": "84㎡",
+        "price": "16.5억",
+        "jeonse": "9.2억",
+        "jeonseRate": "55.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "래미안엘리니티 (용두)",
+        "area": "84㎡",
+        "price": "14.0억",
+        "jeonse": "8.0억",
+        "jeonseRate": "57.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "이문아이파크자이",
+        "area": "84㎡",
+        "price": "13.8억",
+        "jeonse": "7.2억",
+        "jeonseRate": "52.2%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "GTX-B·C 노선 결집지인 청량리역 복합환승센터 개발과 이문·휘경 뉴타운 1만가구 입주로 주거 벨트 급속 업그레이드."
+  },
+  {
+    "name": "강서구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 10.9,
+    "avgPrice": 9.8,
+    "trades": "310건 (7월: 195 / 8월: 115)",
+    "trend": "+1.1",
+    "risk": "+0.5",
+    "schoolScore": 87.0,
+    "schoolRank": "서울 중상위 (명덕학군)",
+    "topSchools": [
+      "명덕외고",
+      "명덕고",
+      "덕원여고",
+      "염창중",
+      "신정여중"
+    ],
+    "academyZone": "우장산역 일대 및 염창동 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.36억",
+      "monthly_interest": "159만원",
+      "rent_income": "140만원",
+      "net_cashflow": "-19만원 (수익성 우수)"
+    },
+    "landmarks": [
+      {
+        "name": "마곡엠밸리7단지",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "9.5억",
+        "jeonseRate": "56.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "마곡13단지힐스테이트마스터",
+        "area": "84㎡",
+        "price": "14.5억",
+        "jeonse": "8.2억",
+        "jeonseRate": "56.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "우장산아이파크e편한세상",
+        "area": "84㎡",
+        "price": "12.5억",
+        "jeonse": "7.2억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "염창동 강변한솔솔파크",
+        "area": "84㎡",
+        "price": "11.2억",
+        "jeonse": "6.8억",
+        "jeonseRate": "60.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "방화동 마곡원더풀경남",
+        "area": "84㎡",
+        "price": "9.5억",
+        "jeonse": "5.8억",
+        "jeonseRate": "61.1%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "마곡 마이스(MICE) 및 LG·코오롱 등 대기업 R&D 종사자들의 고소득 탄탄한 배후수요. 전세가율 60% 근접으로 투자 안정성 높음."
+  },
+  {
+    "name": "성북구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 10.5,
+    "avgPrice": 9.3,
+    "trades": "280건 (7월: 180 / 8월: 100)",
+    "trend": "+1.0",
+    "risk": "+0.4",
+    "schoolScore": 85.0,
+    "schoolRank": "서울 중위권",
+    "topSchools": [
+      "대일외고",
+      "서울사대부고",
+      "경신고",
+      "길음중",
+      "종암중"
+    ],
+    "academyZone": "길음뉴타운 중심상가 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.20억",
+      "monthly_interest": "153만원",
+      "rent_income": "135만원",
+      "net_cashflow": "-18만원"
+    },
+    "landmarks": [
+      {
+        "name": "길음뉴타운클라시아",
+        "area": "84㎡",
+        "price": "14.5억",
+        "jeonse": "8.2억",
+        "jeonseRate": "56.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "래미안길음센터피스",
+        "area": "84㎡",
+        "price": "13.8억",
+        "jeonse": "7.8억",
+        "jeonseRate": "56.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "래미안포레카운티 (장위)",
+        "area": "84㎡",
+        "price": "10.8억",
+        "jeonse": "6.5억",
+        "jeonseRate": "60.2%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "돈암동 한신한진",
+        "area": "84㎡",
+        "price": "8.5억",
+        "jeonse": "5.2억",
+        "jeonseRate": "61.2%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "장위자이레디언트",
+        "area": "84㎡",
+        "price": "12.0억",
+        "jeonse": "7.0억",
+        "jeonseRate": "58.3%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "길음·장위 뉴타운 완성으로 쾌적한 주거환경 제공. 도심(CBD) 20분 진입 가능해 신혼부부 및 3040 실수요 인기 지속."
+  },
+  {
+    "name": "은평구",
+    "province": "seoul",
+    "zone": "서북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 9.8,
+    "avgPrice": 8.7,
+    "trades": "215건 (7월: 135 / 8월: 80)",
+    "trend": "+0.7",
+    "risk": "+0.8",
+    "schoolScore": 82.0,
+    "schoolRank": "서울 중하위",
+    "topSchools": [
+      "하나고",
+      "선정고",
+      "동명여고",
+      "연서중",
+      "불광중"
+    ],
+    "academyZone": "녹번역 일대 및 은평뉴타운 중심상가",
+    "cashflow": {
+      "ltv40_loan": "3.92억",
+      "monthly_interest": "143만원",
+      "rent_income": "125만원",
+      "net_cashflow": "-18만원"
+    },
+    "landmarks": [
+      {
+        "name": "녹번역e편한세상캐슬",
+        "area": "84㎡",
+        "price": "11.8억",
+        "jeonse": "6.8억",
+        "jeonseRate": "57.6%",
+        "signal": "관망"
+      },
+      {
+        "name": "힐스테이트녹번",
+        "area": "84㎡",
+        "price": "11.2억",
+        "jeonse": "6.5억",
+        "jeonseRate": "58.0%",
+        "signal": "관망"
+      },
+      {
+        "name": "은평뉴타운박석고개",
+        "area": "84㎡",
+        "price": "8.8억",
+        "jeonse": "5.5억",
+        "jeonseRate": "62.5%",
+        "signal": "관망"
+      },
+      {
+        "name": "백련산힐스테이트4차",
+        "area": "84㎡",
+        "price": "8.5억",
+        "jeonse": "5.2억",
+        "jeonseRate": "61.2%",
+        "signal": "관망"
+      },
+      {
+        "name": "DMC베르티체",
+        "area": "84㎡",
+        "price": "9.9억",
+        "jeonse": "5.8억",
+        "jeonseRate": "58.6%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "GTX-A 연신내역 개통 효과가 기선반영된 상태에서 외곽 거래 침체. 신축 단지 위주로 전세가율 60% 이상 매물만 선별 관망 권고."
+  },
+  {
+    "name": "관악구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 9.2,
+    "avgPrice": 8.3,
+    "trades": "185건 (7월: 115 / 8월: 70)",
+    "trend": "+0.8",
+    "risk": "+0.7",
+    "schoolScore": 81.5,
+    "schoolRank": "서울 중하위",
+    "topSchools": [
+      "미림여고",
+      "남강고",
+      "광신고",
+      "봉원중",
+      "관악중"
+    ],
+    "academyZone": "서울대입구역 및 신림사거리 학원가",
+    "cashflow": {
+      "ltv40_loan": "3.68억",
+      "monthly_interest": "134만원",
+      "rent_income": "120만원",
+      "net_cashflow": "-14만원"
+    },
+    "landmarks": [
+      {
+        "name": "e편한세상서울대입구",
+        "area": "84㎡",
+        "price": "12.0억",
+        "jeonse": "7.0억",
+        "jeonseRate": "58.3%",
+        "signal": "관망"
+      },
+      {
+        "name": "관악드림타운",
+        "area": "84㎡",
+        "price": "8.8억",
+        "jeonse": "5.2억",
+        "jeonseRate": "59.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "봉천두산아파트",
+        "area": "84㎡",
+        "price": "9.5억",
+        "jeonse": "5.8억",
+        "jeonseRate": "61.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "신림현대아파트",
+        "area": "84㎡",
+        "price": "7.8억",
+        "jeonse": "4.8억",
+        "jeonseRate": "61.5%",
+        "signal": "관망"
+      },
+      {
+        "name": "신림건영3차",
+        "area": "84㎡",
+        "price": "6.9억",
+        "jeonse": "4.3억",
+        "jeonseRate": "62.3%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "신림선 개통으로 여의도 접근성 개선되었으나 2호선 역세권 외 구축 빌라 혼재 지역은 환금성 저하 주의 필요."
+  },
+  {
+    "name": "구로구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 8.9,
+    "avgPrice": 8.1,
+    "trades": "190건 (7월: 120 / 8월: 70)",
+    "trend": "+0.7",
+    "risk": "+0.7",
+    "schoolScore": 80.0,
+    "schoolRank": "서울 하위권",
+    "topSchools": [
+      "구로고",
+      "우신고",
+      "오류고",
+      "신도림중",
+      "영서중"
+    ],
+    "academyZone": "신도림역 일대 디큐브시티 상권 학원가",
+    "cashflow": {
+      "ltv40_loan": "3.56억",
+      "monthly_interest": "130만원",
+      "rent_income": "115만원",
+      "net_cashflow": "-15만원"
+    },
+    "landmarks": [
+      {
+        "name": "신도림디큐브시티",
+        "area": "84㎡",
+        "price": "15.5억",
+        "jeonse": "9.0억",
+        "jeonseRate": "58.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "신도림e편한세상4차",
+        "area": "84㎡",
+        "price": "14.2억",
+        "jeonse": "8.2억",
+        "jeonseRate": "57.7%",
+        "signal": "관망"
+      },
+      {
+        "name": "구로현대연예인",
+        "area": "84㎡",
+        "price": "8.2억",
+        "jeonse": "4.8억",
+        "jeonseRate": "58.5%",
+        "signal": "관망"
+      },
+      {
+        "name": "개봉아이파크",
+        "area": "84㎡",
+        "price": "8.0억",
+        "jeonse": "4.8억",
+        "jeonseRate": "60.0%",
+        "signal": "관망"
+      },
+      {
+        "name": "천왕이펜하우스2단지",
+        "area": "84㎡",
+        "price": "7.5억",
+        "jeonse": "4.6억",
+        "jeonseRate": "61.3%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "신도림 역세권 대장 아파트는 견고하나 개봉·오류 등 외곽 구축 아파트는 거래량 정체로 보수적 접근 필요."
+  },
+  {
+    "name": "노원구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 8.7,
+    "avgPrice": 7.6,
+    "trades": "360건 (7월: 230 / 8월: 130)",
+    "trend": "+0.8",
+    "risk": "+0.9",
+    "schoolScore": 95.0,
+    "schoolRank": "서울 3대 학군 (중계 은행사거리)",
+    "topSchools": [
+      "대진고",
+      "서라벌고",
+      "상명고",
+      "을지중",
+      "불암중"
+    ],
+    "academyZone": "중계동 은행사거리 학원가 (강북 최대, 450개소 이상)",
+    "cashflow": {
+      "ltv40_loan": "3.48억",
+      "monthly_interest": "127만원",
+      "rent_income": "110만원",
+      "net_cashflow": "-17만원"
+    },
+    "landmarks": [
+      {
+        "name": "포레나노원 (상계)",
+        "area": "84㎡",
+        "price": "12.8억",
+        "jeonse": "7.2억",
+        "jeonseRate": "56.3%",
+        "signal": "관망"
+      },
+      {
+        "name": "중계청구3차",
+        "area": "84㎡",
+        "price": "12.5억",
+        "jeonse": "6.8억",
+        "jeonseRate": "54.4%",
+        "signal": "관망"
+      },
+      {
+        "name": "상계주공7단지",
+        "area": "59㎡",
+        "price": "6.5억",
+        "jeonse": "2.8억",
+        "jeonseRate": "43.1%",
+        "signal": "주의"
+      },
+      {
+        "name": "하계미륭",
+        "area": "84㎡",
+        "price": "8.8억",
+        "jeonse": "4.8억",
+        "jeonseRate": "54.5%",
+        "signal": "관망"
+      },
+      {
+        "name": "공릉풍림아이원",
+        "area": "84㎡",
+        "price": "7.9억",
+        "jeonse": "4.8억",
+        "jeonseRate": "60.8%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "중계 학원가 파워는 견고하나, 상계주공 재건축 단지의 공사비 증액 및 분담금 리스크로 투자심리 위축. 전세가율 낮은 구축 주의."
+  },
+  {
+    "name": "중랑구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 8.4,
+    "avgPrice": 7.5,
+    "trades": "165건 (7월: 105 / 8월: 60)",
+    "trend": "+0.7",
+    "risk": "+0.7",
+    "schoolScore": 79.5,
+    "schoolRank": "서울 하위권",
+    "topSchools": [
+      "원묵고",
+      "송곡여고",
+      "면목고",
+      "원묵중",
+      "태릉중"
+    ],
+    "academyZone": "상봉·망우역 엔터식스 상권 및 신내동 에듀클러스터",
+    "cashflow": {
+      "ltv40_loan": "3.36억",
+      "monthly_interest": "123만원",
+      "rent_income": "110만원",
+      "net_cashflow": "-13만원"
+    },
+    "landmarks": [
+      {
+        "name": "사가정센트럴아이파크",
+        "area": "84㎡",
+        "price": "12.2억",
+        "jeonse": "7.0억",
+        "jeonseRate": "57.4%",
+        "signal": "관망"
+      },
+      {
+        "name": "한양수자인사그리다",
+        "area": "84㎡",
+        "price": "10.5억",
+        "jeonse": "6.2억",
+        "jeonseRate": "59.0%",
+        "signal": "관망"
+      },
+      {
+        "name": "신내동 데시앙",
+        "area": "84㎡",
+        "price": "8.2억",
+        "jeonse": "5.0억",
+        "jeonseRate": "61.0%",
+        "signal": "관망"
+      },
+      {
+        "name": "묵동e편한세상화랑대",
+        "area": "84㎡",
+        "price": "9.5억",
+        "jeonse": "5.8억",
+        "jeonseRate": "61.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "면목동 현대휴먼빌",
+        "area": "84㎡",
+        "price": "7.8억",
+        "jeonse": "4.8억",
+        "jeonseRate": "61.5%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "상봉터미널 복합개발 호재가 있으나 전반적인 매수세 약세. 신축 대단지 위주의 실수요 실거주 접근이 안전."
+  },
+  {
+    "name": "금천구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 8.2,
+    "avgPrice": 7.5,
+    "trades": "110건 (7월: 70 / 8월: 40)",
+    "trend": "+0.6",
+    "risk": "+0.8",
+    "schoolScore": 78.0,
+    "schoolRank": "서울 하위권",
+    "topSchools": [
+      "문일고",
+      "금천고",
+      "동일여고",
+      "안천중",
+      "시흥중"
+    ],
+    "academyZone": "독산·시흥사거리 로컬 학원가",
+    "cashflow": {
+      "ltv40_loan": "3.28억",
+      "monthly_interest": "120만원",
+      "rent_income": "110만원",
+      "net_cashflow": "-10만원"
+    },
+    "landmarks": [
+      {
+        "name": "롯데캐슬골드파크1차",
+        "area": "84㎡",
+        "price": "11.5억",
+        "jeonse": "6.8억",
+        "jeonseRate": "59.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "롯데캐슬골드파크3차",
+        "area": "84㎡",
+        "price": "11.8억",
+        "jeonse": "7.0억",
+        "jeonseRate": "59.3%",
+        "signal": "관망"
+      },
+      {
+        "name": "시흥동 남서울힐스테이트",
+        "area": "84㎡",
+        "price": "8.5억",
+        "jeonse": "5.2억",
+        "jeonseRate": "61.2%",
+        "signal": "관망"
+      },
+      {
+        "name": "독산동 한신아파트",
+        "area": "84㎡",
+        "price": "7.2억",
+        "jeonse": "4.5억",
+        "jeonseRate": "62.5%",
+        "signal": "관망"
+      },
+      {
+        "name": "시흥동 무지개아파트",
+        "area": "53㎡",
+        "price": "5.8억",
+        "jeonse": "2.0억",
+        "jeonseRate": "34.5%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "신안산선 개통 지연 우려 및 서울 최외곽 입지로 매수세 둔화. 롯데캐슬 등 브랜드 대단지 중심으로만 방어력 유지."
+  },
+  {
+    "name": "강북구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 7.9,
+    "avgPrice": 7.1,
+    "trades": "125건 (7월: 80 / 8월: 45)",
+    "trend": "+0.6",
+    "risk": "+0.8",
+    "schoolScore": 78.5,
+    "schoolRank": "서울 하위권",
+    "topSchools": [
+      "신일고",
+      "혜화여고",
+      "미양고",
+      "수유중",
+      "번동중"
+    ],
+    "academyZone": "미아사거리 현대백화점 인근 및 수유역 상권",
+    "cashflow": {
+      "ltv40_loan": "3.16억",
+      "monthly_interest": "115만원",
+      "rent_income": "105만원",
+      "net_cashflow": "-10만원"
+    },
+    "landmarks": [
+      {
+        "name": "꿈의숲효성해링턴플레이스",
+        "area": "84㎡",
+        "price": "10.5억",
+        "jeonse": "6.2억",
+        "jeonseRate": "59.0%",
+        "signal": "관망"
+      },
+      {
+        "name": "래미안트리베라2차",
+        "area": "84㎡",
+        "price": "9.5억",
+        "jeonse": "5.8억",
+        "jeonseRate": "61.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "두산위브트레지움 (미아)",
+        "area": "84㎡",
+        "price": "9.0억",
+        "jeonse": "5.5억",
+        "jeonseRate": "61.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "SK북한산시티",
+        "area": "84㎡",
+        "price": "7.2억",
+        "jeonse": "4.4억",
+        "jeonseRate": "61.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "수유벽산아파트",
+        "area": "84㎡",
+        "price": "6.8억",
+        "jeonse": "4.2억",
+        "jeonseRate": "61.8%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "북한산 조망과 경전철 우이신설선이 있으나 중심 업무지구와의 이동 거리 한계로 거래 침체 장기화. 철저한 저가 급매 위주 대응."
+  },
+  {
+    "name": "도봉구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "avg84": 7.8,
+    "avgPrice": 6.9,
+    "trades": "145건 (7월: 95 / 8월: 50)",
+    "trend": "+0.6",
+    "risk": "+0.8",
+    "schoolScore": 79.0,
+    "schoolRank": "서울 하위권",
+    "topSchools": [
+      "선덕고",
+      "정의여고",
+      "창동고",
+      "창북중",
+      "도봉중"
+    ],
+    "academyZone": "창동역 복합환승센터 인근 및 노원 학원가 셔틀권",
+    "cashflow": {
+      "ltv40_loan": "3.12억",
+      "monthly_interest": "114만원",
+      "rent_income": "100만원",
+      "net_cashflow": "-14만원"
+    },
+    "landmarks": [
+      {
+        "name": "북한산아이파크5차",
+        "area": "84㎡",
+        "price": "9.8억",
+        "jeonse": "5.8억",
+        "jeonseRate": "59.2%",
+        "signal": "관망"
+      },
+      {
+        "name": "창동주공19단지",
+        "area": "84㎡",
+        "price": "9.2억",
+        "jeonse": "4.8억",
+        "jeonseRate": "52.2%",
+        "signal": "관망"
+      },
+      {
+        "name": "동아청솔 (창동)",
+        "area": "84㎡",
+        "price": "8.8억",
+        "jeonse": "5.2억",
+        "jeonseRate": "59.1%",
+        "signal": "관망"
+      },
+      {
+        "name": "방학동 대상타운현대",
+        "area": "84㎡",
+        "price": "7.5억",
+        "jeonse": "4.6억",
+        "jeonseRate": "61.3%",
+        "signal": "관망"
+      },
+      {
+        "name": "도봉한신아파트",
+        "area": "84㎡",
+        "price": "6.5억",
+        "jeonse": "4.0억",
+        "jeonseRate": "61.5%",
+        "signal": "관망"
+      }
+    ],
+    "verdict": "창동 아레나 및 GTX-C 착공 기대감이 있으나 금리 부담으로 저평가 회복 속도 더딤. 실수요자는 전세가율 높은 신축 위주 검토."
+  },
+  {
+    "name": "과천시",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 22.8,
+    "avgPrice": 20.5,
+    "trades": "115건 (7월: 75 / 8월: 40)",
+    "trend": "+1.7",
+    "risk": "+1.1",
+    "schoolScore": 96.0,
+    "schoolRank": "경기 1위 (준강남)",
+    "topSchools": [
+      "과천고",
+      "과천외고",
+      "과천여고",
+      "문원중",
+      "과천중"
+    ],
+    "academyZone": "정부과천청사역 중심상가 및 평촌/대치 학원가 연동",
+    "cashflow": {
+      "ltv40_loan": "9.12억",
+      "monthly_interest": "333만원",
+      "rent_income": "220만원",
+      "net_cashflow": "-113만원"
+    },
+    "landmarks": [
+      {
+        "name": "과천푸르지오써밋",
+        "area": "84㎡",
+        "price": "24.5억",
+        "jeonse": "12.0억",
+        "jeonseRate": "49.0%",
+        "signal": "주의"
+      },
+      {
+        "name": "과천위버필드",
+        "area": "84㎡",
+        "price": "22.8억",
+        "jeonse": "11.2억",
+        "jeonseRate": "49.1%",
+        "signal": "주의"
+      },
+      {
+        "name": "과천자이",
+        "area": "84㎡",
+        "price": "22.0억",
+        "jeonse": "11.0억",
+        "jeonseRate": "50.0%",
+        "signal": "주의"
+      },
+      {
+        "name": "래미안슈르",
+        "area": "84㎡",
+        "price": "17.8억",
+        "jeonse": "9.5억",
+        "jeonseRate": "53.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "과천지식정보타운라비엔오",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "8.8억",
+        "jeonseRate": "52.4%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "준강남 입지와 지정타 자족기능 결합으로 시세 강남 턱밑 추격. 신축 호가 23억 돌파로 가격 피로감 존재, 래미안슈르 등 가성비 주목."
+  },
+  {
+    "name": "성남시 (분당/판교)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "avg84": 17.8,
+    "avgPrice": 16.2,
+    "trades": "420건 (7월: 280 / 8월: 140)",
+    "trend": "+1.6",
+    "risk": "+1.0",
+    "schoolScore": 98.2,
+    "schoolRank": "경기 최상위 (분당학군)",
+    "topSchools": [
+      "낙생고",
+      "서현고",
+      "분당대진고",
+      "내정중",
+      "수내중"
+    ],
+    "academyZone": "수내동·정자동 학원가 (대치동 버금가는 경기 1위 학원가)",
+    "cashflow": {
+      "ltv40_loan": "7.12억",
+      "monthly_interest": "260만원",
+      "rent_income": "190만원",
+      "net_cashflow": "-70만원"
+    },
+    "landmarks": [
+      {
+        "name": "판교푸르지오그랑블",
+        "area": "98㎡",
+        "price": "31.0억",
+        "jeonse": "16.0억",
+        "jeonseRate": "51.6%",
+        "signal": "주의"
+      },
+      {
+        "name": "산운마을7단지 (판교)",
+        "area": "84㎡",
+        "price": "24.5억",
+        "jeonse": "12.0억",
+        "jeonseRate": "49.0%",
+        "signal": "주의"
+      },
+      {
+        "name": "파크뷰 (정자)",
+        "area": "84㎡",
+        "price": "20.8억",
+        "jeonse": "11.5억",
+        "jeonseRate": "55.3%",
+        "signal": "주의"
+      },
+      {
+        "name": "시범한양 (서현)",
+        "area": "84㎡",
+        "price": "16.5억",
+        "jeonse": "7.5억",
+        "jeonseRate": "45.5%",
+        "signal": "주의"
+      },
+      {
+        "name": "양지마을금호 (수내)",
+        "area": "84㎡",
+        "price": "17.0억",
+        "jeonse": "8.0억",
+        "jeonseRate": "47.1%",
+        "signal": "주의"
+      }
+    ],
+    "verdict": "노후계획도시 선도지구 지정 추진으로 재건축 기대감 최고조. 판교 IT 일자리와 수내 학군 조합으로 경기 남부 부동의 원탑."
+  },
+  {
+    "name": "하남시 (미사/위례)",
+    "province": "gyeonggi",
+    "zone": "동남축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 12.4,
+    "avgPrice": 11.3,
+    "trades": "260건 (7월: 170 / 8월: 90)",
+    "trend": "+1.4",
+    "risk": "+0.5",
+    "schoolScore": 89.5,
+    "schoolRank": "경기 상위권",
+    "topSchools": [
+      "하남고",
+      "미사고",
+      "신장고",
+      "윤슬중",
+      "미사강변중"
+    ],
+    "academyZone": "미사강변도시 중심상업지구 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.96억",
+      "monthly_interest": "181만원",
+      "rent_income": "150만원",
+      "net_cashflow": "-31만원"
+    },
+    "landmarks": [
+      {
+        "name": "미사강변스타힐스",
+        "area": "84㎡",
+        "price": "12.8억",
+        "jeonse": "7.2억",
+        "jeonseRate": "56.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "미사강변센트럴자이",
+        "area": "84㎡",
+        "price": "13.5억",
+        "jeonse": "7.8억",
+        "jeonseRate": "57.8%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "위례포레자이 (학암)",
+        "area": "95㎡",
+        "price": "15.0억",
+        "jeonse": "8.5억",
+        "jeonseRate": "56.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "하남감일스윗시티",
+        "area": "84㎡",
+        "price": "11.2억",
+        "jeonse": "6.5억",
+        "jeonseRate": "58.0%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "하남풍산아이파크1단지",
+        "area": "84㎡",
+        "price": "10.0억",
+        "jeonse": "6.0억",
+        "jeonseRate": "60.0%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "5호선 완통 및 9호선 미사 연장 호재. 강남 접근성 우수하며 미사호수공원 등 환경 쾌적해 30대 부부 선호도 최상위."
+  },
+  {
+    "name": "용인시 (수지/기흥)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 11.2,
+    "avgPrice": 9.8,
+    "trades": "480건 (7월: 310 / 8월: 170)",
+    "trend": "+1.3",
+    "risk": "+0.5",
+    "schoolScore": 94.0,
+    "schoolRank": "경기 상위권 (수지학군)",
+    "topSchools": [
+      "수지고",
+      "풍덕고",
+      "홍천고",
+      "이현중",
+      "수지중"
+    ],
+    "academyZone": "풍덕천동 수지구청역 학원가 (경기 남부 주요 학원밀집지)",
+    "cashflow": {
+      "ltv40_loan": "4.48억",
+      "monthly_interest": "164만원",
+      "rent_income": "140만원",
+      "net_cashflow": "-24만원"
+    },
+    "landmarks": [
+      {
+        "name": "성복역롯데캐슬골드타운",
+        "area": "84㎡",
+        "price": "14.8억",
+        "jeonse": "8.5억",
+        "jeonseRate": "57.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "수지자이2차",
+        "area": "84㎡",
+        "price": "12.0억",
+        "jeonse": "7.0억",
+        "jeonseRate": "58.3%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "e편한세상수지",
+        "area": "84㎡",
+        "price": "13.2억",
+        "jeonse": "7.8억",
+        "jeonseRate": "59.1%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "기흥역더샵",
+        "area": "84㎡",
+        "price": "9.8억",
+        "jeonse": "5.8억",
+        "jeonseRate": "59.2%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "용인플랫폼시티인근 신원아침도시",
+        "area": "84㎡",
+        "price": "8.5억",
+        "jeonse": "5.2억",
+        "jeonseRate": "61.2%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "신분당선 강남 20분대 주파와 용인 반도체 메가클러스터·플랫폼시티 개발 수혜. 수지구청역 학원가로 학부모 실수요 굳건."
+  },
+  {
+    "name": "수원시 (영통/광교)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 10.5,
+    "avgPrice": 8.9,
+    "trades": "520건 (7월: 340 / 8월: 180)",
+    "trend": "+1.3",
+    "risk": "+0.5",
+    "schoolScore": 92.5,
+    "schoolRank": "경기 상위권 (영통·광교)",
+    "topSchools": [
+      "유신고",
+      "수원외고",
+      "광교고",
+      "연무중",
+      "영덕중"
+    ],
+    "academyZone": "영통동 학원가 및 광교 에듀타운 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.20억",
+      "monthly_interest": "153만원",
+      "rent_income": "135만원",
+      "net_cashflow": "-18만원"
+    },
+    "landmarks": [
+      {
+        "name": "광교중흥S-클래스",
+        "area": "84㎡",
+        "price": "16.5억",
+        "jeonse": "9.5억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "자연앤힐스테이트 (광교)",
+        "area": "84㎡",
+        "price": "15.0억",
+        "jeonse": "8.8억",
+        "jeonseRate": "58.7%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "화서역파크푸르지오",
+        "area": "84㎡",
+        "price": "12.5억",
+        "jeonse": "7.2억",
+        "jeonseRate": "57.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "영통황골마을주공1단지",
+        "area": "59㎡",
+        "price": "4.8억",
+        "jeonse": "3.0억",
+        "jeonseRate": "62.5%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "수원역푸르지오자이",
+        "area": "84㎡",
+        "price": "9.8억",
+        "jeonse": "5.8억",
+        "jeonseRate": "59.2%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "신분당선 광교와 스타필드 수원 개통으로 화서역 일대 신흥 랜드마크 형성. 삼성전자 배후수요로 전세가율 안정적."
+  },
+  {
+    "name": "화성시 (동탄)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "avg84": 10.2,
+    "avgPrice": 8.5,
+    "trades": "610건 (7월: 410 / 8월: 200)",
+    "trend": "+1.4",
+    "risk": "+0.5",
+    "schoolScore": 91.0,
+    "schoolRank": "경기 상위권 (동탄신도시)",
+    "topSchools": [
+      "동탄국제고",
+      "화성고",
+      "예당고",
+      "동탄중",
+      "청계중"
+    ],
+    "academyZone": "동탄 청계동 카림애비뉴 및 남동탄 호수공원 학원가",
+    "cashflow": {
+      "ltv40_loan": "4.08억",
+      "monthly_interest": "149만원",
+      "rent_income": "130만원",
+      "net_cashflow": "-19만원"
+    },
+    "landmarks": [
+      {
+        "name": "동탄역롯데캐슬",
+        "area": "84㎡",
+        "price": "16.8억",
+        "jeonse": "8.5억",
+        "jeonseRate": "50.6%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "동탄역시범우남퍼스트빌",
+        "area": "84㎡",
+        "price": "12.5억",
+        "jeonse": "6.8억",
+        "jeonseRate": "54.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "동탄역유보라아이비파크",
+        "area": "84㎡",
+        "price": "10.8억",
+        "jeonse": "6.2억",
+        "jeonseRate": "57.4%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "동탄호수공원더샵레이크에듀타운",
+        "area": "84㎡",
+        "price": "9.5억",
+        "jeonse": "5.6억",
+        "jeonseRate": "58.9%",
+        "signal": "매수고려"
+      },
+      {
+        "name": "병점역아이파크캐슬",
+        "area": "84㎡",
+        "price": "8.2억",
+        "jeonse": "4.9억",
+        "jeonseRate": "59.8%",
+        "signal": "매수고려"
+      }
+    ],
+    "verdict": "GTX-A 수서~동탄 개통으로 수서역 20분 진입 혁명 실현. 롯데캐슬 신고가 16억대 돌파하며 경기 남부 핵심 주거지로 안착."
+  }
+]

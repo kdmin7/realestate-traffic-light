@@ -1,4 +1,4 @@
-﻿# Environment variables (API Keys, Secrets) - 절대 커밋 금지!
+# Environment variables (API Keys, Secrets) - 절대 커밋 금지!
 .env
 **/.env
 .env.*
@@ -23,3 +23,8 @@ Thumbs.db
 # Editor directories
 .vscode/
 .idea/
+
+# Python & Test profiles
+__pycache__/
+*.pyc
+tmp_profile/

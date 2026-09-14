@@ -24,17 +24,40 @@
             --border-color: #243048;
             --border-bright: #334155;
             
-            --signal-warning-bg: rgba(245, 158, 11, 0.15);
-            --signal-warning-border: #f59e0b;
-            --signal-warning-text: #fbbf24;
+            --signal-warning-bg: rgba(250, 204, 21, 0.15);
+            --signal-warning-border: #facc15;
+            --signal-warning-text: #facc15;
             
             --signal-watch-bg: rgba(239, 68, 68, 0.15);
             --signal-watch-border: #ef4444;
-            --signal-watch-text: #f87171;
+            --signal-watch-text: #ef4444;
 
-            --signal-buy-bg: rgba(16, 185, 129, 0.15);
-            --signal-buy-border: #10b981;
-            --signal-buy-text: #34d399;
+            --signal-buy-bg: rgba(34, 197, 94, 0.15);
+            --signal-buy-border: #22c55e;
+            --signal-buy-text: #22c55e;
+        }
+
+        .btn-back-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-blue);
+            padding: 9px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-back-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            background: var(--accent-blue);
+            color: #0b0f19;
         }
 
         * {
@@ -404,6 +427,99 @@
             border-radius: 10px;
             font-size: 0.84rem;
         }
+
+        .btn-back-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.55);
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+        }
+
+        /* ===================================================
+           모바일 반응형 스타일 (UX 최적화)
+           =================================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px 12px;
+            }
+            .dashboard-wrapper {
+                gap: 16px;
+            }
+            .top-nav {
+                padding: 18px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .brand-title h1 {
+                font-size: 1.35rem;
+                flex-wrap: wrap;
+            }
+            .meta-tags {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 8px;
+            }
+            .btn-back-main {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                font-size: 0.92rem;
+            }
+            .filter-tabs {
+                display: flex;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 4px;
+                width: 100%;
+            }
+            .tab-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .panel-card {
+                padding: 18px 16px;
+            }
+            .main-content-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-wrapper {
+                height: 250px;
+            }
+            table {
+                font-size: 0.84rem;
+                min-width: 500px;
+            }
+            footer {
+                padding: 16px;
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            footer .btn-back-main {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -415,6 +531,7 @@
                 <p>멀티 에이전트 파이프라인 정량 스코어링 & 매수 타이밍 통합 대시보드 (1920x1080 화면 최적화)</p>
             </div>
             <div class="meta-tags">
+                <a href="../index.html" class="btn-back-main">🏠 메인 대시보드로 돌아가기</a>
                 <div class="filter-tabs">
                     <button class="tab-btn active" onclick="filterDistrict('all')">전체 보기</button>
                     <button class="tab-btn" onclick="filterDistrict('gangnam')">강남구</button>

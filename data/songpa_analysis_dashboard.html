@@ -23,9 +23,40 @@
             --border-color: #243048;
             --border-bright: #334155;
             
-            --signal-warning-bg: rgba(245, 158, 11, 0.15);
-            --signal-warning-border: #f59e0b;
-            --signal-warning-text: #fbbf24;
+            --signal-warning-bg: rgba(250, 204, 21, 0.15);
+            --signal-warning-border: #facc15;
+            --signal-warning-text: #facc15;
+
+            --signal-buy-bg: rgba(34, 197, 94, 0.15);
+            --signal-buy-border: #22c55e;
+            --signal-buy-text: #22c55e;
+
+            --signal-watch-bg: rgba(239, 68, 68, 0.15);
+            --signal-watch-border: #ef4444;
+            --signal-watch-text: #ef4444;
+        }
+
+        .btn-back-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-blue);
+            padding: 9px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-back-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            background: var(--accent-blue);
+            color: #0b0f19;
         }
 
         * {
@@ -253,6 +284,120 @@
             font-size: 0.84rem;
             color: var(--text-muted);
         }
+
+        .btn-back-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.55);
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+        }
+
+        /* ===================================================
+           모바일 반응형 스타일 (UX 최적화)
+           =================================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px 12px;
+            }
+            .dashboard-wrapper {
+                gap: 16px;
+            }
+            .top-nav {
+                padding: 18px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .brand-title h1 {
+                font-size: 1.35rem;
+                flex-wrap: wrap;
+            }
+            .brand-title p {
+                font-size: 0.84rem;
+            }
+            .meta-tags {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 8px;
+            }
+            .btn-back-main {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                font-size: 0.92rem;
+            }
+            .signal-pill, .meta-badge {
+                text-align: center;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 14px 16px;
+                gap: 4px;
+            }
+            .stat-card .val {
+                font-size: 1.45rem;
+            }
+            .panel {
+                padding: 18px 16px;
+                gap: 14px;
+            }
+            .panel h3 {
+                font-size: 1.05rem;
+            }
+            .chart-container {
+                height: 250px;
+            }
+            table {
+                font-size: 0.84rem;
+                min-width: 500px;
+            }
+            th, td {
+                padding: 10px 8px;
+            }
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+            .plan-card {
+                padding: 16px;
+            }
+            footer {
+                padding: 16px;
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            footer .btn-back-main {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .brand-title h1 {
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -264,6 +409,7 @@
                 <p>송파구 아파트 매수 타이밍 신호 및 단지별 수익성 심사 (1920x1080 화면 최적화)</p>
             </div>
             <div class="meta-tags">
+                <a href="../index.html" class="btn-back-main">🏠 메인 대시보드로 돌아가기</a>
                 <span class="signal-pill">⚠️ 최종 신호: 주의 (🟡)</span>
                 <span class="meta-badge">기준금리 2.75%</span>
                 <span class="meta-badge">2026.08</span>

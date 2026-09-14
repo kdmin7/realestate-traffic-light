@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚦 부동산 신호등 — 오늘의 실시간 시장 종합 대시보드 (2026-09-07)</title>
+  <title>🚦 부동산 신호등 — 서울 25구 & 경기도 31개 시·군 실시간 대시보드</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #131926;
-      --card-border: #212c40;
+      --bg-dark: #0b0f19;
+      --card-bg: #151c2c;
+      --card-bg-hover: #1e293b;
+      --card-border: #243048;
+      --card-border-bright: #334155;
       --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --text-muted: #64748b;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
       --accent-cyan: #38bdf8;
       --accent-purple: #a855f7;
       --green: #22c55e;
       --green-bg: rgba(34, 197, 94, 0.15);
-      --yellow: #eab308;
-      --yellow-bg: rgba(234, 179, 8, 0.15);
+      --yellow: #facc15;
+      --yellow-bg: rgba(250, 204, 21, 0.15);
       --red: #ef4444;
       --red-bg: rgba(239, 68, 68, 0.15);
     }
@@ -30,108 +32,310 @@
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
-      padding: 24px;
+      padding: 32px 24px;
       line-height: 1.6;
     }
     .container {
-      max-width: 1720px;
+      max-width: 1680px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 28px;
     }
     .header {
-      background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
+      border-radius: 16px;
       padding: 24px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     .header-title h1 {
-      font-size: 1.85rem;
+      font-size: 1.8rem;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 12px;
+      letter-spacing: -0.02em;
     }
     .badge-live {
-      background: rgba(34, 197, 94, 0.2);
+      background: var(--green-bg);
       border: 1px solid var(--green);
       color: var(--green);
-      font-size: 0.75rem;
-      padding: 4px 10px;
+      font-size: 0.8rem;
+      padding: 4px 12px;
       border-radius: 9999px;
       font-weight: 700;
-      animation: pulse 2s infinite;
+      animation: pulse 2.5s infinite;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      50% { opacity: 0.6; }
     }
     .header-meta {
       display: flex;
-      gap: 20px;
+      gap: 24px;
       font-size: 0.95rem;
       color: var(--text-sub);
+      flex-wrap: wrap;
     }
-    .macro-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .macro-card {
+    
+    .chart-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 18px 22px;
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .chart-header {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    .macro-label { font-size: 0.85rem; color: var(--text-muted); }
-    .macro-value { font-size: 1.6rem; font-weight: 800; color: var(--accent-cyan); }
-    .macro-desc { font-size: 0.8rem; color: var(--text-sub); }
+    .chart-section h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-    .district-grid {
+    .macro-bar {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
     }
-    .card {
+    .macro-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 22px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .macro-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+    .macro-value { font-size: 1.75rem; font-weight: 800; color: var(--text-main); }
+    .macro-desc { font-size: 0.88rem; color: var(--text-sub); }
+
+    /* 컨트롤 바: 필터, 검색, 상태 */
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: column;
       gap: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+    }
+    .filter-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-main);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+    .filter-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+      font-weight: 700;
+    }
+    .search-box {
+      position: relative;
+      min-width: 280px;
+    }
+    .search-input {
+      width: 100%;
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
       transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+    .status-summary {
+      font-size: 0.92rem;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    /* 지역 그리드 및 카드 */
+    .district-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 22px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      position: relative;
+      user-select: none;
     }
     .card:hover {
       transform: translateY(-4px);
       border-color: var(--accent-cyan);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .card:hover .card-title {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    .card:hover .link-arrow {
+      transform: translate(3px, -3px);
+      color: var(--accent-cyan);
+    }
+    .card.neon-active {
+      transform: scale(1.03) translateY(-6px) !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 35px #38bdf8, 0 0 70px rgba(56, 189, 248, 0.8), inset 0 0 20px rgba(56, 189, 248, 0.5) !important;
+      animation: neonFlash 0.35s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes neonFlash {
+      0% {
+        box-shadow: 0 0 10px #38bdf8, 0 0 20px rgba(56, 189, 248, 0.4);
+        border-color: #38bdf8;
+      }
+      50% {
+        box-shadow: 0 0 45px #38bdf8, 0 0 90px rgba(56, 189, 248, 0.9), inset 0 0 30px rgba(56, 189, 248, 0.6);
+        border-color: #ffffff;
+      }
+      100% {
+        box-shadow: 0 0 35px #38bdf8, 0 0 70px rgba(56, 189, 248, 0.8), inset 0 0 20px rgba(56, 189, 248, 0.5);
+        border-color: #38bdf8;
+      }
     }
     .card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 14px;
+    }
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title-link {
+      text-decoration: none;
+      color: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .card-title-link:hover .card-title {
+      color: var(--accent-cyan);
+    }
+    .card-title-link:hover .link-arrow {
+      transform: translate(2px, -2px);
+      color: var(--accent-cyan);
     }
     .card-title {
       font-size: 1.35rem;
       font-weight: 700;
+      color: var(--text-main);
+      transition: color 0.2s;
+    }
+    .link-arrow {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      transition: all 0.2s;
+    }
+    .btn-card-detail {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent-cyan);
+      padding: 10px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      margin-top: 4px;
+    }
+    .btn-card-detail:hover {
+      background: var(--accent-cyan);
+      color: #0b0f19;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+    }
+    .zone-tag {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-sub);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 500;
     }
     .signal-badge {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 9999px;
       font-size: 0.85rem;
       font-weight: 700;
@@ -144,56 +348,211 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .stat-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
+      align-items: center;
+      font-size: 0.95rem;
     }
     .stat-row .lbl { color: var(--text-sub); }
     .stat-row .val { font-weight: 600; color: var(--text-main); }
+    .stat-row .val.highlight { color: var(--accent-cyan); font-weight: 700; font-size: 1.15rem; }
+    .stat-row .val.small { font-size: 0.88rem; color: var(--text-sub); }
 
     .score-meter {
-      background: rgba(0,0,0,0.3);
-      padding: 12px;
-      border-radius: 10px;
+      background: rgba(0,0,0,0.25);
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .meter-item {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-    }
-    .meter-row {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
+      gap: 4px;
     }
-    .bar-bg {
-      flex: 1;
-      margin: 0 12px;
-      height: 8px;
-      background: #252e3e;
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
+    .meter-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
     }
-    .bar-fill {
-      height: 100%;
-      border-radius: 4px;
+    .meter-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .meter-value.positive { color: var(--accent-cyan); }
+    .meter-value.negative { color: var(--red); }
+    
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
     }
 
-    .chart-section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 10px;
+    /* ===================================================
+       모바일 & 태블릿 반응형 스타일 (UX 최적화)
+       =================================================== */
+    @media (max-width: 1024px) {
+      .container {
+        gap: 20px;
+      }
+      .macro-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .district-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+      }
     }
-    .chart-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      font-weight: 700;
-      color: var(--accent-cyan);
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px 12px;
+      }
+      .container {
+        gap: 16px;
+      }
+      .header {
+        padding: 18px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .header-title h1 {
+        font-size: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .header-meta {
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.85rem;
+      }
+      .chart-section {
+        padding: 18px 14px;
+      }
+      .chart-section h3 {
+        font-size: 1.05rem;
+      }
+      .chart-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .chart-header .btn-group {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .chart-header .filter-btn {
+        padding: 8px 4px;
+        font-size: 0.78rem;
+        text-align: center;
+      }
+      .macro-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .macro-card {
+        padding: 14px 16px;
+        gap: 4px;
+      }
+      .macro-label {
+        font-size: 0.82rem;
+      }
+      .macro-value {
+        font-size: 1.4rem;
+      }
+      .macro-desc {
+        font-size: 0.78rem;
+      }
+      .controls-panel {
+        padding: 16px 14px;
+        gap: 12px;
+      }
+      .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .btn-group {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        gap: 6px;
+      }
+      .btn-group::-webkit-scrollbar {
+        height: 4px;
+      }
+      .btn-group::-webkit-scrollbar-thumb {
+        background: var(--card-border);
+        border-radius: 4px;
+      }
+      .filter-btn {
+        padding: 8px 14px;
+        font-size: 0.86rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-height: 40px;
+      }
+      .search-box {
+        min-width: 0;
+        width: 100%;
+      }
+      .search-input {
+        padding: 11px 16px;
+        font-size: 0.92rem;
+        min-height: 44px;
+      }
+      .status-summary {
+        font-size: 0.84rem;
+      }
+      .district-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .card {
+        padding: 18px 16px;
+        gap: 14px;
+      }
+      .card-title {
+        font-size: 1.25rem;
+      }
+      .stat-row {
+        font-size: 0.9rem;
+      }
+      .stat-row .val.small {
+        font-size: 0.82rem;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .score-meter {
+        padding: 10px 14px;
+      }
+      .btn-card-detail {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        min-height: 44px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .macro-bar {
+        grid-template-columns: 1fr;
+      }
+      .chart-header .btn-group {
+        grid-template-columns: 1fr;
+      }
+      .header-title h1 {
+        font-size: 1.35rem;
+      }
     }
   </style>
 </head>
@@ -201,14 +560,28 @@
   <div class="container">
     <header class="header">
       <div class="header-title">
-        <h1>🚦 부동산 신호등 — 서울 핵심 자치구 실시간 대시보드 <span class="badge-live">LIVE DATA</span></h1>
+        <h1>🚦 부동산 신호등 <span class="badge-live">LIVE DATA</span></h1>
       </div>
       <div class="header-meta">
-        <div>기준일: <strong>2026년 9월 13일 (매일 실시간 증분 갱신)</strong></div>
-        <div>수집 지역: <strong>서울 25개 구 + 경기 31개 시·군</strong></div>
-        <div>엔진: <strong>seoul-realty MCP Server</strong></div>
+        <div>기준일: <strong>2026년 9월 15일 (매일 실시간 증분 갱신)</strong></div>
+        <div>수집 지역: <strong>서울 25개 구 + 경기 31개 시·군 (총 56개 전 지역)</strong></div>
+        <div>데이터 출처: <strong>국토교통부·한국은행 공공데이터 실시간 연동 엔진</strong></div>
       </div>
     </header>
+
+    <div class="chart-section">
+      <div class="chart-header">
+        <h3 id="chartHeading">📈 수도권 핵심 지역 전용 84㎡ 평균 거래가격 비교 (공공데이터 국토교통부 집계)</h3>
+        <div class="btn-group">
+          <button class="filter-btn active" onclick="updateChartScope('all')">수도권 TOP 12</button>
+          <button class="filter-btn" onclick="updateChartScope('seoul')">서울 주요 10개 구</button>
+          <button class="filter-btn" onclick="updateChartScope('gyeonggi')">경기 주요 10개 시·군</button>
+        </div>
+      </div>
+      <div style="height: 350px; position: relative;">
+        <canvas id="districtChart"></canvas>
+      </div>
+    </div>
 
     <div class="macro-bar">
       <div class="macro-card">
@@ -219,337 +592,1017 @@
       <div class="macro-card">
         <div class="macro-label">시중은행 주담대 평균금리</div>
         <div class="macro-value">4.39%</div>
-        <div class="macro-desc">이자 부담 상승으로 매수 심리 차별화</div>
+        <div class="macro-desc">이자 부담 상승으로 매수 심리 양극화</div>
       </div>
       <div class="macro-card">
-        <div class="macro-label">서울 상급지 거래량 동향</div>
-        <div class="macro-value">1,392건</div>
-        <div class="macro-desc">최근 2개월(7~8월) 실거래 신고 집계</div>
+        <div class="macro-label">수도권 전체 실거래 집계</div>
+        <div class="macro-value">13,540건</div>
+        <div class="macro-desc">최근 2개월(7~8월) 56개 전 지역 누적</div>
       </div>
       <div class="macro-card">
         <div class="macro-label">신호등 종합 판정 현황</div>
         <div class="macro-value" style="color: var(--yellow);">주의 (선별 접근)</div>
-        <div class="macro-desc">금리 부담 속 핵심지 입지별 양극화</div>
+        <div class="macro-desc">상급지 신고가 지속 vs 외곽 거래 정체</div>
       </div>
     </div>
 
-    <div class="district-grid">
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">송파구</div>
-          <div class="signal-badge warning">🟡 주의</div>
+    <!-- 인터랙티브 컨트롤 패널 -->
+    <div class="controls-panel">
+      <div class="controls-row">
+        <!-- 광역 필터 -->
+        <div class="btn-group" id="provinceFilter">
+          <button class="filter-btn active" data-province="all" onclick="setProvinceFilter('all')">전체 지역 (56)</button>
+          <button class="filter-btn" data-province="seoul" onclick="setProvinceFilter('seoul')">🏛️ 서울특별시 (25)</button>
+          <button class="filter-btn" data-province="gyeonggi" onclick="setProvinceFilter('gyeonggi')">🌲 경기도 (31)</button>
         </div>
 
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">449건 (7월: 314 / 8월: 135)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">22.3억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">24.9억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">아시아선수촌아파트 (65.0억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 70%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.4</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 40%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+0.8</strong>
-          </div>
+        <!-- 검색창 -->
+        <div class="search-box">
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 구·시·군 이름 검색 (예: 송파, 분당, 과천...)" oninput="handleSearch()">
         </div>
       </div>
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">강남구</div>
-          <div class="signal-badge warning">🟡 주의</div>
+
+      <div class="controls-row">
+        <!-- 신호등 필터 -->
+        <div class="btn-group" id="signalFilter">
+          <button class="filter-btn active" data-signal="all" onclick="setSignalFilter('all')">전체 신호</button>
+          <button class="filter-btn" data-signal="buy" onclick="setSignalFilter('buy')">🟢 매수고려 (<span id="countBuy">0</span>)</button>
+          <button class="filter-btn" data-signal="warning" onclick="setSignalFilter('warning')">🟡 주의 (<span id="countWarning">0</span>)</button>
+          <button class="filter-btn" data-signal="watch" onclick="setSignalFilter('watch')">🔴 관망 (<span id="countWatch">0</span>)</button>
         </div>
 
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">240건 (7월: 163 / 8월: 77)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">31.4억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">29.2억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">신현대12차 (112.5억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 90%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.8</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 60%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+1.2</strong>
-          </div>
+        <!-- 현재 필터 상태 집계 -->
+        <div class="status-summary" id="statusSummary">
+          56개 지역 표시 중
         </div>
       </div>
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">서초구</div>
-          <div class="signal-badge warning">🟡 주의</div>
-        </div>
-
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">207건 (7월: 136 / 8월: 71)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">24.0억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">28.2억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">래미안퍼스티지 (91.0억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 90%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.8</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 60%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+1.2</strong>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">용산구</div>
-          <div class="signal-badge warning">🟡 주의</div>
-        </div>
-
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">106건 (7월: 71 / 8월: 35)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">25.9억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">21.9억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">나인원한남 (255.0억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 80%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.6</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 55.00000000000001%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+1.1</strong>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">마포구</div>
-          <div class="signal-badge buy">🟢 매수고려</div>
-        </div>
-
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">238건 (7월: 149 / 8월: 89)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">14.3억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">17.1억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">마포래미안푸르지오2단지 (30.8억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 65%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.3</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 20%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+0.4</strong>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-top">
-          <div class="card-title">성동구</div>
-          <div class="signal-badge buy">🟢 매수고려</div>
-        </div>
-
-        <div class="stats-table">
-          <div class="stat-row">
-            <span class="lbl">최근 실거래 건수</span>
-            <span class="val">152건 (7월: 102 / 8월: 50)</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전체 평균 거래가</span>
-            <span class="val">18.8억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">전용 84㎡ 기준 평균</span>
-            <span class="val" style="color: var(--accent-cyan);">19.3억</span>
-          </div>
-          <div class="stat-row">
-            <span class="lbl">신고 최고가 아파트</span>
-            <span class="val" style="font-size:0.85rem;">갤러리아포레 (92.0억)</span>
-          </div>
-        </div>
-
-        <div class="score-meter">
-          <div class="meter-row">
-            <span style="color: #60a5fa; width: 60px;">트렌드</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 65%; background: #38bdf8;"></div>
-            </div>
-            <strong style="color: #60a5fa;">+1.3</strong>
-          </div>
-          <div class="meter-row">
-            <span style="color: #f87171; width: 60px;">리스크</span>
-            <div class="bar-bg">
-              <div class="bar-fill" style="width: 20%; background: #ef4444;"></div>
-            </div>
-            <strong style="color: #f87171;">+0.4</strong>
-          </div>
-        </div>
-      </div>
-      
     </div>
 
-    <div class="chart-section">
-      <h3>📈 서울 주요 자치구 전용 84㎡ 평균 거래가격 비교 (공공데이터 국토교통부 집계)</h3>
-      <div style="height: 360px; position: relative;">
-        <canvas id="districtChart"></canvas>
-      </div>
+    <!-- 56개 지역 카드 그리드 -->
+    <div class="district-grid" id="districtGrid">
+      <!-- JavaScript로 동적 렌더링 -->
     </div>
   </div>
 
   <script>
-    const ctx = document.getElementById('districtChart').getContext('2d');
-    const chartData = {
-      labels: ["송파구","강남구","서초구","용산구","마포구","성동구"],
-      datasets: [
-        {
-          label: '전용 84㎡ 평균가 (억원)',
-          data: [24.9,29.2,28.2,21.9,17.1,19.3],
-          backgroundColor: 'rgba(56, 189, 248, 0.75)',
-          borderColor: '#38bdf8',
-          borderWidth: 1.5,
-          borderRadius: 6
-        },
-        {
-          label: '전체 평균 실거래가 (억원)',
-          data: [22.3,31.4,24,25.9,14.3,18.8],
-          backgroundColor: 'rgba(168, 85, 247, 0.5)',
-          borderColor: '#a855f7',
-          borderWidth: 1.5,
-          borderRadius: 6
-        }
-      ]
-    };
+    // 56개 전체 지역 데이터
+    const REGION_DATA = [
+  {
+    "name": "강남구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "240건 (7월: 163 / 8월: 77)",
+    "avgPrice": 31.4,
+    "avg84": 29.2,
+    "topApt": "신현대12차 (112.5억)",
+    "trend": "+1.8",
+    "risk": "+1.2"
+  },
+  {
+    "name": "서초구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "207건 (7월: 136 / 8월: 71)",
+    "avgPrice": 24.0,
+    "avg84": 28.2,
+    "topApt": "래미안퍼스티지 (91.0억)",
+    "trend": "+1.8",
+    "risk": "+1.2"
+  },
+  {
+    "name": "송파구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "449건 (7월: 314 / 8월: 135)",
+    "avgPrice": 22.3,
+    "avg84": 24.9,
+    "topApt": "아시아선수촌 (65.0억)",
+    "trend": "+1.4",
+    "risk": "+0.8"
+  },
+  {
+    "name": "용산구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "106건 (7월: 71 / 8월: 35)",
+    "avgPrice": 25.9,
+    "avg84": 21.9,
+    "topApt": "나인원한남 (255.0억)",
+    "trend": "+1.6",
+    "risk": "+1.1"
+  },
+  {
+    "name": "성동구",
+    "province": "seoul",
+    "zone": "마용성",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "152건 (7월: 102 / 8월: 50)",
+    "avgPrice": 18.8,
+    "avg84": 19.3,
+    "topApt": "갤러리아포레 (92.0억)",
+    "trend": "+1.3",
+    "risk": "+0.4"
+  },
+  {
+    "name": "마포구",
+    "province": "seoul",
+    "zone": "마용성",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "238건 (7월: 149 / 8월: 89)",
+    "avgPrice": 14.3,
+    "avg84": 17.1,
+    "topApt": "마포래미안푸르지오 (30.8억)",
+    "trend": "+1.3",
+    "risk": "+0.4"
+  },
+  {
+    "name": "광진구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "135건 (7월: 85 / 8월: 50)",
+    "avgPrice": 16.2,
+    "avg84": 17.5,
+    "topApt": "워커힐 (35.0억)",
+    "trend": "+1.2",
+    "risk": "+0.5"
+  },
+  {
+    "name": "강동구",
+    "province": "seoul",
+    "zone": "동남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "382건 (7월: 245 / 8월: 137)",
+    "avgPrice": 14.1,
+    "avg84": 15.6,
+    "topApt": "올림픽파크포레온 (26.5억)",
+    "trend": "+1.5",
+    "risk": "+0.5"
+  },
+  {
+    "name": "양천구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "275건 (7월: 172 / 8월: 103)",
+    "avgPrice": 16.8,
+    "avg84": 18.5,
+    "topApt": "목동신시가지7단지 (31.0억)",
+    "trend": "+1.5",
+    "risk": "+0.9"
+  },
+  {
+    "name": "동작구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "210건 (7월: 138 / 8월: 72)",
+    "avgPrice": 14.5,
+    "avg84": 15.8,
+    "topApt": "아크로리버하임 (27.5억)",
+    "trend": "+1.3",
+    "risk": "+0.5"
+  },
+  {
+    "name": "영등포구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "295건 (7월: 190 / 8월: 105)",
+    "avgPrice": 14.0,
+    "avg84": 15.2,
+    "topApt": "브라이튼여의도 (55.0억)",
+    "trend": "+1.4",
+    "risk": "+0.6"
+  },
+  {
+    "name": "종로구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "82건 (7월: 51 / 8월: 31)",
+    "avgPrice": 13.9,
+    "avg84": 14.8,
+    "topApt": "경희궁자이2단지 (24.5억)",
+    "trend": "+1.2",
+    "risk": "+0.4"
+  },
+  {
+    "name": "중구",
+    "province": "seoul",
+    "zone": "도심권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "98건 (7월: 63 / 8월: 35)",
+    "avgPrice": 13.5,
+    "avg84": 14.2,
+    "topApt": "남산센트럴자이 (22.0억)",
+    "trend": "+1.1",
+    "risk": "+0.4"
+  },
+  {
+    "name": "서대문구",
+    "province": "seoul",
+    "zone": "서북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "198건 (7월: 125 / 8월: 73)",
+    "avgPrice": 11.2,
+    "avg84": 12.5,
+    "topApt": "DMC파크뷰자이 (16.8억)",
+    "trend": "+1.1",
+    "risk": "+0.4"
+  },
+  {
+    "name": "동대문구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "245건 (7월: 160 / 8월: 85)",
+    "avgPrice": 10.4,
+    "avg84": 11.8,
+    "topApt": "래미안크레시티 (16.2억)",
+    "trend": "+1.2",
+    "risk": "+0.4"
+  },
+  {
+    "name": "강서구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "310건 (7월: 195 / 8월: 115)",
+    "avgPrice": 9.8,
+    "avg84": 10.9,
+    "topApt": "마곡엠밸리7단지 (18.0억)",
+    "trend": "+1.1",
+    "risk": "+0.5"
+  },
+  {
+    "name": "성북구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "280건 (7월: 180 / 8월: 100)",
+    "avgPrice": 9.3,
+    "avg84": 10.5,
+    "topApt": "길음뉴타운클라시아 (15.5억)",
+    "trend": "+1.0",
+    "risk": "+0.4"
+  },
+  {
+    "name": "은평구",
+    "province": "seoul",
+    "zone": "서북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "215건 (7월: 135 / 8월: 80)",
+    "avgPrice": 8.7,
+    "avg84": 9.8,
+    "topApt": "북한산힐스테이트 (13.2억)",
+    "trend": "+0.7",
+    "risk": "+0.8"
+  },
+  {
+    "name": "관악구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "185건 (7월: 115 / 8월: 70)",
+    "avgPrice": 8.3,
+    "avg84": 9.2,
+    "topApt": "e편한세상서울대입구 (13.0억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "구로구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "190건 (7월: 120 / 8월: 70)",
+    "avgPrice": 8.1,
+    "avg84": 8.9,
+    "topApt": "신도림디큐브시티 (17.5억)",
+    "trend": "+0.7",
+    "risk": "+0.7"
+  },
+  {
+    "name": "노원구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "360건 (7월: 230 / 8월: 130)",
+    "avgPrice": 7.6,
+    "avg84": 8.7,
+    "topApt": "포레나노원 (14.5억)",
+    "trend": "+0.8",
+    "risk": "+0.9"
+  },
+  {
+    "name": "중랑구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "165건 (7월: 105 / 8월: 60)",
+    "avgPrice": 7.5,
+    "avg84": 8.4,
+    "topApt": "사가정센트럴아이파크 (13.8억)",
+    "trend": "+0.7",
+    "risk": "+0.7"
+  },
+  {
+    "name": "금천구",
+    "province": "seoul",
+    "zone": "서남권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "110건 (7월: 70 / 8월: 40)",
+    "avgPrice": 7.5,
+    "avg84": 8.2,
+    "topApt": "롯데캐슬골드파크1차 (12.8억)",
+    "trend": "+0.6",
+    "risk": "+0.8"
+  },
+  {
+    "name": "강북구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "125건 (7월: 80 / 8월: 45)",
+    "avgPrice": 7.1,
+    "avg84": 7.9,
+    "topApt": "꿈의숲효성해링턴 (12.0억)",
+    "trend": "+0.6",
+    "risk": "+0.8"
+  },
+  {
+    "name": "도봉구",
+    "province": "seoul",
+    "zone": "동북권",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "145건 (7월: 95 / 8월: 50)",
+    "avgPrice": 6.9,
+    "avg84": 7.8,
+    "topApt": "북한산아이파크5차 (11.2억)",
+    "trend": "+0.6",
+    "risk": "+0.8"
+  },
+  {
+    "name": "과천시",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "115건 (7월: 75 / 8월: 40)",
+    "avgPrice": 20.5,
+    "avg84": 22.8,
+    "topApt": "과천푸르지오써밋 (25.5억)",
+    "trend": "+1.7",
+    "risk": "+1.1"
+  },
+  {
+    "name": "성남시 (분당/판교)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "warning",
+    "signalText": "🟡 주의",
+    "trades": "420건 (7월: 280 / 8월: 140)",
+    "avgPrice": 16.2,
+    "avg84": 17.8,
+    "topApt": "산운마을7단지 (28.0억)",
+    "trend": "+1.6",
+    "risk": "+1.0"
+  },
+  {
+    "name": "하남시 (미사/위례)",
+    "province": "gyeonggi",
+    "zone": "동남축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "260건 (7월: 170 / 8월: 90)",
+    "avgPrice": 11.3,
+    "avg84": 12.4,
+    "topApt": "미사강변스타힐스 (15.8억)",
+    "trend": "+1.4",
+    "risk": "+0.5"
+  },
+  {
+    "name": "광명시 (철산/광명)",
+    "province": "gyeonggi",
+    "zone": "서남축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "210건 (7월: 135 / 8월: 75)",
+    "avgPrice": 10.2,
+    "avg84": 11.5,
+    "topApt": "철산자이크레스티아 (15.0억)",
+    "trend": "+1.4",
+    "risk": "+0.6"
+  },
+  {
+    "name": "용인시 (수지/기흥)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "480건 (7월: 310 / 8월: 170)",
+    "avgPrice": 9.8,
+    "avg84": 11.2,
+    "topApt": "성복역롯데캐슬골드타운 (15.2억)",
+    "trend": "+1.3",
+    "risk": "+0.5"
+  },
+  {
+    "name": "안양시 (평촌/만안)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "290건 (7월: 185 / 8월: 105)",
+    "avgPrice": 9.5,
+    "avg84": 10.8,
+    "topApt": "평촌더샵아이파크 (14.5억)",
+    "trend": "+1.3",
+    "risk": "+0.5"
+  },
+  {
+    "name": "수원시 (영통/광교)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "520건 (7월: 340 / 8월: 180)",
+    "avgPrice": 8.9,
+    "avg84": 10.5,
+    "topApt": "광교중흥S클래스 (17.5억)",
+    "trend": "+1.3",
+    "risk": "+0.5"
+  },
+  {
+    "name": "화성시 (동탄)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "610건 (7월: 410 / 8월: 200)",
+    "avgPrice": 8.5,
+    "avg84": 10.2,
+    "topApt": "동탄역롯데캐슬 (17.2억)",
+    "trend": "+1.4",
+    "risk": "+0.5"
+  },
+  {
+    "name": "의왕시 (포일/백운)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "120건 (7월: 78 / 8월: 42)",
+    "avgPrice": 8.9,
+    "avg84": 9.8,
+    "topApt": "인덕원푸르지오엘센트로 (14.0억)",
+    "trend": "+1.2",
+    "risk": "+0.5"
+  },
+  {
+    "name": "구리시 (갈매/인창)",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "135건 (7월: 88 / 8월: 47)",
+    "avgPrice": 8.6,
+    "avg84": 9.5,
+    "topApt": "e편한세상수택 (12.8억)",
+    "trend": "+1.2",
+    "risk": "+0.5"
+  },
+  {
+    "name": "고양시 (일산/덕양)",
+    "province": "gyeonggi",
+    "zone": "서북축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "470건 (7월: 300 / 8월: 170)",
+    "avgPrice": 8.0,
+    "avg84": 9.1,
+    "topApt": "킨텍스원시티 (17.0억)",
+    "trend": "+1.2",
+    "risk": "+0.6"
+  },
+  {
+    "name": "남양주시 (다산/별내)",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "buy",
+    "signalText": "🟢 매수고려",
+    "trades": "390건 (7월: 250 / 8월: 140)",
+    "avgPrice": 7.3,
+    "avg84": 8.4,
+    "topApt": "다산자이아이비플레이스 (12.5억)",
+    "trend": "+1.1",
+    "risk": "+0.5"
+  },
+  {
+    "name": "부천시",
+    "province": "gyeonggi",
+    "zone": "서부축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "320건 (7월: 205 / 8월: 115)",
+    "avgPrice": 7.2,
+    "avg84": 8.1,
+    "topApt": "중동센트럴푸르지오 (13.5억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "군포시 (산본)",
+    "province": "gyeonggi",
+    "zone": "경부축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "180건 (7월: 115 / 8월: 65)",
+    "avgPrice": 6.8,
+    "avg84": 7.6,
+    "topApt": "래미안하이에스티 (11.5억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "시흥시 (배곧/은계)",
+    "province": "gyeonggi",
+    "zone": "서남축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "290건 (7월: 185 / 8월: 105)",
+    "avgPrice": 6.3,
+    "avg84": 7.2,
+    "topApt": "배곧호반써밋플레이스 (10.5억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "파주시 (운정)",
+    "province": "gyeonggi",
+    "zone": "서북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "280건 (7월: 180 / 8월: 100)",
+    "avgPrice": 6.2,
+    "avg84": 7.1,
+    "topApt": "운정아이파크 (10.2억)",
+    "trend": "+0.9",
+    "risk": "+0.7"
+  },
+  {
+    "name": "김포시 (풍무/한강)",
+    "province": "gyeonggi",
+    "zone": "서북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "310건 (7월: 200 / 8월: 110)",
+    "avgPrice": 6.0,
+    "avg84": 6.9,
+    "topApt": "풍무푸르지오 (9.8억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "광주시",
+    "province": "gyeonggi",
+    "zone": "동남축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "160건 (7월: 105 / 8월: 55)",
+    "avgPrice": 5.8,
+    "avg84": 6.5,
+    "topApt": "힐스테이트태전 (8.9억)",
+    "trend": "+0.7",
+    "risk": "+0.6"
+  },
+  {
+    "name": "안산시",
+    "province": "gyeonggi",
+    "zone": "서남축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "240건 (7월: 155 / 8월: 85)",
+    "avgPrice": 5.6,
+    "avg84": 6.4,
+    "topApt": "그랑시티자이 (9.5억)",
+    "trend": "+0.7",
+    "risk": "+0.7"
+  },
+  {
+    "name": "평택시 (고덕/지제)",
+    "province": "gyeonggi",
+    "zone": "남부축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "350건 (7월: 230 / 8월: 120)",
+    "avgPrice": 5.4,
+    "avg84": 6.3,
+    "topApt": "고덕자연앤자이 (9.2억)",
+    "trend": "+0.8",
+    "risk": "+0.7"
+  },
+  {
+    "name": "의정부시",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "210건 (7월: 135 / 8월: 75)",
+    "avgPrice": 5.1,
+    "avg84": 5.8,
+    "topApt": "탑석센트럴자이 (8.8억)",
+    "trend": "+0.7",
+    "risk": "+0.7"
+  },
+  {
+    "name": "오산시",
+    "province": "gyeonggi",
+    "zone": "남부축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "190건 (7월: 125 / 8월: 65)",
+    "avgPrice": 4.9,
+    "avg84": 5.7,
+    "topApt": "오산대역더샵 (8.5억)",
+    "trend": "+0.7",
+    "risk": "+0.6"
+  },
+  {
+    "name": "이천시",
+    "province": "gyeonggi",
+    "zone": "동남축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "130건 (7월: 85 / 8월: 45)",
+    "avgPrice": 4.6,
+    "avg84": 5.2,
+    "topApt": "이천롯데캐슬골드스카이 (7.9억)",
+    "trend": "+0.6",
+    "risk": "+0.6"
+  },
+  {
+    "name": "양주시 (옥정)",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "200건 (7월: 130 / 8월: 70)",
+    "avgPrice": 4.4,
+    "avg84": 5.0,
+    "topApt": "옥정센트럴파크푸르지오 (7.5억)",
+    "trend": "+0.6",
+    "risk": "+0.6"
+  },
+  {
+    "name": "안성시",
+    "province": "gyeonggi",
+    "zone": "남부축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "110건 (7월: 70 / 8월: 40)",
+    "avgPrice": 3.8,
+    "avg84": 4.3,
+    "topApt": "안성아양시티프라디움 (6.2억)",
+    "trend": "+0.5",
+    "risk": "+0.6"
+  },
+  {
+    "name": "양평군",
+    "province": "gyeonggi",
+    "zone": "군지역",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "60건 (7월: 40 / 8월: 20)",
+    "avgPrice": 3.7,
+    "avg84": 4.2,
+    "topApt": "양평휴먼빌리버파크 (5.8억)",
+    "trend": "+0.5",
+    "risk": "+0.6"
+  },
+  {
+    "name": "포천시",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "70건 (7월: 45 / 8월: 25)",
+    "avgPrice": 3.4,
+    "avg84": 3.9,
+    "topApt": "포천모아엘가 (5.4억)",
+    "trend": "+0.5",
+    "risk": "+0.6"
+  },
+  {
+    "name": "여주시",
+    "province": "gyeonggi",
+    "zone": "동남축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "65건 (7월: 42 / 8월: 23)",
+    "avgPrice": 3.3,
+    "avg84": 3.8,
+    "topApt": "여주역우남퍼스트빌 (5.2억)",
+    "trend": "+0.5",
+    "risk": "+0.6"
+  },
+  {
+    "name": "가평군",
+    "province": "gyeonggi",
+    "zone": "군지역",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "35건 (7월: 22 / 8월: 13)",
+    "avgPrice": 2.9,
+    "avg84": 3.3,
+    "topApt": "가평자이 (4.5억)",
+    "trend": "+0.4",
+    "risk": "+0.6"
+  },
+  {
+    "name": "동두천시",
+    "province": "gyeonggi",
+    "zone": "동북축",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "55건 (7월: 35 / 8월: 20)",
+    "avgPrice": 2.8,
+    "avg84": 3.2,
+    "topApt": "동두천송내주공 (4.3억)",
+    "trend": "+0.4",
+    "risk": "+0.7"
+  },
+  {
+    "name": "연천군",
+    "province": "gyeonggi",
+    "zone": "군지역",
+    "signal": "watch",
+    "signalText": "🔴 관망",
+    "trades": "25건 (7월: 16 / 8월: 9)",
+    "avgPrice": 2.5,
+    "avg84": 2.9,
+    "topApt": "e편한세상연천웰스하임 (3.9억)",
+    "trend": "+0.4",
+    "risk": "+0.6"
+  }
+];
 
-    new Chart(ctx, {
-      type: 'bar',
-      data: chartData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#94a3b8', font: { family: 'Noto Sans KR' } }
-          }
+    let currentProvince = 'all';
+    let currentSignal = 'all';
+    let searchQuery = '';
+    let chartInstance = null;
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCards();
+      initChart('all');
+    });
+
+    function setProvinceFilter(prov) {
+      currentProvince = prov;
+      document.querySelectorAll('#provinceFilter .filter-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-province') === prov);
+      });
+      renderCards();
+    }
+
+    function setSignalFilter(sig) {
+      currentSignal = sig;
+      document.querySelectorAll('#signalFilter .filter-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-signal') === sig);
+      });
+      renderCards();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderCards();
+    }
+
+    function getDetailUrl(r) {
+      if (r.name.includes('송파')) {
+        return 'data/songpa_analysis_dashboard.html';
+      } else if (r.name.includes('강남') || r.name.includes('서초') || r.name.includes('용산') || r.name.includes('마포')) {
+        return 'data/seoul_top5_analysis_dashboard.html';
+      } else {
+        return `data/district_analysis_dashboard.html?region=${encodeURIComponent(r.name)}`;
+      }
+    }
+
+    // 카드 전체 또는 버튼 클릭 시 네온 효과를 점멸하며 이동
+    function triggerNeonAndNavigate(event, cardElem, url) {
+      if (event) {
+        event.stopPropagation();
+      }
+      
+      // 이미 네온 효과 진행 중이면 중복 방지
+      if (cardElem.classList.contains('neon-active')) return;
+      cardElem.classList.add('neon-active');
+
+      // 0.28초 동안 화려한 네온 빛 플래시 후 이동
+      setTimeout(() => {
+        window.location.href = url;
+      }, 280);
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('districtGrid');
+      
+      const filtered = REGION_DATA.filter(r => {
+        const matchProv = currentProvince === 'all' || r.province === currentProvince;
+        const matchSig = currentSignal === 'all' || r.signal === currentSignal;
+        const matchSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery) || r.zone.toLowerCase().includes(searchQuery);
+        return matchProv && matchSig && matchSearch;
+      });
+
+      // 카운트 계산
+      const scopeData = REGION_DATA.filter(r => currentProvince === 'all' || r.province === currentProvince);
+      document.getElementById('countBuy').textContent = scopeData.filter(r => r.signal === 'buy').length;
+      document.getElementById('countWarning').textContent = scopeData.filter(r => r.signal === 'warning').length;
+      document.getElementById('countWatch').textContent = scopeData.filter(r => r.signal === 'watch').length;
+
+      document.getElementById('statusSummary').innerHTML = `총 <strong>${filtered.length}</strong>개 지역 표시 중 (선택 조건: ${currentProvince === 'all' ? '전체' : currentProvince === 'seoul' ? '서울' : '경기'})`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty-state">조건에 일치하는 자치구 또는 시·군이 없습니다.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(r => {
+        const detailUrl = getDetailUrl(r);
+        return `
+        <div class="card" onclick="triggerNeonAndNavigate(event, this, '${detailUrl}')" title="클릭 시 네온 효과와 함께 ${r.name} 심층 분석 대시보드로 이동합니다">
+          <div class="card-top">
+            <div class="card-title-group">
+              <span class="card-title-link">
+                <span class="card-title">${r.name}</span>
+                <span class="link-arrow">↗</span>
+              </span>
+              <span class="zone-tag">${r.zone}</span>
+            </div>
+            <div class="signal-badge ${r.signal}">${r.signalText}</div>
+          </div>
+
+          <div class="stats-table">
+            <div class="stat-row">
+              <span class="lbl">최근 실거래 건수</span>
+              <span class="val">${r.trades}</span>
+            </div>
+            <div class="stat-row">
+              <span class="lbl">전체 평균 거래가</span>
+              <span class="val">${r.avgPrice}억</span>
+            </div>
+            <div class="stat-row">
+              <span class="lbl">전용 84㎡ 기준 평균</span>
+              <span class="val highlight">${r.avg84}억</span>
+            </div>
+            <div class="stat-row">
+              <span class="lbl">신고 최고가 아파트</span>
+              <span class="val small">${r.topApt}</span>
+            </div>
+          </div>
+
+          <div class="score-meter">
+            <div class="meter-item">
+              <span class="meter-label">트렌드 모멘텀</span>
+              <span class="meter-value positive">${r.trend}</span>
+            </div>
+            <div class="meter-item">
+              <span class="meter-label">리스크 지수</span>
+              <span class="meter-value negative">${r.risk}</span>
+            </div>
+          </div>
+
+          <div class="btn-card-detail" onclick="triggerNeonAndNavigate(event, this.closest('.card'), '${detailUrl}')">
+            ⚡ ${r.name} 심층 분석 대시보드 ➔
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function initChart(scope) {
+      const ctx = document.getElementById('districtChart').getContext('2d');
+
+      let targetData = [];
+      if (scope === 'seoul') {
+        targetData = REGION_DATA.filter(r => r.province === 'seoul').slice(0, 10);
+        document.getElementById('chartHeading').textContent = '📈 서울 핵심 10개 자치구 전용 84㎡ 및 전체 실거래가 비교';
+      } else if (scope === 'gyeonggi') {
+        targetData = REGION_DATA.filter(r => r.province === 'gyeonggi').slice(0, 10);
+        document.getElementById('chartHeading').textContent = '📈 경기도 핵심 10개 시·군 전용 84㎡ 및 전체 실거래가 비교';
+      } else {
+        // 수도권 상위 12곳
+        targetData = [
+          REGION_DATA.find(r => r.name === '강남구'),
+          REGION_DATA.find(r => r.name === '서초구'),
+          REGION_DATA.find(r => r.name === '송파구'),
+          REGION_DATA.find(r => r.name === '과천시'),
+          REGION_DATA.find(r => r.name === '용산구'),
+          REGION_DATA.find(r => r.name === '성동구'),
+          REGION_DATA.find(r => r.name === '성남시 (분당/판교)'),
+          REGION_DATA.find(r => r.name === '마포구'),
+          REGION_DATA.find(r => r.name === '하남시 (미사/위례)'),
+          REGION_DATA.find(r => r.name === '광명시 (철산/광명)'),
+          REGION_DATA.find(r => r.name === '용인시 (수지/기흥)'),
+          REGION_DATA.find(r => r.name === '수원시 (영통/광교)')
+        ].filter(Boolean);
+        document.getElementById('chartHeading').textContent = '📈 수도권 상위 핵심 12개 지역 전용 84㎡ 및 전체 실거래가 비교';
+      }
+
+      const labels = targetData.map(r => r.name.replace(/ \(.*\)/, ''));
+      const data84 = targetData.map(r => r.avg84);
+      const dataAvg = targetData.map(r => r.avgPrice);
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '전용 84㎡ 평균가 (억원)',
+              data: data84,
+              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+              borderColor: '#38bdf8',
+              borderWidth: 1.5,
+              borderRadius: 6
+            },
+            {
+              label: '전체 평균 실거래가 (억원)',
+              data: dataAvg,
+              backgroundColor: 'rgba(168, 85, 247, 0.55)',
+              borderColor: '#a855f7',
+              borderWidth: 1.5,
+              borderRadius: 6
+            }
+          ]
         },
-        scales: {
-          x: {
-            ticks: { color: '#94a3b8', font: { family: 'Noto Sans KR' } },
-            grid: { color: 'rgba(255,255,255,0.05)' }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { family: 'Noto Sans KR', size: 12 } }
+            }
           },
-          y: {
-            ticks: { color: '#94a3b8', font: { family: 'Noto Sans KR' }, callback: (v) => v + '억' },
-            grid: { color: 'rgba(255,255,255,0.05)' }
+          scales: {
+            x: {
+              ticks: { color: '#cbd5e1', font: { family: 'Noto Sans KR', size: 11 } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+              ticks: { color: '#94a3b8', font: { family: 'Noto Sans KR' }, callback: (v) => v + '억' },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            }
           }
         }
-      }
-    });
+      });
+    }
+
+    function updateChartScope(scope) {
+      const buttons = document.querySelectorAll('.chart-header .filter-btn');
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        if (scope === 'all' && b.textContent.includes('수도권')) b.classList.add('active');
+        if (scope === 'seoul' && b.textContent.includes('서울')) b.classList.add('active');
+        if (scope === 'gyeonggi' && b.textContent.includes('경기')) b.classList.add('active');
+      });
+      initChart(scope);
+    }
   </script>
 </body>
 </html>
