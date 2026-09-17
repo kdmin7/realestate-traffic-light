@@ -50,6 +50,48 @@
       gap: 22px;
     }
 
+    /* Global Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 10px 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-sub);
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+    .nav-link:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .nav-link.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
     /* Top Global Header */
     header {
       background: #ffffff;
@@ -758,6 +800,16 @@
 <body>
 
   <div class="fhd-container">
+
+    <!-- 전역 네비게이션 헤더 -->
+    <nav class="top-nav">
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html" class="nav-link active">🏫 나이스 학군 대시보드</a>
+        <a href="crime_dashboard.html" class="nav-link">🛡️ 경찰청 범죄 대시보드</a>
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">NEIS 교육정보개방포털 실시간 연계</span>
+    </nav>
 
     <!-- Top Global Header with Prominent Timestamp in White Layout -->
     <header>

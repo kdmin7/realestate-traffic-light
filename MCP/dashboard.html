@@ -317,7 +317,7 @@
     .log-out { color: #34d399; }
     .log-cache { color: #fbbf24; }
 
-    /* 도구 27종 리스트 카드 */
+    /* 도구 28종 리스트 카드 */
     .tools-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -466,7 +466,7 @@
       </div>
 
       <div class="form-group">
-        <label for="tool-select">실행할 MCP 도구 선택 (27개 도구 탑재):</label>
+        <label for="tool-select">실행할 MCP 도구 선택 (28개 도구 탑재):</label>
         <select id="tool-select" onchange="onToolChange()">
           <optgroup label="[A] 거시 & 지역 지표 (8개)">
             <option value="get_price_trend">get_price_trend (아파트 매매가 분기 트렌드 & CAGR)</option>
@@ -487,12 +487,13 @@
             <option value="calculate_monthly_cashflow">calculate_monthly_cashflow (월 잉여현금흐름 & DSR)</option>
             <option value="calculate_compound_growth">calculate_compound_growth (적립식 복리 성장 계산)</option>
           </optgroup>
-          <optgroup label="[D] A2A 위치 & 맞춤 추천 (5개)">
+          <optgroup label="[D] A2A 위치 & 맞춤 추천 (6개)">
             <option value="find_nearest_subway_stations" selected>find_nearest_subway_stations (최근접 지하철역 Top N & 역세권)</option>
             <option value="calculate_location_score">calculate_location_score (입지 종합 점수 & 등급)</option>
             <option value="evaluate_investment_value">evaluate_investment_value (투자가치 점수 및 층수/연식 프리미엄)</option>
             <option value="evaluate_life_quality">evaluate_life_quality (실거주 삶의 질 지수)</option>
             <option value="recommend_property">recommend_property (사용자 성향별 종합 맞춤 추천)</option>
+            <option value="find_school_learning">find_school_learning (학교 및 학습 정보 조회)</option>
           </optgroup>
         </select>
       </div>
@@ -510,24 +511,24 @@
         <span>📡 JSON-RPC 트래픽 & 실시간 콘솔</span>
       </div>
       <div class="terminal-box" id="terminal">
-        <div class="log-line"><span class="log-time">[SYSTEM]</span> MCP Core Initialized. 27 tools registered ready.</div>
+        <div class="log-line"><span class="log-time">[SYSTEM]</span> MCP Core Initialized. 28 tools registered ready.</div>
         <div class="log-line"><span class="log-time">[READY]</span> Listening on stdio transport...</div>
       </div>
     </div>
 
   </div>
 
-  <!-- 하단: 도구 27종 라이브러리 -->
+  <!-- 하단: 도구 28종 라이브러리 -->
   <div class="diagram-panel">
     <div class="panel-title">
-      <span>📚 탑재된 27개 MCP 도구 전체 탐색기</span>
+      <span>📚 탑재된 28개 MCP 도구 전체 탐색기</span>
       <span style="font-size: 13px; color: var(--text-muted);">카드를 클릭하면 시뮬레이터로 자동 로드됩니다</span>
     </div>
     <div class="tools-grid" id="tools-grid"></div>
   </div>
 
   <script>
-    // 27개 도구 메타데이터 정의
+    // 28개 도구 메타데이터 정의
     const TOOLS_CATALOG = [
       { name: "get_price_trend", category: "macro", desc: "수도권 아파트 분기별 중위/평균/평당가 및 CAGR·변동성", defaultParam: "강남구" },
       { name: "get_jeonse_ratio", category: "macro", desc: "분기별 전세가율(전세/매매) 및 월세 비중 추이", defaultParam: "송파구" },
@@ -559,6 +560,7 @@
       { name: "evaluate_investment_value", category: "a2a", desc: "가격 적정성, 감가/연식, 층수, 역세권 반영 투자가치 점수", defaultParam: "150000, 84.9, 12, 25, 2019, 0.4" },
       { name: "evaluate_life_quality", category: "a2a", desc: "통근 편의, 편의 인프라, 녹지 환경, 단지 연식 반영 삶의 질 지수", defaultParam: "0.5, 20, 0.4, 2020" },
       { name: "recommend_property", category: "a2a", desc: "사용자 성향(투자형/실거주형/균형형) 맞춤 추천 점수 & 행동 신호", defaultParam: "반포자이, 250000, 84.9, investment" },
+      { name: "find_school_learning", category: "a2a", desc: "학교 기본정보·공시·급식·학사일정 통합 조회", defaultParam: "휘문고등학교" },
     ];
 
     // 도구 카탈로그 렌더링

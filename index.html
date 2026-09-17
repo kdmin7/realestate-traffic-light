@@ -10,23 +10,73 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
+      /* Dark Theme Tokens (Default) */
       --bg-dark: #0b0f19;
+      --bg-surface: #0f172a;
       --card-bg: #151c2c;
       --card-bg-hover: #1e293b;
       --card-border: #243048;
-      --card-border-bright: #334155;
+      --card-border-bright: #384b6e;
+      --input-bg: #0b0f19;
       --text-main: #f8fafc;
       --text-sub: #cbd5e1;
       --text-muted: #94a3b8;
       --accent-cyan: #38bdf8;
-      --accent-purple: #a855f7;
+      --accent-cyan-bg: rgba(56, 189, 248, 0.12);
+      --accent-purple: #c084fc;
+      --meter-bg: rgba(0, 0, 0, 0.35);
+      --tag-bg: rgba(255, 255, 255, 0.08);
+
+      /* High-contrast WCAG-compliant Signal Colors */
       --green: #22c55e;
-      --green-bg: rgba(34, 197, 94, 0.15);
+      --green-bg: rgba(34, 197, 94, 0.16);
+      --green-border: rgba(34, 197, 94, 0.45);
       --yellow: #facc15;
-      --yellow-bg: rgba(250, 204, 21, 0.15);
-      --red: #ef4444;
-      --red-bg: rgba(239, 68, 68, 0.15);
+      --yellow-bg: rgba(250, 204, 21, 0.16);
+      --yellow-border: rgba(250, 204, 21, 0.45);
+      --red: #f87171;
+      --red-bg: rgba(239, 68, 68, 0.16);
+      --red-border: rgba(239, 68, 68, 0.45);
+
+      --chart-grid: rgba(255, 255, 255, 0.06);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
+
+    /* Clean Crisp Light Theme */
+    [data-theme="light"] {
+      --bg-dark: #f1f5f9;
+      --bg-surface: #ffffff;
+      --card-bg: #ffffff;
+      --card-bg-hover: #f8fafc;
+      --card-border: #cbd5e1;
+      --card-border-bright: #94a3b8;
+      --input-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --accent-cyan: #0284c7;
+      --accent-cyan-bg: rgba(2, 132, 199, 0.1);
+      --accent-purple: #7c3aed;
+      --meter-bg: #f1f5f9;
+      --tag-bg: #e2e8f0;
+
+      /* High-contrast Light Mode Signals */
+      --green: #15803d;
+      --green-bg: #dcfce7;
+      --green-border: #86efac;
+      --yellow: #a16207;
+      --yellow-bg: #fef9c3;
+      --yellow-border: #fde047;
+      --red: #b91c1c;
+      --red-bg: #fee2e2;
+      --red-border: #fca5a5;
+
+      --chart-grid: rgba(0, 0, 0, 0.06);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-dark);
@@ -34,109 +84,268 @@
       font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
       padding: 32px 24px;
       line-height: 1.6;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* Tabular figures for aligned and readable numbers */
+    .num, .val, .macro-value, .meter-value, .stat-row .val {
+      font-feature-settings: "tnum" 1, "cv05" 1;
+      font-variant-numeric: tabular-nums;
+    }
+
     .container {
       max-width: 1680px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 24px;
+      box-shadow: var(--shadow-sm);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.02rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-sub);
+      padding: 9px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-link:hover {
+      color: var(--text-main);
+      border-color: var(--accent-cyan);
+    }
+    .nav-link.active {
+      background: var(--accent-cyan);
+      color: #0b0f19;
+      font-weight: 800;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 14px var(--accent-cyan-bg);
+    }
+    [data-theme="light"] .nav-link.active {
+      color: #ffffff;
     }
     .header {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 24px 32px;
+      padding: 26px 36px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      gap: 18px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.25s ease;
     }
-    .header-title h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
+    .header-main {
       display: flex;
       align-items: center;
-      gap: 12px;
-      letter-spacing: -0.02em;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .header-title h1 {
+      font-size: 2.1rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      line-height: 1.25;
     }
     .badge-live {
       background: var(--green-bg);
-      border: 1px solid var(--green);
+      border: 1px solid var(--green-border);
       color: var(--green);
-      font-size: 0.8rem;
-      padding: 4px 12px;
+      font-size: 0.88rem;
+      padding: 5px 14px;
       border-radius: 9999px;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       animation: pulse 2.5s infinite;
+      white-space: nowrap;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
+      50% { opacity: 0.65; }
     }
     .header-meta {
       display: flex;
       gap: 24px;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       color: var(--text-sub);
       flex-wrap: wrap;
+      line-height: 1.5;
+    }
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan-bg);
+      transform: translateY(-1px);
     }
     
     .chart-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 28px 32px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 30px 36px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.25s ease;
     }
     .chart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
     }
     .chart-section h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
       color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      line-height: 1.35;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+      width: 100%;
     }
 
     .macro-bar {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
     }
     .macro-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 22px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
     }
-    .macro-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
-    .macro-value { font-size: 1.75rem; font-weight: 800; color: var(--text-main); }
-    .macro-desc { font-size: 0.88rem; color: var(--text-sub); }
+    .macro-label { font-size: 0.98rem; color: var(--text-muted); font-weight: 600; }
+    .macro-value { font-size: 2.1rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.02em; line-height: 1.2; }
+    .macro-desc { font-size: 0.96rem; color: var(--text-sub); line-height: 1.45; }
+
+    .pipeline-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px 32px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+    }
+    .pipeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .pipeline-header h3 { font-size: 1.35rem; font-weight: 800; }
+    .pipeline-header p { color: var(--text-sub); font-size: 1.0rem; margin-top: 5px; line-height: 1.5; }
+    .pipeline-status {
+      color: var(--green);
+      border: 1px solid var(--green);
+      background: var(--green-bg);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .pipeline-step {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 116px;
+      transition: all 0.25s ease;
+    }
+    .pipeline-step strong { display: block; color: var(--accent-cyan); font-size: 0.98rem; font-weight: 800; }
+    .pipeline-step span { display: block; color: var(--text-main); font-weight: 800; font-size: 1.02rem; margin: 6px 0; }
+    .pipeline-step small { color: var(--text-muted); font-size: 0.88rem; word-break: break-word; line-height: 1.45; }
+    .pipeline-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+    .pipeline-links a {
+      color: var(--accent-cyan);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: var(--input-bg);
+      transition: all 0.2s ease;
+    }
+    .pipeline-links a:hover { border-color: var(--accent-cyan); background: var(--accent-cyan-bg); }
 
     /* 컨트롤 바: 필터, 검색, 상태 */
     .controls-panel {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 20px 28px;
+      padding: 22px 32px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      gap: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
     }
     .controls-row {
       display: flex;
@@ -147,17 +356,17 @@
     }
     .btn-group {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .filter-btn {
-      background: #0b0f19;
+      background: var(--input-bg);
       border: 1px solid var(--card-border);
       color: var(--text-sub);
-      padding: 8px 18px;
+      padding: 10px 20px;
       border-radius: 10px;
-      font-size: 0.92rem;
-      font-weight: 600;
+      font-size: 1.0rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       font-family: inherit;
@@ -165,66 +374,67 @@
     .filter-btn:hover {
       border-color: var(--accent-cyan);
       color: var(--text-main);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 10px var(--accent-cyan-bg);
     }
     .filter-btn.active {
-      background: rgba(56, 189, 248, 0.15);
+      background: var(--accent-cyan-bg);
       color: var(--accent-cyan);
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
-      font-weight: 700;
+      box-shadow: 0 0 14px var(--accent-cyan-bg);
+      font-weight: 800;
     }
     .search-box {
       position: relative;
-      min-width: 280px;
+      min-width: 320px;
     }
     .search-input {
       width: 100%;
-      background: #0b0f19;
+      background: var(--input-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 10px 16px;
+      padding: 12px 18px;
       color: var(--text-main);
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       font-family: inherit;
       outline: none;
       transition: all 0.2s ease;
     }
     .search-input:focus {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 12px var(--accent-cyan-bg);
     }
     .status-summary {
-      font-size: 0.92rem;
+      font-size: 1.02rem;
       color: var(--text-sub);
       display: flex;
       align-items: center;
       gap: 14px;
+      font-weight: 600;
     }
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     /* 지역 그리드 및 카드 */
     .district-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 22px;
+      gap: 24px;
     }
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 24px;
+      padding: 26px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 18px;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      gap: 20px;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s, box-shadow 0.2s;
+      box-shadow: var(--shadow-sm);
       cursor: pointer;
       position: relative;
       user-select: none;
@@ -232,11 +442,10 @@
     .card:hover {
       transform: translateY(-4px);
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), 0 10px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 24px var(--accent-cyan-bg), var(--shadow-md);
     }
     .card:hover .card-title {
       color: var(--accent-cyan);
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
     .card:hover .link-arrow {
       transform: translate(3px, -3px);
@@ -244,23 +453,23 @@
     }
     .card.neon-active {
       transform: scale(1.03) translateY(-6px) !important;
-      border-color: #38bdf8 !important;
-      box-shadow: 0 0 35px #38bdf8, 0 0 70px rgba(56, 189, 248, 0.8), inset 0 0 20px rgba(56, 189, 248, 0.5) !important;
+      border-color: var(--accent-cyan) !important;
+      box-shadow: 0 0 35px var(--accent-cyan), 0 0 60px var(--accent-cyan-bg) !important;
       animation: neonFlash 0.35s ease-out forwards;
       z-index: 10;
     }
     @keyframes neonFlash {
       0% {
-        box-shadow: 0 0 10px #38bdf8, 0 0 20px rgba(56, 189, 248, 0.4);
-        border-color: #38bdf8;
+        box-shadow: 0 0 10px var(--accent-cyan);
+        border-color: var(--accent-cyan);
       }
       50% {
-        box-shadow: 0 0 45px #38bdf8, 0 0 90px rgba(56, 189, 248, 0.9), inset 0 0 30px rgba(56, 189, 248, 0.6);
+        box-shadow: 0 0 45px var(--accent-cyan), 0 0 90px var(--accent-cyan-bg);
         border-color: #ffffff;
       }
       100% {
-        box-shadow: 0 0 35px #38bdf8, 0 0 70px rgba(56, 189, 248, 0.8), inset 0 0 20px rgba(56, 189, 248, 0.5);
-        border-color: #38bdf8;
+        box-shadow: 0 0 35px var(--accent-cyan), 0 0 60px var(--accent-cyan-bg);
+        border-color: var(--accent-cyan);
       }
     }
     .card-top {
@@ -268,12 +477,14 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 14px;
+      padding-bottom: 16px;
+      gap: 8px;
     }
     .card-title-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     .card-title-link {
       text-decoration: none;
@@ -291,79 +502,93 @@
       color: var(--accent-cyan);
     }
     .card-title {
-      font-size: 1.35rem;
-      font-weight: 700;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       color: var(--text-main);
       transition: color 0.2s;
+      line-height: 1.3;
     }
     .link-arrow {
       color: var(--text-muted);
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       transition: all 0.2s;
     }
     .btn-card-detail {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 6px;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      gap: 8px;
+      background: var(--accent-cyan-bg);
+      border: 1px solid var(--card-border-bright);
       color: var(--accent-cyan);
-      padding: 10px 16px;
+      padding: 12px 18px;
       border-radius: 10px;
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 1.02rem;
       font-weight: 700;
       transition: all 0.2s ease;
-      margin-top: 4px;
+      margin-top: 6px;
+      min-height: 48px;
     }
     .btn-card-detail:hover {
       background: var(--accent-cyan);
       color: #0b0f19;
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 16px var(--accent-cyan-bg);
+      font-weight: 800;
+    }
+    [data-theme="light"] .btn-card-detail:hover {
+      color: #ffffff;
     }
     .zone-tag {
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--tag-bg);
       color: var(--text-sub);
-      font-size: 0.75rem;
-      padding: 2px 8px;
+      font-size: 0.82rem;
+      padding: 4px 9px;
       border-radius: 6px;
-      font-weight: 500;
+      font-weight: 700;
+      border: 1px solid var(--card-border);
+      white-space: nowrap;
     }
     .signal-badge {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 9999px;
-      font-size: 0.85rem;
-      font-weight: 700;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
     }
-    .signal-badge.buy { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
-    .signal-badge.warning { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow); }
-    .signal-badge.watch { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+    .signal-badge.buy { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .signal-badge.warning { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-border); }
+    .signal-badge.watch { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
 
     .stats-table {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .stat-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-size: 0.95rem;
+      align-items: baseline;
+      font-size: 1.04rem;
+      padding: 3px 0;
+      gap: 8px;
     }
-    .stat-row .lbl { color: var(--text-sub); }
-    .stat-row .val { font-weight: 600; color: var(--text-main); }
-    .stat-row .val.highlight { color: var(--accent-cyan); font-weight: 700; font-size: 1.15rem; }
-    .stat-row .val.small { font-size: 0.88rem; color: var(--text-sub); }
+    .stat-row .lbl { color: var(--text-muted); font-size: 0.98rem; font-weight: 500; }
+    .stat-row .val { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+    .stat-row .val.highlight { color: var(--accent-cyan); font-weight: 900; font-size: 1.35rem; }
+    .stat-row .val.small { font-size: 0.96rem; color: var(--text-sub); font-weight: 600; }
 
     .score-meter {
-      background: rgba(0,0,0,0.25);
-      padding: 14px 18px;
+      background: var(--meter-bg);
+      border: 1px solid var(--card-border);
+      padding: 14px 20px;
       border-radius: 12px;
       display: flex;
       justify-content: space-around;
@@ -376,14 +601,15 @@
       gap: 4px;
     }
     .meter-label {
-      font-size: 0.82rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
+      font-weight: 600;
     }
     .meter-value {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.25rem;
+      font-weight: 900;
     }
-    .meter-value.positive { color: var(--accent-cyan); }
+    .meter-value.positive { color: var(--green); }
     .meter-value.negative { color: var(--red); }
     
     .empty-state {
@@ -391,15 +617,18 @@
       text-align: center;
       padding: 60px 20px;
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
     }
 
     /* ===================================================
-       모바일 & 태블릿 반응형 스타일 (UX 최적화)
+       모바일 & 태블릿 반응형 스타일 (모바일 안 깨짐 보장)
        =================================================== */
     @media (max-width: 1024px) {
       .container {
         gap: 20px;
+      }
+      .chart-wrapper {
+        height: 360px;
       }
       .macro-bar {
         grid-template-columns: repeat(2, 1fr);
@@ -417,31 +646,63 @@
       .container {
         gap: 16px;
       }
-      .header {
-        padding: 18px 16px;
+      .top-nav {
+        padding: 12px 14px;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 12px;
       }
+      .nav-links {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+      .nav-links::-webkit-scrollbar {
+        height: 3px;
+      }
+      .nav-link {
+        font-size: 0.94rem;
+        padding: 8px 14px;
+        flex-shrink: 0;
+      }
+      .theme-toggle-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+        font-size: 0.95rem;
+      }
+      .header {
+        padding: 20px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
       .header-title h1 {
-        font-size: 1.5rem;
+        font-size: 1.65rem;
         flex-wrap: wrap;
+        gap: 8px;
       }
       .header-meta {
         flex-direction: column;
-        gap: 6px;
-        font-size: 0.85rem;
+        gap: 8px;
+        font-size: 0.94rem;
       }
       .chart-section {
-        padding: 18px 14px;
+        padding: 20px 16px;
       }
       .chart-section h3 {
-        font-size: 1.05rem;
+        font-size: 1.15rem;
+      }
+      .chart-wrapper {
+        height: 300px;
       }
       .chart-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
       }
       .chart-header .btn-group {
         display: grid;
@@ -449,42 +710,55 @@
         gap: 6px;
       }
       .chart-header .filter-btn {
-        padding: 8px 4px;
-        font-size: 0.78rem;
+        padding: 9px 4px;
+        font-size: 0.85rem;
         text-align: center;
+        white-space: nowrap;
       }
       .macro-bar {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 12px;
       }
       .macro-card {
-        padding: 14px 16px;
-        gap: 4px;
+        padding: 16px;
+        gap: 6px;
+      }
+      .pipeline-section {
+        padding: 20px 16px;
+      }
+      .pipeline-flow {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .pipeline-step {
+        padding: 12px;
+        min-height: 100px;
       }
       .macro-label {
-        font-size: 0.82rem;
+        font-size: 0.9rem;
       }
       .macro-value {
-        font-size: 1.4rem;
+        font-size: 1.65rem;
       }
       .macro-desc {
-        font-size: 0.78rem;
+        font-size: 0.88rem;
       }
       .controls-panel {
-        padding: 16px 14px;
-        gap: 12px;
+        padding: 18px 16px;
+        gap: 14px;
       }
       .controls-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
       }
       .btn-group {
         display: flex;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         padding-bottom: 6px;
-        gap: 6px;
+        gap: 8px;
+        flex-wrap: nowrap;
       }
       .btn-group::-webkit-scrollbar {
         height: 4px;
@@ -494,52 +768,52 @@
         border-radius: 4px;
       }
       .filter-btn {
-        padding: 8px 14px;
-        font-size: 0.86rem;
+        padding: 9px 16px;
+        font-size: 0.94rem;
         white-space: nowrap;
         flex-shrink: 0;
-        min-height: 40px;
+        min-height: 44px;
       }
       .search-box {
         min-width: 0;
         width: 100%;
       }
       .search-input {
-        padding: 11px 16px;
-        font-size: 0.92rem;
-        min-height: 44px;
+        padding: 12px 16px;
+        font-size: 1.0rem;
+        min-height: 48px;
       }
       .status-summary {
-        font-size: 0.84rem;
+        font-size: 0.94rem;
       }
       .district-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 16px;
       }
       .card {
-        padding: 18px 16px;
-        gap: 14px;
+        padding: 20px 18px;
+        gap: 16px;
       }
       .card-title {
-        font-size: 1.25rem;
+        font-size: 1.35rem;
       }
       .stat-row {
-        font-size: 0.9rem;
+        font-size: 0.98rem;
       }
       .stat-row .val.small {
-        font-size: 0.82rem;
-        max-width: 180px;
+        font-size: 0.9rem;
+        max-width: 200px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
       .score-meter {
-        padding: 10px 14px;
+        padding: 12px 16px;
       }
       .btn-card-detail {
         padding: 12px 16px;
-        font-size: 0.9rem;
-        min-height: 44px;
+        font-size: 0.98rem;
+        min-height: 48px;
       }
     }
 
@@ -547,25 +821,46 @@
       .macro-bar {
         grid-template-columns: 1fr;
       }
+      .pipeline-flow {
+        grid-template-columns: 1fr;
+      }
       .chart-header .btn-group {
         grid-template-columns: 1fr;
       }
       .header-title h1 {
-        font-size: 1.35rem;
+        font-size: 1.45rem;
+      }
+      .chart-section h3 {
+        font-size: 1.05rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- 전역 네비게이션 헤더 -->
+    <nav class="top-nav">
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active">🚦 메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
+        <a href="crime_dashboard.html" class="nav-link">🛡️ 경찰청 범죄 대시보드</a>
+      </div>
+      <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="테마 전환">
+        <span id="themeToggleIcon">☀️</span>
+        <span id="themeToggleText">라이트 모드</span>
+      </button>
+    </nav>
+
     <header class="header">
-      <div class="header-title">
-        <h1>🚦 부동산 신호등 <span class="badge-live">LIVE DATA</span></h1>
+      <div class="header-main">
+        <div class="header-title">
+          <h1>🚦 부동산 신호등 <span class="badge-live">LIVE DATA</span></h1>
+        </div>
       </div>
       <div class="header-meta">
-        <div>기준일: <strong>2026년 9월 15일 (매일 실시간 증분 갱신)</strong></div>
+        <div>기준일: <strong>2026년 9월 18일 (매일 실시간 증분 갱신)</strong></div>
         <div>수집 지역: <strong>서울 25개 구 + 경기 31개 시·군 (총 56개 전 지역)</strong></div>
-        <div>데이터 출처: <strong>국토교통부·한국은행 공공데이터 실시간 연동 엔진</strong></div>
+        <div>데이터 출처: <strong>국토교통부·한국은행·경찰청·나이스(NEIS) 공공데이터 실시간 연동 엔진</strong></div>
       </div>
     </header>
 
@@ -578,7 +873,7 @@
           <button class="filter-btn" onclick="updateChartScope('gyeonggi')">경기 주요 10개 시·군</button>
         </div>
       </div>
-      <div style="height: 350px; position: relative;">
+      <div class="chart-wrapper">
         <canvas id="districtChart"></canvas>
       </div>
     </div>
@@ -600,11 +895,56 @@
         <div class="macro-desc">최근 2개월(7~8월) 56개 전 지역 누적</div>
       </div>
       <div class="macro-card">
+        <div class="macro-label">경찰청 범죄·치안 지표</div>
+        <div class="macro-value" style="color: #34d399;">7.8건<span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/천명</span></div>
+        <div class="macro-desc">5대 강력범죄 기준 (3개월 주기 자동 수집)</div>
+      </div>
+      <div class="macro-card">
         <div class="macro-label">신호등 종합 판정 현황</div>
         <div class="macro-value" style="color: var(--yellow);">주의 (선별 접근)</div>
         <div class="macro-desc">상급지 신고가 지속 vs 외곽 거래 정체</div>
       </div>
     </div>
+
+    <section class="pipeline-section" aria-labelledby="pipeline-title">
+      <div class="pipeline-header">
+        <div>
+          <h3 id="pipeline-title">🔗 Agent · MCP · 산출물 실행 상태</h3>
+          <p>최종 점검: 2026-09-18 00:25 (KST) · 3개 MCP 서버(39개 도구) 및 56개 지역 데이터 연동 검증 완료</p>
+        </div>
+        <span class="pipeline-status">✅ 검증 완료 (39 Tools / PASS)</span>
+      </div>
+      <div class="pipeline-flow">
+        <div class="pipeline-step">
+          <strong>01 · 수집</strong>
+          <span>re-data-collector</span>
+          <small>국토부 실거래가 + 나이스 학군 + 경찰청 범죄통계(3개월 주기)</small>
+        </div>
+        <div class="pipeline-step">
+          <strong>02 · 분석</strong>
+          <span>re-trend-risk-analyst</span>
+          <small>raw → data/re-trend-risk-analyst/{slug}_scores.md</small>
+        </div>
+        <div class="pipeline-step">
+          <strong>03 · 판정</strong>
+          <span>re-timing-judge</span>
+          <small>scores → data/re-timing-judge/{slug}_signal.md</small>
+        </div>
+        <div class="pipeline-step">
+          <strong>04 · 브리핑</strong>
+          <span>re-briefing-reporter</span>
+          <small>signal → data/re-briefing-reporter/{slug}_briefing.md</small>
+        </div>
+      </div>
+      <div class="pipeline-links">
+        <a href="data/pipeline_validation_20260917.md">점검 보고서 열기</a>
+        <a href="crime_dashboard.html" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 700;">🛡️ 경찰청 범죄통계 대시보드</a>
+        <a href="schoolinfo_dashboard.html" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399; font-weight: 700;">🏫 나이스 학군 대시보드</a>
+        <a href="MCP/dashboard.html">MCP 도구 대시보드</a>
+        <a href="mcp_architecture_dashboard.html">MCP 아키텍처</a>
+        <span class="pipeline-status">MCP 3개 서버 · 39개 도구 (부동산 29 + 학군 6 + 범죄 4) · 산출물 체인 PASS</span>
+      </div>
+    </section>
 
     <!-- 인터랙티브 컨트롤 패널 -->
     <div class="controls-panel">
@@ -1380,10 +1720,44 @@
     let currentProvince = 'all';
     let currentSignal = 'all';
     let searchQuery = '';
+    let currentChartScope = 'all';
     let chartInstance = null;
+
+    // 테마 관리 (다크/라이트)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('re_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('re_theme', theme);
+
+      const icon = document.getElementById('themeToggleIcon');
+      const text = document.getElementById('themeToggleText');
+      if (theme === 'light') {
+        if (icon) icon.textContent = '🌙';
+        if (text) text.textContent = '다크 모드';
+      } else {
+        if (icon) icon.textContent = '☀️';
+        if (text) text.textContent = '라이트 모드';
+      }
+
+      // 차트가 이미 그려져 있으면 테마 색상에 맞게 다시 렌더링
+      if (chartInstance) {
+        initChart(currentChartScope);
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const nextTheme = current === 'light' ? 'dark' : 'light';
+      applyTheme(nextTheme);
+    }
 
     // 초기화
     document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       renderCards();
       initChart('all');
     });
@@ -1461,7 +1835,7 @@
       grid.innerHTML = filtered.map(r => {
         const detailUrl = getDetailUrl(r);
         return `
-        <div class="card" onclick="triggerNeonAndNavigate(event, this, '${detailUrl}')" title="클릭 시 네온 효과와 함께 ${r.name} 심층 분석 대시보드로 이동합니다">
+        <div class="card" onclick="triggerNeonAndNavigate(event, this, '${detailUrl}')" title="클릭 시 ${r.name} 심층 분석 대시보드로 이동합니다">
           <div class="card-top">
             <div class="card-title-group">
               <span class="card-title-link">
@@ -1512,13 +1886,15 @@
     }
 
     function initChart(scope) {
+      currentChartScope = scope || currentChartScope;
       const ctx = document.getElementById('districtChart').getContext('2d');
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
       let targetData = [];
-      if (scope === 'seoul') {
+      if (currentChartScope === 'seoul') {
         targetData = REGION_DATA.filter(r => r.province === 'seoul').slice(0, 10);
         document.getElementById('chartHeading').textContent = '📈 서울 핵심 10개 자치구 전용 84㎡ 및 전체 실거래가 비교';
-      } else if (scope === 'gyeonggi') {
+      } else if (currentChartScope === 'gyeonggi') {
         targetData = REGION_DATA.filter(r => r.province === 'gyeonggi').slice(0, 10);
         document.getElementById('chartHeading').textContent = '📈 경기도 핵심 10개 시·군 전용 84㎡ 및 전체 실거래가 비교';
       } else {
@@ -1548,6 +1924,10 @@
         chartInstance.destroy();
       }
 
+      const textColor = isLight ? '#334155' : '#cbd5e1';
+      const labelColor = isLight ? '#64748b' : '#94a3b8';
+      const gridColor = isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)';
+
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1556,17 +1936,17 @@
             {
               label: '전용 84㎡ 평균가 (억원)',
               data: data84,
-              backgroundColor: 'rgba(56, 189, 248, 0.8)',
-              borderColor: '#38bdf8',
-              borderWidth: 1.5,
+              backgroundColor: isLight ? 'rgba(2, 132, 199, 0.88)' : 'rgba(56, 189, 248, 0.85)',
+              borderColor: isLight ? '#0284c7' : '#38bdf8',
+              borderWidth: 2,
               borderRadius: 6
             },
             {
               label: '전체 평균 실거래가 (억원)',
               data: dataAvg,
-              backgroundColor: 'rgba(168, 85, 247, 0.55)',
-              borderColor: '#a855f7',
-              borderWidth: 1.5,
+              backgroundColor: isLight ? 'rgba(124, 58, 237, 0.75)' : 'rgba(168, 85, 247, 0.65)',
+              borderColor: isLight ? '#7c3aed' : '#a855f7',
+              borderWidth: 2,
               borderRadius: 6
             }
           ]
@@ -1576,17 +1956,35 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              labels: { color: '#94a3b8', font: { family: 'Noto Sans KR', size: 12 } }
+              labels: {
+                color: isLight ? '#1e293b' : '#f1f5f9',
+                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 12 : 14, weight: '700' },
+                padding: 16
+              }
+            },
+            tooltip: {
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              padding: 12,
+              boxPadding: 6
             }
           },
           scales: {
             x: {
-              ticks: { color: '#cbd5e1', font: { family: 'Noto Sans KR', size: 11 } },
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              ticks: {
+                color: textColor,
+                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 11 : 13, weight: '600' },
+                maxRotation: window.innerWidth < 768 ? 45 : 0
+              },
+              grid: { color: gridColor }
             },
             y: {
-              ticks: { color: '#94a3b8', font: { family: 'Noto Sans KR' }, callback: (v) => v + '억' },
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              ticks: {
+                color: labelColor,
+                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 11 : 13, weight: '600' },
+                callback: (v) => v + '억'
+              },
+              grid: { color: gridColor }
             }
           }
         }

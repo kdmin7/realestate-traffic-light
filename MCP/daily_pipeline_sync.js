@@ -35,7 +35,27 @@ async function runDailySync() {
     console.log(`✔ index.html 게시판 최신 기준일(${dateStr}) 및 데이터 동기화 완료!`);
   }
 
+  // -------------------------------------------------------------
+  // 경찰청 범죄 통계 3개월(분기별, 90일) 주기 자동 재수집 체크
+  // -------------------------------------------------------------
+  try {
+    const { checkQuarterlySyncStatus, collectAllYears } = await import('./crime-service.js');
+    const crimeStatus = checkQuarterlySyncStatus();
+    console.log(`\n[경찰청 범죄 데이터 3개월 주기 점검]`);
+    console.log(`- 상태: ${crimeStatus.message}`);
+    if (crimeStatus.isDue) {
+      console.log('🚨 3개월 주기가 도래하여 범죄 데이터 자동 재수집 및 대시보드 갱신을 실행합니다...');
+      await collectAllYears({ overwrite: true });
+      const { execSync } = await import('child_process');
+      execSync('node generate_crime_dashboard.js', { cwd: __dirname, stdio: 'inherit' });
+      console.log('✔ 범죄 데이터 3개월 정기 재수집 및 대시보드 갱신 완료!');
+    }
+  } catch (err) {
+    console.warn('[경고] 범죄 데이터 주기 점검 중 오류:', err.message);
+  }
+
   console.log(`\n🎉 [일일 파이프라인 취합 & 게시판 업데이트 완료]`);
 }
 
 runDailySync();
+

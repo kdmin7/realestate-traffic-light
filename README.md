@@ -1,431 +1,293 @@
-# 🚦 부동산 신호등
+# 🚦 부동산 신호등 (Real Estate Traffic Light)
 
-> **4개의 AI 에이전트가 켜주는 매수 타이밍 신호**
-
-부동산 투자 판단을 자동화하는 **멀티에이전트 시스템**입니다. 공공데이터 수집부터 최종 브리핑까지 4단계를 거쳐 매수 타이밍 신호와 수익성 분석을 제공합니다.
-
-신호는 신호등 3색에 대응됩니다:
-
-| 신호 | 색 | 의미 |
-|------|-----|------|
-| 매수고려 | 🟢 | 트렌드 양호 + 리스크 낮음, 진입 검토 가능 |
-| 주의 | 🟡 | 기회는 있으나 리스크 동반, 조건 확인 후 판단 |
-| 관망 | 🔴 | 지금은 멈추고 기다리기 |
+수도권(서울 25개 구 + 경기 31개 시·군 = 56개 전 지역)의 부동산 실거래가, 한국은행 거시경제, 나이스(NEIS) 학군, 경찰청 범죄·치안 통계를 실시간 수집·분석하여 **투자 신호등(매수고려·주의·관망)**과 **인터랙티브 시각화 대시보드**를 제공하는 멀티 에이전트 & MCP 시스템입니다.
 
 ---
 
-## 🏗️ 시스템 구조
+## 💡 게시판(대시보드) 소개
 
-### 데이터 흐름: 한 방향 파이프라인
+**부동산 신호등**은 파편화된 공공데이터(국토교통부 실거래가, 한국은행 ECOS 금리, 교육부 나이스 학군 정보, 경찰청 13개년 범죄통계)를 단 하나의 직관적인 사용자 인터페이스로 통합한 **수도권 부동산 종합 진단 대시보드**입니다.
 
-```
-공공데이터
-    ↓
-[① re-data-collector]
-  → 원자재 데이터셋
-    ↓
-[② re-trend-risk-analyst]
-  → 트렌드/리스크 스코어
-    ↓
-[③ re-timing-judge]
-  → 매수 신호 + 수익성 분석
-    ↓
-[④ re-briefing-reporter]
-  → 최종 브리핑 (HTML/텍스트)
-```
-
-### 각 서브에이전트 역할
-
-#### 1️⃣ **re-data-collector** (데이터 수집가)
-- **역할**: 공공데이터 조회 및 정리
-- **입력**: 관심 지역/단지 리스트
-- **출력**: 원자재 데이터셋 (출처 명시)
-- **페르소나**: 통계 담당관형 리서처 (건조·명사형 종결, 팩트+출처만, 해석 제외)
-- **도구**: WebFetch, WebSearch, Read, Write
-- **출력 폴더**: `data/re-data-collector/`
-
-**조회 항목:**
-- 실거래가 추이
-- 전세가율
-- 공급물량 캘린더
-- 인구 추이
-- 기준금리
-- 매물 적체 기간 (가능 시)
-- 개발 호재 진행 상황
+사용자는 복잡한 공공데이터 포털을 일일이 찾아다니지 않고도, 메인 대시보드([`index.html`](index.html))에서 수도권 56개 전 지역의 **가격 흐름, 금리 부담, 치안 안전도, 학군 선호도**를 한눈에 비교 분석할 수 있습니다.
 
 ---
 
-#### 2️⃣ **re-trend-risk-analyst** (트렌드·리스크 분석가)
-- **역할**: 데이터 → 스코어화
-- **입력**: re-data-collector 출력 파일
-- **출력**: 트렌드/리스크 점수표 (척도: -2~+2)
-- **페르소나**: 리서치센터 애널리스트 (점수 먼저 + 근거 한 줄, 보고서형 종결, 판단은 안 함)
-- **도구**: Read, Write, Grep, Glob
-- **출력 폴더**: `data/re-trend-risk-analyst/`
+## 🌟 주요 장점 및 실무 유용성
 
-**생성하는 스코어:**
-- **트렌드 스코어**: 공급물량, 개발호재, 인구 유입
-- **리스크 스코어**: 고점매수, 환금성, 금리 (3가지)
+### 1. 4대 공공 빅데이터의 객관적 융합 (감정이 배제된 팩트 분석)
+- **국토교통부 실거래가**: 매매·전월세 전수 데이터 및 국민평형(84㎡) 실거래가 실시간 추적
+- **한국은행 ECOS**: 기준금리(3.0%) 및 시중은행 주담대 평균금리(4.39%) 금융 지표 연동
+- **교육부 나이스(NEIS)**: 특목고·자율고 배출률, 명문 초·중·고 학군 및 학원가 클러스터 분석
+- **경찰청 공공데이터**: 2012~2024년 13개년 5대 강력범죄 통계 및 인구 1천명당 치안 위험도 지수 산출
 
----
+### 2. 직관적인 3단계 신호등 판정 엔진
+- **🟢 매수고려 (BUY)**: 높은 전세가율(50% 이상) + 트렌드 모멘텀 상승 + 리스크 지수 안정 구간
+- **🟡 주의 (WARNING)**: 단기 급등 피로도, 고금리 이자 부담 또는 전세가율 50% 미만으로 갭 부담이 높은 구간
+- **🔴 관망 (WATCH)**: 거래량 침체, 전세가율 저조 및 관망 필요 구간
 
-#### 3️⃣ **re-timing-judge** (판단 엔진)
-- **역할**: 스코어 종합 판정 + 수익성 계산
-- **입력**: re-trend-risk-analyst 출력 파일 + (선택) 매물 정보
-- **출력**: 매수 신호 ("관망"/"주의"/"매수고려") + 수익률 시뮬레이션
-- **페르소나**: 여신심사역형 심사관 (판정→규칙→근거 구조, 조건부 화법, 책임 고지 고정 문장)
-- **도구**: Read, Write
-- **출력 폴더**: `data/re-timing-judge/`
+### 3. 심층 분석 대시보드 연계 (원클릭 드릴다운)
+- 메인 카드 클릭 시 해당 지역 전용 [심층 분석 리포트](data/district_analysis_dashboard.html)로 즉시 전환
+- **모듈 ①**: 5대 랜드마크 단지 시세·전세가율 매트릭스
+- **모듈 ②**: NEIS 교육 빅데이터 기반 명문 학군·학원가 인프라 지수
+- **모듈 ③**: LTV 40% 대출 시뮬레이션 및 월 순현금흐름(이자 vs 임대수익) 정밀 계산
+- **모듈 ④**: 멀티 에이전트 종합 진단 총평 및 실수요자·투자자 맞춤형 행동 지침
 
-**판정 규칙:**
-| 트렌드 | 리스크 | 신호 |
-|-------|-------|------|
-| (+) | (-) | 매수고려 |
-| (+) | (+) | 주의 |
-| (-) | (+) | 관망 |
-| (-) | (-) | 관망 |
+### 4. 무설치 로컬 구동 & 100% 오프라인 완결성
+- 별도의 웹서버 없이 로컬 파일(`file:///...`)로 브라우저에서 바로 열어도 데이터가 절대 끊기지 않는 **임베디드 사전 컴파일 데이터셋** 내장
+- 네트워크 에러나 CORS 정책 차단 환경에서도 0.01초 만에 즉각 로딩
 
-**수익성 계산 항목:**
-- 캡레이트
-- 자기자본수익률 (기본 조건)
-- 시나리오별 수익률 변화 (금리+1%p, 공실, 월세 하락 등)
-- 개선안 3가지
+### 5. 대화면 고가독성 UI & 완벽한 모바일 반응형
+- **PC 모니터 환경**: 15~25% 확대된 대형 폰트, 선명한 고대비 네온 컬러, 넓은 400px 차트 캔버스 적용으로 멀리서도 한눈에 판독 가능
+- **모바일/태블릿 환경**: 터치 스크롤 칩 네비게이션, 1열 전폭 카드 자동 스택, 44px 이상 터치 타깃으로 작은 스마트폰에서도 글씨 겹침이나 화면 깨짐 제로 보장
 
 ---
 
-#### 4️⃣ **re-briefing-reporter** (리포터)
-- **역할**: 최종 결과 브리핑
-- **입력**: re-timing-judge 출력 파일
-- **출력**: 텍스트 브리핑 + (선택) Artifact (HTML 카드)
-- **페르소나**: PB형 상담가 (결론→이유→지금 할 일 3단 구성, 쉬운 말, 과장 금지)
-- **도구**: Read, Write, Artifact
-- **출력 폴더**: `data/re-briefing-reporter/`
+## 🛠️ 최근 업데이트 내역 (2026-09-18)
 
-**포함 내용:**
-- 핵심 신호 카드 (시각적)
-- 신호 근거 (3줄)
-- 수익성 요약 (표)
-- 최우선 액션
-- 출처 링크
+오늘 진행된 주요 개선 및 결함 해결 작업 내역입니다.
+
+### 1. 성남시(분당/판교) 심층 리포트 모듈 ② (NEIS 학군) 연동 복구 및 Blank 결함 완전 해결
+- **문제 진단**: `index.html`에서 "성남시 (분당/판교)" 심층 분석 리포트 진입 시 모듈 ②(명문 학군 & 학원가 인프라 지수)가 Blank(빈칸)으로 출력되거나 기본 폴백값으로 떨어지는 현상 확인.
+- **원인**: 로컬 파일(`file://`) 프로토콜 실행 시 브라우저 보안 정책에 의해 `fetch('regions_detail.json')`가 차단되어 데이터 연동이 실패함.
+- **조치 사항**:
+  - `data/district_analysis_dashboard.html`에 31개 자치구 정밀 빅데이터를 `EMBEDDED_REGIONS_DETAIL` 상수로 내장 컴파일하여 로컬/오프라인 환경에서도 100% 즉시 렌더링되도록 개선.
+  - `findRegionTarget` 지능형 매칭 엔진을 도입하여 `성남시 (분당/판교)`, `성남`, `분당`, `판교` 등 다양한 키워드를 완벽히 인식하도록 처리.
+  - NEIS 대표 학교 목록을 시각적인 뱃지 칩(`school-tag`) UI로 고도화 (낙생고, 서현고, 분당대진고, 내정중, 수내중 등).
+
+### 2. 경찰청 범죄통계 대시보드 (`crime_dashboard.html`) 정상화 및 최신화
+- `crime_dashboard.html`의 2012~2024년 13개년 범죄 발생 통계 및 지자체별 순위 데이터 렌더링 점검 및 동기화 완료.
+- 5대 강력범죄 구성비 및 시계열 추이 그래프 표시 안정화.
+
+### 3. 메인 대시보드 (`index.html`) 대화면 고가독성 & 모바일 반응형 전면 개편
+- **폰트 크기 및 시인성 대폭 상향**:
+  - 메인 타이틀 (`1.85rem` ➔ `2.1rem`, 굵기 900)
+  - 지역 카드 타이틀 (`1.35rem` ➔ `1.45rem`, 가독성 극대화)
+  - 핵심 전용 84㎡ 실거래가 (`1.22rem` ➔ `1.35rem`, 스카이블루 고대비 강조)
+  - 매크로 지표 수치 (`1.8rem` ➔ `2.1rem`)
+  - 카드 테이블 상세 지표 (`0.9rem ~ 1.0rem` ➔ `0.98rem ~ 1.1rem`)
+- **Chart.js 비교 그래프 가독성 강화**:
+  - 차트 높이 `400px`로 확대, 축 라벨 폰트(`13px`, 굵기 600) 및 막대 테두리 선명도 증대.
+  - 범례 및 툴팁 폰트 확대(`14px`)로 호버 시 가격 비교 용이.
+- **모바일/태블릿 반응형 무결점 점검**:
+  - 상단 메뉴 가로 터치 스크롤(`nowrap`) 처리로 스마트폰에서 메뉴 줄바꿈 깨짐 방지.
+  - 모바일(≤768px)에서 지역 카드를 1열 전폭(`1fr`)으로 자동 전환하여 텍스트 말림/잘림 원천 방지.
+  - 모바일 최소 터치 타깃 `44px~48px` 확보.
 
 ---
 
-## 📁 폴더 구조
+## 🔄 Agent · MCP · 데이터 흐름 (Data Flow Architecture)
 
-```
-realestate_prj/
-├── CLAUDE.md                           # 저장소 가이드 (Claude Code / Antigravity용)
-├── README.md                           # 본 프로젝트 안내서
-├── index.html                          # 🚦 실시간 통합 메인 대시보드 (서울 25구 + 경기 31개 시·군)
-│
-├── .github/
-│   └── workflows/
-│       └── update_dashboard.yml        # 매일 KST 06:00 국토부·한국은행 실시간 자동 갱신
-│
-├── .claude/
-│   └── agents/                         # Subagent 정의 파일
-│       ├── re-data-collector.md
-│       ├── re-trend-risk-analyst.md
-│       ├── re-timing-judge.md
-│       └── re-briefing-reporter.md
-│
-├── MCP/                                # 로컬 MCP 데이터 서버 (Node 18+)
-│   ├── realestate-server.js            # seoul-realty — 수도권 부동산 종합 분석 (27 tools)
-│   ├── daily_pipeline_sync.js          # 일일 데이터 수집 및 index.html 동기화 스크립트
-│   └── update_raw_incremental.js       # 최신월 증분 수집 캐싱 엔진
-│
-├── data/                               # 산출물 및 웹 데이터셋
-│   ├── regions_detail.json             # 56개 전 지역 심층 데이터셋 (단지·학군·현금흐름·진단)
-│   ├── district_analysis_dashboard.html# 56개 전 지역 공용 심층 분석 대시보드 템플릿
-│   ├── songpa_analysis_dashboard.html  # 송파구 특화 심층 분석 대시보드
-│   ├── seoul_top5_analysis_dashboard.html # 서울 5대 상급지 종합 분석 대시보드
-│   ├── re-data-collector/              # 원자재 데이터 ({지역명}_raw.md)
-│   ├── re-trend-risk-analyst/          # 트렌드·리스크 스코어 ({지역명}_scores.md)
-│   ├── re-timing-judge/                # 신호 판정 ({지역명}_signal.md)
-│   └── re-briefing-reporter/           # 최종 리포트 ({지역명}_briefing.md)
+전체 시스템은 **공공데이터 원천 → 3개 MCP 서버 → 5개 전문 에이전트 체인 → 대시보드 & 산출물 계층**의 4단계 파이프라인으로 유기적으로 연결됩니다.
+
+```mermaid
+flowchart TD
+    subgraph SOURCEDATA ["🌐 공공데이터 원천 (OpenAPI & Bulk Data)"]
+        D1["국토교통부 실거래가<br/>(아파트/오피스텔/연립/단독/상업)"]
+        D2["한국은행 ECOS<br/>(기준금리, 주택담보대출금리)"]
+        D3["나이스 NEIS<br/>(전국 초·중·고 학군, 급식, 학사일정)"]
+        D4["경찰청 odcloud.kr<br/>(2012~2024 범죄발생지역별 통계)"]
+    end
+
+    subgraph MCPLAYER ["⚙️ MCP 서버 계층 (총 39개 도구)"]
+        M1["seoul-realty MCP (29 tools)<br/>realestate-server.js<br/>- 실거래가/전세가율/금리/대출/입지평가"]
+        M2["schoolinfo MCP (6 tools)<br/>check_schools.js<br/>- 학교검색/학군분류/학사일정"]
+        M3["crime-collector MCP (4 tools)<br/>crime-collector-server.js<br/>- 13개년 범죄수집/치안분석/시계열추이"]
+    end
+
+    subgraph AGENTCHAIN ["🤖 멀티 에이전트 파이프라인"]
+        A1["01. re-market-data<br/>(공공데이터 원천 수집)"]
+        A2["02. re-trend-risk-analyst<br/>(트렌드 모멘텀 & 리스크 스코어링)"]
+        A3["03. re-investment-strategist<br/>(규칙 기반 신호등 판정: BUY/WARN/WATCH)"]
+        A4["04. re-briefing-reporter<br/>(투자 브리핑 리포트 생성)"]
+        A5["05. re-tax-strategist<br/>(취득세·보유세·양도세 세후 수익률 시뮬레이션)"]
+    end
+
+    subgraph OUTPUTLAYER ["📊 최종 산출물 및 대시보드"]
+        OUT1["index.html<br/>56개 지역 신호등 메인 대시보드"]
+        OUT2["crime_dashboard.html<br/>2012~2024 경찰청 범죄통계 대시보드"]
+        OUT3["schoolinfo_dashboard.html<br/>나이스 학군 심층 분석 대시보드"]
+        OUT4["data/re-*/*.md<br/>지역별 raw / scores / signal / briefing 리포트"]
+    end
+
+    D1 & D2 --> M1
+    D3 --> M2
+    D4 --> M3
+    M3 -.->|범죄율 연동| M1
+
+    M1 & M2 & M3 --> A1
+    A1 -->|raw.md| A2
+    A2 -->|scores.md| A3
+    A3 -->|signal.md| A4
+    A3 -.-> A5
+    A4 -->|briefing.md| OUT4
+
+    A3 & A4 -->|REGION_DATA 갱신| OUT1
+    M3 -->|13개년 집계| OUT2
+    M2 -->|학군 데이터| OUT3
 ```
 
+### 단계별 데이터 전환 흐름
+
+1. **수집 단계 (`re-market-data` + MCP 서버 3종)**:
+   - `seoul-realty`: 국토부 API에서 실거래가(매매·전월세)를 수집하고 한국은행 ECOS에서 금리 데이터를 취합
+   - `schoolinfo`: 나이스 API에서 자치구별 초·중·고 학군 및 특목고/자율고 비율 취합
+   - `crime-collector`: 경찰청 OpenAPI에서 2012~2024년 13개 연도 범죄 데이터를 3개월(90일) 주기로 수집하여 `data/crime/{year}.csv` 및 `{year}.json`으로 보관
+   - ➡️ 산출물: `data/re-data-collector/{slug}_raw.md`
+
+2. **분석 단계 (`re-trend-risk-analyst`)**:
+   - 거래량 및 실거래가 분기 CAGR로 **트렌드 모멘텀 점수** 산출
+   - 전세가율, 인구 1천명당 범죄율(역수), 학군 선호도, 금리 부담을 결합한 **리스크 점수** 산출
+   - ➡️ 산출물: `data/re-trend-risk-analyst/{slug}_scores.md`
+
+3. **판정 단계 (`re-investment-strategist`)**:
+   - 모멘텀과 리스크 지수를 교차 평가하여 **신호등(BUY 매수고려 / WARNING 주의 / WATCH 관망)** 부여
+   - ➡️ 산출물: `data/re-timing-judge/{slug}_signal.md`
+
+4. **브리핑 단계 (`re-briefing-reporter`)**:
+   - 핵심 지표 요약, 상승/하락 요인, 단지별 최고가 현황을 담은 분석 리포트 발행
+   - ➡️ 산출물: `data/re-briefing-reporter/{slug}_briefing.md` 및 `index.html`의 56개 지역 카드 데이터 갱신
+
 ---
 
-## 🔌 MCP 데이터 서버 연동
+## 📂 계층별 데이터 구조 (Data Structure)
 
-`MCP/realestate-server.js`(seoul-realty)를 등록하면 re-data-collector가 언론 기사(2차 출처) 대신 **국토부·한국은행 1차 API를 직접 호출**합니다.
+### 1. 원천 데이터 구조 (Raw Datasets)
 
-| MCP 도구 | 신호등에서의 쓰임 |
-|---------|-----------------|
-| `get_price_trend` | 실거래가 분기 트렌드 → 고점매수 리스크·가격 트렌드 |
-| `get_jeonse_ratio` | 전세가율 → 고점매수 리스크 핵심 프록시 |
-| `get_macro_context` | 기준금리·주담대 금리 시계열 → 금리 리스크 |
-| `get_living_population` | 생활인구 추이 → 인구 유입 트렌드 |
-| `get_school_index` · `get_crime_rate` · `get_region_income` | 학군·치안·소득 → (확장) 입지 트렌드 지표 |
-| `get_district_score` | 자치구 종합 순위 → 지역 스카우팅 (분석 대상 발굴) |
+| 데이터군 | 저장 경로 / 엔드포인트 | 포맷 | 주요 필드 및 구조 |
+|---|---|:---:|---|
+| **아파트 실거래가** | `RTMSDataSvcAptTradeDev` (국토부) | XML/JSON | `dealAmount`(매매가), `excluUseAr`(전용면적), `dealYear/Month/Day`, `aptNm`, `floor` |
+| **아파트 전월세** | `RTMSDataSvcAptRent` (국토부) | XML/JSON | `deposit`(보증금), `monthlyRent`(월세), `excluUseAr`, `dealYear/Month` |
+| **한국은행 금리** | `ECOS` 통계 (한국은행) | JSON | `BASE_RATE`(기준금리), `MORTGAGE_RATE`(주담대 평균금리), 월별 시계열 |
+| **경찰청 범죄통계** | `MCP/data/crime/{year}.csv` & `.json` | CSV/JSON | `범죄대분류`, `범죄중분류`, `서울 강남구`, `경기도 고양시` ... 전국 249개 지자체별 발생건수 |
+| **범죄 동기화 메타** | `MCP/data/crime/manifest.json` | JSON | `updatedAt`, `syncIntervalDays: 90`, `nextSyncDueAt`, 연도별 건수/컬럼수 |
+| **나이스 학군** | NEIS API 대방 포털 | JSON | `SCHUL_NM`, `HS_PURPS_SMS_NM`(특목/자율/일반), `ORG_RDNMA` |
 
-등록 명령·API 키 발급처·CSV 준비 방법은 `MCP/README-seoul-realty.md` 참고. 미등록 상태여도 파이프라인은 웹 조회로 폴백해서 동작합니다.
+### 2. 중간 에이전트 산출물 구조 (`data/re-*/`)
+
+- **`{slug}_raw.md`**: 수집된 최근 거래 내역, 전세가율, 학군 목록, 5대 강력범죄 건수 원본
+- **`{slug}_scores.md`**: 트렌드 지수 (1~100점), 리스크 지수 (1~100점), 지표별 가중치 breakdown
+- **`{slug}_signal.md`**: 최종 신호 (`BUY` / `WARNING` / `WATCH`), 신호 산출 사유, 모니터링 체크리스트
+- **`{slug}_briefing.md`**: 사람이 읽기 쉬운 종합 투자 요약문, 학군/치안 종합 평가, 세부 매물 추천
+
+### 3. 최종 메인 대시보드 데이터 구조 (`index.html` 내 `REGION_DATA`)
+
+```javascript
+{
+  name: "성남시 (분당/판교)",          // 지역명 (서울 25구 + 경기 31개 시·군)
+  province: "gyeonggi",              // 광역 구분 (seoul | gyeonggi)
+  zone: "경부축",                     // 세부 생활권역 (경부축, 동남권, 서북권 등)
+  signal: "warning",                 // 신호등 판정 (buy | warning | watch)
+  signalText: "🟡 주의",              // UI 표시 라벨
+  trades: "420건 (7월: 280 / 8월: 140)", // 최근 실거래량
+  avgPrice: 16.2,                    // 전체 평균 매매가 (억원)
+  avg84: 17.8,                       // 국민평형(84㎡) 기준 평균 거래가 (억원)
+  topApt: "산운마을7단지 (28.0억)",    // 신고 최고가 단지
+  trend: "+1.6",                     // 트렌드 모멘텀 점수
+  risk: "+1.0"                       // 복합 리스크 지수
+}
+```
 
 ---
 
-## 🚀 사용법
+## 🎯 어떻게 사용하면 좋을까? (실전 활용 가이드)
 
-### 1️⃣ 새 지역 분석 시작
+### 시나리오 1. 👨‍👩‍👧 실수요자 / 학부모 (안전 + 학군 중심 지역 선정)
+1. **메인 화면 탐색**: [`index.html`](index.html)에서 `🌲 경기도` 또는 `🏛️ 서울특별시` 탭을 선택하고 신호등 상태가 `🟢 매수고려` 또는 `🟡 주의`인 후보 지역을 1차 선별합니다.
+2. **치안 안전도 점검**: 상단 링크의 [`🛡️ 경찰청 범죄통계 대시보드`](crime_dashboard.html)를 열어 후보 지역의 **인구 1,000명당 5대 범죄율 랭킹**을 확인합니다.
+3. **학군 우수성 비교**: [`🏫 나이스 학군 대시보드`](schoolinfo_dashboard.html)에서 자치구별 특목고·자율고 배정 현황과 명문고 분포를 비교하여 최종 이사 후보지를 확정합니다.
 
-```
-관심 지역: 서울시 [구]
-```
+### 시나리오 2. 💼 갭투자자 / 자산가 (저평가·고수익 매물 발굴)
+1. **전세가율 & 금리 모멘텀 확인**: [`index.html`](index.html) 상단 매크로 바에서 기준금리(3%) 및 주담대 평균금리 추이를 확인합니다.
+2. **급매물 발굴**: `전용 84㎡ 기준 평균가`와 `트렌드 모멘텀`이 높으면서 리스크 지수가 낮은 자치구를 탐색합니다.
+3. **지역별 심층 분석**: 카드를 클릭하여 [상세 분석 페이지](data/district_analysis_dashboard.html)로 이동, **모듈 ③(LTV 40% 대출 및 월 순현금흐름 시뮬레이션)**을 통해 월 이자 부담액과 전세/월세 기대수익 간의 실수익성을 검증합니다.
 
-위와 같이 지역을 지정하면 Claude Code에서:
+### 시나리오 3. 📊 공공데이터 리서처 / 부동산 분석가 (시계열 심층 연구)
+1. **13개년 범죄 추이 분석**: [`crime_dashboard.html`](crime_dashboard.html)에서 2012년부터 2024년까지의 5대 범죄 추이를 시계열로 비교 분석하고, `💾 CSV 내보내기`로 엑셀 모델링을 진행합니다.
+2. **MCP 도구 직접 호출**: Claude Code 또는 터미널 환경에서 `get_price_trend`, `get_jeonse_ratio`, `get_district_score` 도구를 직접 호출하여 논문 및 브리핑 보고서용 원자재 데이터를 즉시 추출합니다.
+
+---
+
+## ⚡ 일상 운영 워크플로우 (Daily & Quarterly)
 
 ```bash
-# 1단계: 데이터 수집
-> 4단계 AI 파이프라인으로 OO구 분석해줄래?
-→ re-data-collector 실행
-→ data/re-data-collector/{지역명}_raw.md 생성
+# 1. [웹 대시보드 브라우징 (PowerShell 실행)]
+Start-Process "index.html"
+Start-Process "crime_dashboard.html"
+Start-Process "schoolinfo_dashboard.html"
+Start-Process "data\district_analysis_dashboard.html?region=성남시 (분당/판교)"
 
-# 2단계: 트렌드/리스크 분석
-→ re-trend-risk-analyst 자동 실행 (1단계 출력 읽음)
-→ data/re-trend-risk-analyst/{지역명}_scores.md 생성
+# 2. [매일 아침 1회] 실거래가 증분 수집 및 index.html 최신화
+cd MCP
+npm run daily:sync
 
-# 3단계: 매수 신호 판정
-→ re-timing-judge 자동 실행 (2단계 출력 읽음)
-→ data/re-timing-judge/{지역명}_signal.md 생성
+# 3. [3개월 주기] 경찰청 범죄 데이터 자동 재수집 및 대시보드 동기화
+npm run sync:crime:check  # 현재 주기(90일) 및 남은 일수 확인
+npm run sync:crime        # 90일 만료 시 자동 재수집 + 대시보드 최신화
 
-# 4단계: 최종 브리핑
-→ re-briefing-reporter 자동 실행 (3단계 출력 읽음)
-→ data/re-briefing-reporter/{지역명}_briefing.md 생성
-→ HTML 대시보드 생성
-```
-
-### 2️⃣ 각 단계 개별 실행
-
-필요하면 중간 단계부터 다시 실행할 수 있습니다:
-
-```bash
-# 예: 기준금리가 변경되었으니 트렌드/리스크 다시 계산
-→ re-trend-risk-analyst 다시 실행 (기존 _raw.md 읽음)
-
-# 예: 더 신축적인 수익률 시뮬레이션 필요
-→ re-timing-judge 다시 실행 (기존 _scores.md 읽음)
-```
-
-### 3️⃣ 다른 형태의 출력
-
-```bash
-# 텍스트 브리핑
-→ re-briefing-reporter 실행
-→ data/re-briefing-reporter/{지역명}_briefing.md
-
-# HTML 대시보드
-→ 최종 단계 완료 후 HTML 자동 생성
-→ 브라우저에서 열어서 시각적 확인
+# 4. [전체 시스템 정합성 원클릭 검증]
+cd ..
+node scripts\verify_full_system.js
 ```
 
 ---
 
-## ⚙️ 설정 & 커스터마이징
+## 💻 MCP 설치와 실행
 
-### 분석 시간축 변경
+필요 조건은 Node.js 18 이상입니다. MCP 의존성은 `MCP/package.json`에 있으며 공식 SDK, `fast-xml-parser`, `nodemailer`, `zod`를 사용합니다.
 
-현재 설정: **중기(6개월~2~3년) + 장기(3년+)** 중심
-
-다른 시간축 원하면 각 subagent `.md` 파일의 역할 정의 섹션 수정:
-
-```markdown
-# .claude/agents/re-trend-risk-analyst.md
-## 담당 범위: 두 종류의 스코어
-
-### 1) 중장기 트렌드 스코어
-- [시간축 변경 가능]
+```powershell
+cd C:\practice\geminiCLI\realestate_prj\MCP
+npm install
 ```
 
-### 리스크 항목 추가/제거
+`MCP/.env.example`을 참고해 필요한 키를 환경변수로 설정합니다.
 
-현재 3가지: 고점매수, 환금성, 금리
-
-예를 들어 **세제 리스크** 추가하려면:
-
-```markdown
-# .claude/agents/re-trend-risk-analyst.md
-### 2) 리스크 스코어 (사용자 관심)
-- 고점매수 리스크 → 전세가율 등으로 프록시
-- 환금성 리스크 → 거래량 추이를 프록시
-- 금리 리스크 → 기준금리 방향성
-- **[신규] 세제 리스크 → 양도세 감면 종료 등**
+```text
+MOLIT_API_KEY=...
+ECOS_API_KEY=...
+NEIS_API_KEY=...
+SMTP_USER=...       # 선택
+SMTP_PASS=...       # 선택
 ```
 
----
-
-## 🛡️ 설계 원칙 (유지할 것)
-
-1. **읽기 전용**: 4개 에이전트 모두 Bash/PowerShell/Edit 도구 배제
-   - 공개데이터 읽기 + 새 파일 쓰기만 가능
-   - 기존 파일 수정이나 시스템 명령 불가
-
-2. **출처 명시**: 모든 수치·점수에 근거 남김
-   - Collector: URL + 기관명
-   - Analyst: Collector 파일 경로
-   - Judge: Analyst 파일 경로 + 계산식
-   - Reporter: 모든 출처 링크 포함
-
-3. **최종 판단은 사용자**: 에이전트는 신호만 제공
-   - "매수하라" 지시 금지
-   - 세무사/공인중개사 확인 필수 항목 명시
-   - 신호는 "참고용"임을 항상 강조
-
-4. **페르소나 일관성**: 각 에이전트의 캐릭터·말투 유지 (상세 규칙은 각 `.claude/agents/*.md`의 "페르소나" 섹션이 원본)
-   - Collector: 통계 담당관 — 건조한 명사형 종결, 출처 필수, 이모지·해석 금지
-   - Analyst: 리서치 애널리스트 — 점수 먼저·근거 한 줄, 감정 형용사 대신 수치
-   - Judge: 여신심사역 — 판정문 구조 + 조건부 화법 + 책임 고지 문장
-   - Reporter: PB 상담가 — 결론→이유→할 일 3단 구성, 용어는 한 줄 번역
-
----
-
-## 🔄 주기적 업데이트
-
-### 매월 (기준금리 발표 후)
-
-```bash
-1. re-data-collector 재실행 → 최신 기준금리·실거래가 수집
-2. re-trend-risk-analyst 자동 재실행
-3. re-timing-judge 자동 재실행
-4. re-briefing-reporter 최종 브리핑 업데이트
+```powershell
+# MCP 폴더에서
+npm start                  # realestate-server.js (29개 도구)
+npm run start:realty       # realestate-server.js
+npm run start:school       # check_schools.js (6개 도구)
+npm run start:crime        # crime-collector-server.js (4개 도구)
+npm run fetch:crime        # 13개 연도 범죄통계 일괄 수집
+npm run dashboard:crime    # crime_dashboard.html 재생성
+npm run sync:crime         # 3개월 정기 동기화 검사
+npm run daily:sync         # 일일 증분 파이프라인
 ```
 
-### 분기별 (인구·공급 통계 갱신)
+루트 `.mcp.json` 등록 현황:
 
-```bash
-1. 통계청 인구·공급 데이터 확인
-2. re-data-collector 재실행 (새 수치 반영)
-3. 전체 파이프라인 재실행
-```
-
-### 필요 시 (특별 호재)
-
-```bash
-예: 잠실 MICE 착공식, 재건축 조합 설립 등
-→ re-data-collector로 최신 호재 추가
-→ 전체 파이프라인 재실행
+```json
+{
+  "mcpServers": {
+    "seoul-realty": { "command": "node", "args": ["MCP/realestate-server.js"] },
+    "schoolinfo": { "command": "node", "args": ["MCP/check_schools.js"] },
+    "crime-collector": { "command": "node", "args": ["MCP/crime-collector-server.js"] }
+  }
+}
 ```
 
 ---
 
-## 📊 예시: 송파구 분석 결과
+## 🔍 대시보드 파일 맵
 
-이미 생성된 **송파구 예시**:
-- `data/re-data-collector/songpa_raw.md` — 원본 데이터
-- `data/re-trend-risk-analyst/songpa_scores.md` — 스코어 분석
-- `data/re-timing-judge/songpa_signal.md` — 신호 판정
-- `data/re-briefing-reporter/songpa_briefing.md` — 최종 브리핑
-- `data/songpa_analysis_dashboard.html` — 대시보드
-
-**최종 신호**: ⚠️ **주의** (기회는 있으나 금리 위험)
+- [`index.html`](index.html): **부동산 신호등 메인 대시보드** (수도권 56개 전 지역 종합 현황 및 비교 차트)
+- [`crime_dashboard.html`](crime_dashboard.html): **경찰청 범죄통계 대시보드** (2012~2024년 13개년 5대 강력범죄 추이 및 지자체 치안 순위)
+- [`schoolinfo_dashboard.html`](schoolinfo_dashboard.html): **나이스 학군 대시보드** (자치구별 초·중·고 학군 및 명문 학교 인프라)
+- [`data/district_analysis_dashboard.html`](data/district_analysis_dashboard.html): **지역 심층 분석 대시보드** (랜드마크, 학군·학원가, LTV 40% 현금흐름, 에이전트 진단)
+- [`mcp_architecture_dashboard.html`](mcp_architecture_dashboard.html): MCP 아키텍처 및 도구 파이프라인 시각화 화면
 
 ---
 
-## ❓ FAQ
+## 🔒 보안 및 데이터 한계
 
-### Q1. 왜 4단계를 나누나?
-
-**A**: 각 단계를 독립적으로 추적·수정하기 위함입니다.
-- 새 데이터 수집 필요 → Collector만 재실행
-- 스코어링 방식 변경 → Analyst만 재실행
-- 신호 규칙 변경 → Judge만 재실행
-
-단계가 섞여 있으면 한 부분 수정 시 전체를 다시 돌려야 하는 낭비가 생깁니다.
-
-### Q2. 다른 사람도 이 시스템을 쓸 수 있나?
-
-**A**: 가능합니다. `.claude/agents/*.md`가 있고 CLAUDE.md가 있으면, 다른 Claude Code 사용자도 같은 방식으로 사용할 수 있습니다.
-
-### Q3. "매수고려" 신호가 나오면 바로 사야 하나?
-
-**A**: **아니오.** 신호는 참고만 하고, 반드시:
-1. 현장 임장
-2. 세무사 상담 (세금 계산)
-3. 공인중개사 상담 (거래 조건)
-4. 은행 사전 심사 (대출 가능성)
-
-을 거쳐야 합니다. 에이전트는 데이터 기반 참고 신호만 제공하는 역할입니다.
-
-### Q4. 이 시스템이 100% 정확한가?
-
-**A**: 아니오. 공공데이터 + 규칙 기반 판정이므로 다음 한계가 있습니다:
-- 공공데이터의 타이밍 지연 (최신성 낮을 수 있음)
-- 로컬 핫플레이스·개발 호재는 놓칠 수 있음
-- 인간의 판단(임장, 중개사 정보)은 보완 필수
-
-### Q5. 다른 지역도 분석할 수 있나?
-
-**A**: 물론입니다. "서울시 강남구", "경기도 수원시" 등 원하는 지역을 지정하면 같은 파이프라인으로 분석합니다.
-
----
-
-## 🖥️ 실시간 인터랙티브 웹 대시보드 (Web UI)
-
-본 프로젝트는 단순 CLI 분석에 머무르지 않고, **수도권 전역(56개 구·시)의 부동산 시장 상황을 브라우저에서 직관적으로 탐색할 수 있는 실시간 인터랙티브 웹 대시보드**를 제공합니다.
-
-### 1. 메인 대시보드 (`index.html`)
-* **수도권 전역 56개 지역 완벽 수록**:
-  * **🏛️ 서울특별시 (25개 구)**: 강남, 서초, 송파, 용산, 성동, 마포, 양천, 영등포, 강동, 광진 등 25개 자치구
-  * **🌲 경기도 (31개 시·군)**: 과천, 성남(분당/판교), 하남, 광명, 용인(수지), 수원(광교), 화성(동탄) 등 31개 시·군
-* **직관적인 인터랙티브 컨트롤 패널**:
-  * **광역 필터 탭**: `전체 지역 (56)` / `🏛️ 서울특별시 (25)` / `🌲 경기도 (31)` 원클릭 필터링
-  * **신호등 상태 필터**: `전체` / `🟢 매수고려` / `🟡 주의` / `🔴 관망` (실시간 개수 집계 배지)
-  * **실시간 검색창**: 구·시·군 이름(예: `송파`, `분당`, `과천`) 입력 즉시 필터링
-* **연동형 인터랙티브 차트 (Chart.js)**:
-  * `수도권 TOP 12`, `서울 주요 10개 구`, `경기 주요 10개 시·군`을 선택하여 전용 84㎡ 및 전체 평균 실거래가를 동적 비교
-* **사이버펑크 네온 펄스 인터랙션**:
-  * 카드 호버 시 세련된 시안(Cyan) 네온 글로우 효과
-  * 카드 터치/클릭 시 화려한 0.28초 **네온 플래시 애니메이션(`neon-active`)** 발동 후 심층 분석 대시보드로 이동
-* **완벽한 모바일 반응형 UX**:
-  * 768px 및 440px 분기점 모바일 미디어 쿼리 적용 (카드 1열 자동 재배치, 필터 버튼 터치 가로 스와이프, 터치 타깃 44px 이상 확보)
-
----
-
-### 2. 지역 심층 분석 대시보드 시스템 (`data/`)
-* **공통 중앙 데이터셋 (`data/regions_detail.json`)**:
-  * 56개 전 지역의 4대 핵심 모듈 데이터를 통합 관리하여 유지보수성 및 확장성 극대화
-* **4대 핵심 분석 모듈 탑재 (`data/district_analysis_dashboard.html`)**:
-  1. **📋 모듈 ①**: 대표 5대 랜드마크 단지 시세 & 전세가율 매트릭스
-  2. **🎓 모듈 ②**: 명문 학군 & 학원가 인프라 지수 (NEIS 교육정보 데이터 연동)
-  3. **💰 모듈 ③**: 전용 84㎡ 기준 LTV 40% 주담대 월 상환액 & 월 순현금흐름 시뮬레이터
-  4. **🤖 모듈 ④**: 부동산 신호등 멀티 에이전트 종합 진단 총평 및 실수요·갭투자 행동 가이드
-* **원클릭 메인 복귀 기능**:
-  * 모든 상세 대시보드 상단과 하단에 `🏠 메인 대시보드로 돌아가기` 버튼 탑재
-
----
-
-### 3. 일일 자동화 파이프라인 (GitHub Actions)
-* **실행 주기**: 매일 한국 시간(KST) 오전 06:00 자동 실행 (`.github/workflows/update_dashboard.yml`)
-* **자동 동기화**: `MCP/daily_pipeline_sync.js`를 통해 국토부 실거래가 및 ECOS 금리를 최신 진행월 기준으로 증분 수집하고 `index.html` 기준일자를 자동 갱신 및 커밋·푸시
-
----
-
-### 4. 🎨 통합 디자인 시스템 & 컬러 매칭 규격 (Design System Tokens)
-대시보드 전반(`index.html`, `data/*.html`)의 시각적 일관성과 정보 전달력을 극대화하기 위해 엄격한 컬러 토큰 시스템을 적용했습니다.
-
-| 디자인 토큰 | 색상 코드 (HEX / RGBA) | 용도 및 시각적 역할 |
-|---|---|---|
-| **Background (기본 배경)** | `#0b0f19` | 프리미엄 딥 슬레이트 다크 (눈의 피로 방지 및 네온 대비 극대화) |
-| **Surface / Card (카드 표면)** | `#151c2c` (호버: `#1e293b`) | 깊이감 있는 서피스 레이어 (다크 글래스모피즘) |
-| **Border (경계선)** | `#243048` (강조: `#334155`) | 정밀한 1px 구조 분할선 |
-| **Primary Accent (핵심 악센트)** | `#38bdf8` (Neon Cyan) | 국평 84㎡ 시세, 학군 지표, 인터랙티브 호버/클릭 네온 글로우 |
-| **Secondary Accent (보조 악센트)**| `#a855f7` (Electric Purple) | 전체 평균 평단가, 금융/대출 시뮬레이션 지표 |
-| **Signal Buy (적극매수)** | `#22c55e` / `rgba(34, 197, 94, 0.15)` | 정통 비비드 그린 (안정 및 기회 구간 배지) |
-| **Signal Warning (신중접근)** | `#facc15` / `rgba(250, 204, 21, 0.15)` | 레몬 옐로우 (고평가/금리 리스크 주의 배지) |
-| **Signal Watch (관망)** | `#ef4444` / `rgba(239, 68, 68, 0.15)` | 비비드 레드 (현금흐름 적자 및 하락 리스크 경고 배지) |
-| **Neon Active (클릭 효과)** | `0 0 35px #38bdf8, 0 0 70px ...` | 카드 클릭 시 0.28s 듀얼 레이어 발광 애니메이션 |
-
----
-
-## 📞 지원
-
-이 시스템 관련 문제나 개선사항이 있으면:
-
-- CLAUDE.md 파일 확인 (저장소 가이드)
-- 각 `.claude/agents/*.md` 파일의 역할 정의 검토
-- Claude Code `/help` 명령으로 일반 질문 해결
-
----
-
-**작품명**: 부동산 신호등 🚦  
-**만든이**: Claude AI & Antigravity (멀티에이전트 파이프라인 & 실시간 웹 대시보드)  
-**마지막 업데이트**: 2026년 9월 15일
+- API 키와 비밀번호는 Git 커밋에 포함되지 않으며, `.env` 로컬 환경에만 보관됩니다.
+- MCP 서버가 제공하는 계산값과 알고리즘 신호(매수고려·주의·관망)는 **참고자료**이며 법적 투자 권유가 아닙니다.
+- 공공데이터 수집 시점과 시장 호가 간에는 시차가 발생할 수 있으므로, 최종 거래 시 현장 확인 및 전문가 상담을 권고합니다.

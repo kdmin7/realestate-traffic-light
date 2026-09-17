@@ -1880,7 +1880,15 @@
         "price": "31.0억",
         "jeonse": "16.0억",
         "jeonseRate": "51.6%",
-        "signal": "주의"
+        "signal": "매수고려"
+      },
+      {
+        "name": "파크뷰 (정자)",
+        "area": "84㎡",
+        "price": "20.8억",
+        "jeonse": "11.5억",
+        "jeonseRate": "55.3%",
+        "signal": "매수고려"
       },
       {
         "name": "산운마을7단지 (판교)",
@@ -1891,11 +1899,11 @@
         "signal": "주의"
       },
       {
-        "name": "파크뷰 (정자)",
+        "name": "양지마을금호 (수내)",
         "area": "84㎡",
-        "price": "20.8억",
-        "jeonse": "11.5억",
-        "jeonseRate": "55.3%",
+        "price": "17.0억",
+        "jeonse": "8.0억",
+        "jeonseRate": "47.1%",
         "signal": "주의"
       },
       {
@@ -1904,14 +1912,6 @@
         "price": "16.5억",
         "jeonse": "7.5억",
         "jeonseRate": "45.5%",
-        "signal": "주의"
-      },
-      {
-        "name": "양지마을금호 (수내)",
-        "area": "84㎡",
-        "price": "17.0억",
-        "jeonse": "8.0억",
-        "jeonseRate": "47.1%",
         "signal": "주의"
       }
     ],

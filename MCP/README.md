@@ -3,6 +3,10 @@
 서울 25개 자치구 및 경기도 31개 시·군/구를 기준 단위로, 아파트 실거래가·전세가율·금리·학군·범죄율·생활인구를
 하나의 지표 체계로 조회하는 MCP 서버입니다. (`realestate-server.js`)
 
+서울과 경기도는 동일한 수도권 지역 집합으로 관리합니다. 지역명을 입력하면 내장 법정동코드 매핑으로
+서울(`11xxx`)·경기(`41xxx`)를 구분하고, 지역을 생략한 종합지표 조회는 양 지역의 표준 지역을 함께 취합합니다.
+메인 대시보드의 `REGION_DATA`도 서울 25개와 경기 31개를 합친 56개 단일 데이터셋으로 관리합니다.
+
 > ⚠️ **이 서버는 투자 조언을 하지 않습니다.** 공공데이터 지표를 조회·집계할 뿐이며,
 > 가중치와 최종 판단은 사용자 몫입니다. 과거 트렌드는 구조 파악용이지 미래 수익 보장이 아닙니다.
 > 설계 배경은 [설계도](design.html) 참고.
@@ -21,7 +25,7 @@
 | `get_crime_rate` | 자치구/시·구 5대 범죄율(인구 1천명당) | 경찰청 범죄 지역별 통계 | 파일(CSV) |
 | `get_living_population` | 자치구/시·구 생활인구(유동인구) 월별 추이·증감 | 서울/수도권 생활인구 | 파일(CSV) |
 | `get_region_income` | 자치구/시·구 평균 소득·연도별 추이 | KOSIS/국세청 시군구 소득 | 파일(CSV) |
-| `get_district_score` | **종합 스코어** — 위 지표를 0~100 정규화·가중합한 지역 순위 | (위 도구 종합) | 오케스트레이터 |
+| `get_district_score` | **수도권 종합 스코어** — 위 지표를 0~100 정규화·가중합한 지역 순위 | (위 도구 종합) | 오케스트레이터 |
 
 ### 2. 부동산 유형별 실거래가 & 청약 & 재무 계산 도구 ([tae0y/real-estate-mcp](https://github.com/tae0y/real-estate-mcp) 연동)
 | 도구 | 설명 | 데이터 소스 / 유형 |
@@ -80,16 +84,18 @@ npm install
 
 ## 파일 데이터 준비 (범죄·생활인구·소득)
 
-이 데이터들은 REST가 아니라 **벌크 CSV**라 직접 내려받아 둡니다:
+이 데이터들은 REST가 아니라 **벌크 CSV**로 운영되거나 전용 수집기로 자동 다운로드됩니다:
 
 ```
 data/
-├─ crime/         ← 경찰청_범죄 발생 지역별 통계 (연도별 CSV, 예: 2024.csv)
+├─ crime/         ← 경찰청_범죄 발생 지역별 통계 (연도별 CSV 및 JSON, 2012~2024 자동 수집)
 ├─ living_pop/    ← 자치구 단위 서울 생활인구 (LOCAL_PEOPLE_GU_YYYY.csv)
 └─ income/        ← 시군구 소득 통계 (KOSIS/국세청 CSV)
 ```
 
-- **범죄**: [경찰청_범죄 발생 지역별 통계](https://www.data.go.kr/data/3074462/fileData.do) → 연도별 CSV
+- **범죄 (자동 수집 지원)**: [경찰청_범죄 발생 지역별 통계 OpenAPI](https://infuser.odcloud.kr/oas/docs?namespace=3074462/v1)
+  - `npm run fetch:crime` 또는 `node fetch_crime.js` 실행 시 2012~2024년 13개 연도 전체를 `data/crime/`에 자동 수집 및 CSV/JSON 동기화합니다.
+  - MCP 도구 `collect_crime_data`를 통해서도 실시간 수집 가능합니다.
 - **생활인구**: [자치구 단위 서울 생활인구(내국인)](https://data.seoul.go.kr/dataList/OA-15439/S/1/datasetView.do) → zip 해제 후 CSV
 - **소득**: KOSIS 'e-지방지표 1인당 개인소득' 또는 국세청 시군구 소득 통계 → CSV (연도가 컬럼인 wide, 소득/연도 컬럼인 long 모두 지원)
 
@@ -100,10 +106,16 @@ data/
 ## 실행 · 등록
 
 ```bash
-# 직접 실행
+# 부동산 종합 MCP 서버 실행
 npm start
 # 또는
 npm run start:realty
+
+# 경찰청 범죄 데이터 전용 MCP 서버 실행
+npm run start:crime
+
+# 범죄 데이터 일괄 수집 CLI
+npm run fetch:crime
 
 # Claude Code / Desktop 에 등록
 claude mcp add seoul-realty \
@@ -111,6 +123,11 @@ claude mcp add seoul-realty \
   -e ECOS_API_KEY=한국은행_키 \
   -e NEIS_API_KEY=나이스_키 \
   -- node <경로>/realestate-server.js
+
+# 범죄 데이터 MCP 서버 단독 등록
+claude mcp add crime-mcp \
+  -e MOLIT_API_KEY=공공데이터포털_키 \
+  -- node <경로>/crime-collector-server.js
 ```
 
 ---

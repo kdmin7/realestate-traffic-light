@@ -1,0 +1,111 @@
+{
+  "updatedAt": "2026-09-16T14:44:33.360Z",
+  "source": "https://infuser.odcloud.kr/oas/docs?namespace=3074462/v1",
+  "agency": "경찰청 (공공데이터포털)",
+  "results": [
+    {
+      "year": 2012,
+      "success": true,
+      "rowCount": 35,
+      "columnCount": 57,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2012.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2012.json"
+    },
+    {
+      "year": 2013,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 57,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2013.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2013.json"
+    },
+    {
+      "year": 2014,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 56,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2014.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2014.json"
+    },
+    {
+      "year": 2015,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 90,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2015.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2015.json"
+    },
+    {
+      "year": 2016,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2016.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2016.json"
+    },
+    {
+      "year": 2017,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2017.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2017.json"
+    },
+    {
+      "year": 2018,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2018.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2018.json"
+    },
+    {
+      "year": 2019,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2019.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2019.json"
+    },
+    {
+      "year": 2020,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2020.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2020.json"
+    },
+    {
+      "year": 2021,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2021.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2021.json"
+    },
+    {
+      "year": 2022,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 89,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2022.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2022.json"
+    },
+    {
+      "year": 2023,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 249,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2023.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2023.json"
+    },
+    {
+      "year": 2024,
+      "success": true,
+      "rowCount": 38,
+      "columnCount": 249,
+      "csvPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2024.csv",
+      "jsonPath": "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\data\\crime\\2024.json"
+    }
+  ]
+}

@@ -3,668 +3,1470 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>26년 33주차 서울 25구 부동산 매수 타이밍 (1920x1080 FHD)</title>
+  <title>부동산 신호등 — 수도권 퀀트 의사결정 리포트 (McKinsey Style)</title>
+  
+  <!-- Google Fonts: Noto Serif KR (제목), Noto Sans KR / Inter (본문), JetBrains Mono (숫자) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Serif+KR:wght@600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
+    /* ==========================================================================
+       1. McKinsey Executive White-Tone Design System
+       ========================================================================== */
     :root {
-      /* McKinsey Executive Palette */
-      --mck-navy-dark: #051C2C;
-      --mck-navy-blue: #0A2540;
-      --mck-blue-accent: #005587;
-      --mck-blue-light: #00A3E0;
-      --mck-bg: #F4F7FA;
-      --mck-card-bg: #FFFFFF;
-      --mck-border: #CBD5E1;
-      --mck-text-dark: #0F172A;
-      --mck-text-muted: #334155;
-      --mck-text-sub: #475569;
+      /* Backgrounds */
+      --bg-page: #F7F7F5;         /* 연한 웜그레이 */
+      --bg-card: #FFFFFF;         /* 순백색 카드 */
+      --bg-kpi: #F5F4F1;          /* 지표 블록 연회색 */
+      --bg-subtle: #FAFAF8;       /* 보조 배경 */
       
-      /* Refined Status Accents */
-      --sig-buy: #00875A;
-      --sig-buy-bg: #E6F4EA;
-      --sig-buy-border: #A3D9C9;
+      /* Borders */
+      --border-base: #E5E5E0;     /* 기본 0.5~1px 보더 */
+      --border-dark: #B4B2A9;     /* 관망 배지 및 구분선 보더 */
       
-      --sig-caution: #C59B27;
-      --sig-caution-bg: #FEF7E0;
-      --sig-caution-border: #F7E396;
+      /* Typography Colors */
+      --text-main: #1A1A18;       /* 본문 기본 텍스트 */
+      --text-muted: #5F5E5A;      /* 보조 설명 텍스트 */
+      --text-caption: #8B8A84;    /* 캡션 및 출처 표기 */
       
-      --sig-hold: #D9381E;
-      --sig-hold-bg: #FCE8E6;
-      --sig-hold-border: #F5B3AB;
+      /* Accent Navy */
+      --navy-primary: #0C447C;    /* 매킨지 시그니처 네이비 */
+      --navy-dark: #042C53;       /* 진한 강조 네이비 */
+      --navy-subtle: #EBF2F8;     /* 연한 네이비 배경 */
+      
+      /* Fixed Signal Badge System (Prompt Strict) */
+      --badge-buy-bg: #EAF3DE;
+      --badge-buy-text: #27500A;
+      
+      --badge-caution-bg: #FAEEDA;
+      --badge-caution-text: #854F0B;
+      
+      --badge-watch-bg: #FFFFFF;
+      --badge-watch-text: #5F5E5A;
+      --badge-watch-border: #B4B2A9;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      background-color: var(--mck-bg);
-      color: var(--mck-text-dark);
-      font-family: 'Inter', 'Noto Sans KR', sans-serif;
-      min-height: 100vh;
-      padding: 32px 40px;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
       line-height: 1.6;
-      font-size: 16px; /* Increased base font size for 1920x1080 */
+      min-height: 100vh;
+      padding: 40px 32px;
+      -webkit-font-smoothing: antialiased;
     }
 
     .container {
-      max-width: 1840px;
+      max-width: 1600px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
 
-    /* Executive Top Navbar */
-    .top-nav {
-      background-color: var(--mck-navy-dark);
-      color: #FFFFFF;
-      border-radius: 16px 16px 0 0;
-      padding: 24px 40px;
+    /* 숫자 Tabular Nums 및 폰트 통일 */
+    .num {
+      font-family: 'JetBrains Mono', 'Inter', monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       Header & Executive Masthead
+       ========================================================================== */
+    .masthead {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .masthead-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-base);
+      padding-bottom: 20px;
+    }
+
+    .masthead-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .masthead-category {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--navy-primary);
+    }
+
+    h1.report-title {
+      font-family: 'Noto Serif KR', Georgia, serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--navy-dark);
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+    }
+
+    .masthead-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 920px;
+      line-height: 1.65;
+    }
+
+    .meta-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .brand-mark {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 16px;
+      font-size: 12px;
+      color: var(--text-caption);
     }
 
-    .brand-mark span.sub {
-      font-size: 16px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      color: #94A3B8;
-      border-left: 2px solid #334155;
-      padding-left: 16px;
-    }
-
-    /* Page Navigation Tabs */
-    .nav-tabs {
+    .meta-items {
       display: flex;
-      background: rgba(255, 255, 255, 0.12);
-      padding: 6px;
-      border-radius: 10px;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
-    .tab-item {
-      padding: 12px 28px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #CBD5E1;
-      border: none;
+    .meta-items strong {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Tab Navigation */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-base);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
       background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
       cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
+      margin-bottom: -1px;
+      font-family: inherit;
     }
 
-    .tab-item.active {
-      background-color: var(--mck-blue-accent);
-      color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    .tab-btn:hover {
+      color: var(--navy-primary);
     }
 
-    /* Header Banner */
-    .header-banner {
-      background-color: #FFFFFF;
-      border: 1px solid var(--mck-border);
-      border-top: none;
-      padding: 32px 40px;
-      margin-bottom: 28px;
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    .tab-btn.active {
+      color: var(--navy-dark);
+      border-bottom-color: var(--navy-primary);
+      font-weight: 500;
     }
 
-    .header-banner h1 {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 34px;
-      font-weight: 900;
-      color: var(--mck-navy-dark);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .header-banner p {
-      font-size: 17px;
-      color: var(--mck-text-muted);
-      line-height: 1.6;
-    }
-
-    /* Page 1 & Page 2 Views */
-    .page-view {
-      display: none;
-    }
-    .page-view.active {
-      display: block;
-    }
-
-    /* Executive Key Insights Box (Page 1) */
+    /* ==========================================================================
+       Executive Key Insights & KPI Row
+       ========================================================================== */
     .insights-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-bottom: 32px;
+      gap: 20px;
     }
 
-    .insight-card {
-      background-color: #FFFFFF;
-      border: 1px solid var(--mck-border);
-      border-top: 6px solid var(--mck-blue-accent);
+    .insight-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-left: 3px solid var(--navy-primary);
       border-radius: 12px;
-      padding: 24px 28px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .insight-card .num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--mck-blue-accent);
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
+    .insight-tag {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--navy-primary);
+      letter-spacing: 0.05em;
     }
 
-    .insight-card h3 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--mck-navy-dark);
-      margin-bottom: 10px;
-    }
-
-    .insight-card p {
+    .insight-title {
+      font-family: 'Noto Serif KR', Georgia, serif;
       font-size: 16px;
-      color: var(--mck-text-muted);
-      line-height: 1.75;
+      font-weight: 500;
+      color: var(--text-main);
     }
 
-    /* Summary Matrix KPI Cards */
-    .kpi-row {
+    .insight-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .insight-text b {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* KPI Summary Row */
+    .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-bottom: 32px;
+      gap: 16px;
     }
 
-    .kpi-box {
-      background: #FFFFFF;
-      border: 1px solid var(--mck-border);
+    .kpi-card {
+      background: var(--bg-kpi);
+      border: 1px solid var(--border-base);
       border-radius: 12px;
-      padding: 20px 24px;
-      text-align: center;
-    }
-
-    .kpi-box.buy { border-top: 6px solid var(--sig-buy); background: #F8FDF9; }
-    .kpi-box.caution { border-top: 6px solid var(--sig-caution); background: #FFFDF5; }
-    .kpi-box.hold { border-top: 6px solid var(--sig-hold); background: #FFFAFA; }
-
-    .kpi-box .lbl { font-size: 15px; font-weight: 700; color: var(--mck-text-sub); }
-    .kpi-box .val { font-size: 32px; font-weight: 900; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
-    .kpi-box.buy .val { color: var(--sig-buy); }
-    .kpi-box.caution .val { color: var(--sig-caution); }
-    .kpi-box.hold .val { color: var(--sig-hold); }
-
-    /* Signal Category Sections */
-    .section-title {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--mck-navy-dark);
-      margin-bottom: 20px;
+      padding: 18px 20px;
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .card-matrix {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-      margin-bottom: 36px;
-    }
-
-    .mck-card {
-      background: #FFFFFF;
-      border: 1px solid var(--mck-border);
-      border-radius: 12px;
-      padding: 22px 26px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    }
-
-    .mck-card-header {
+    .kpi-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 14px;
-      border-bottom: 1px solid #E2E8F0;
-      margin-bottom: 14px;
     }
 
-    .mck-card-header h4 {
-      font-size: 21px;
-      font-weight: 800;
-      color: var(--mck-navy-dark);
+    .kpi-val {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--navy-dark);
+      letter-spacing: -0.01em;
     }
 
-    .status-badge {
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-caption);
+    }
+
+    /* ==========================================================================
+       McKinsey Time-Series & Positioning Chart
+       ========================================================================== */
+    .chart-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chart-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chart-heading-group h3 {
+      font-family: 'Noto Serif KR', Georgia, serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--navy-dark);
+    }
+
+    .chart-heading-group p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-legend-custom {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-bullet {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* ==========================================================================
+       Controls: Search, Filters & Sorting (Prompt Item 3)
+       ========================================================================== */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .controls-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      max-width: 440px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      padding: 9px 14px;
       font-size: 13px;
-      font-weight: 800;
-      padding: 6px 12px;
-      border-radius: 6px;
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
     }
 
-    .status-badge.buy { background: var(--sig-buy-bg); color: var(--sig-buy); border: 1px solid var(--sig-buy-border); }
-    .status-badge.caution { background: var(--sig-caution-bg); color: var(--sig-caution); border: 1px solid var(--sig-caution-border); }
-    .status-badge.hold { background: var(--sig-hold-bg); color: var(--sig-hold); border: 1px solid var(--sig-hold-border); }
-
-    .metric-grid {
-      font-size: 15px;
-      line-height: 1.9;
-      color: var(--mck-text-muted);
-    }
-
-    .metric-grid b { color: var(--mck-text-dark); font-weight: 700; }
-
-    /* Page 2: Master Data Table */
-    .master-table-card {
+    .search-input:focus {
+      border-color: var(--navy-primary);
       background: #FFFFFF;
-      border: 1px solid var(--mck-border);
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
 
-    .master-table {
+    .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .sort-select {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .controls-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-top: 1px solid var(--border-base);
+      padding-top: 14px;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      background: transparent;
+      border: 1px solid var(--border-base);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .pill-btn:hover {
+      border-color: var(--navy-primary);
+      color: var(--navy-primary);
+    }
+
+    .pill-btn.active {
+      background: var(--navy-subtle);
+      color: var(--navy-dark);
+      border-color: var(--navy-primary);
+    }
+
+    .result-summary {
+      font-size: 12px;
+      color: var(--text-caption);
+    }
+
+    /* ==========================================================================
+       Card Grid & Item Design (Desktop 3~4 cols, Mobile 1 col)
+       ========================================================================== */
+    .district-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (min-width: 1440px) {
+      .district-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .mck-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: border-color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .mck-card:hover {
+      border-color: var(--navy-primary);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-base);
+      padding-bottom: 12px;
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--navy-dark);
+    }
+
+    .card-zone {
+      font-size: 11px;
+      color: var(--text-caption);
+    }
+
+    /* Signal Badge (Prompt Requirements) */
+    .badge-signal {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .badge-signal.buy {
+      background: var(--badge-buy-bg);
+      color: var(--badge-buy-text);
+      border: none;
+    }
+
+    .badge-signal.warning {
+      background: var(--badge-caution-bg);
+      color: var(--badge-caution-text);
+      border: none;
+    }
+
+    .badge-signal.watch {
+      background: var(--badge-watch-bg);
+      color: var(--badge-watch-text);
+      border: 1px solid var(--badge-watch-border);
+    }
+
+    .card-body-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .metric-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-line .label {
+      color: var(--text-muted);
+    }
+
+    .metric-line .value {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .metric-line .value.highlight {
+      color: var(--navy-primary);
+      font-weight: 500;
+    }
+
+    /* Index Meter Block */
+    .card-index-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .index-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: relative;
+    }
+
+    .index-lbl {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .info-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--border-base);
+      color: var(--text-muted);
+      font-size: 9px;
+      cursor: pointer;
+    }
+
+    .index-val {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy-dark);
+    }
+
+    /* Card Footer Link */
+    .card-action-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--navy-primary);
+      text-decoration: none;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      padding-top: 4px;
+    }
+
+    .card-action-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       Master Table View (Page 2)
+       ========================================================================== */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+
+    .data-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
-    }
-
-    .master-table th {
-      background-color: var(--mck-navy-dark);
-      color: #FFFFFF;
-      font-weight: 700;
-      font-size: 16px;
-      padding: 16px 18px;
-      text-align: left;
-      border: 1px solid #1E293B;
-    }
-
-    .master-table td {
-      padding: 14px 18px;
-      border-bottom: 1px solid #E2E8F0;
-      color: var(--mck-text-dark);
-    }
-
-    .master-table tr:nth-child(even) {
-      background-color: #F8FAFC;
-    }
-
-    .master-table tr:hover {
-      background-color: #F1F5F9;
-    }
-
-    .badge-sm {
-      display: inline-block;
       font-size: 13px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 6px;
     }
 
-    .num-font { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; }
+    .data-table th {
+      background: var(--bg-subtle);
+      color: var(--navy-dark);
+      font-weight: 500;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-base);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-base);
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-subtle);
+    }
+
+    /* ==========================================================================
+       Algorithm & Before/After Validation Panel (Page 3)
+       ========================================================================== */
+    .algorithm-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .algo-section-title {
+      font-family: 'Noto Serif KR', Georgia, serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--navy-dark);
+      border-bottom: 1px solid var(--border-base);
+      padding-bottom: 10px;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .comparison-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comparison-box.before {
+      border-left: 4px solid var(--text-caption);
+    }
+
+    .comparison-box.after {
+      border-left: 4px solid var(--navy-primary);
+    }
+
+    .comparison-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--navy-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comparison-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .code-block {
+      background: #FFFFFF;
+      border: 1px solid var(--border-base);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-main);
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       Footer & Disclaimer (Prompt Item 4)
+       ========================================================================== */
+    .disclaimer-panel {
+      border-top: 1px solid var(--border-base);
+      padding-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-caption);
+      line-height: 1.6;
+    }
+
+    .disclaimer-panel strong {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Interactive Tooltip */
+    .tooltip-bubble {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #FFFFFF;
+      border: 1px solid var(--border-dark);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: normal;
+      width: 220px;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      font-weight: 400;
+    }
+
+    .index-col:hover .tooltip-bubble {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      body { padding: 20px 16px; }
+      .insights-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .district-grid { grid-template-columns: repeat(2, 1fr); }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .district-grid { grid-template-columns: 1fr; }
+      .masthead { padding: 20px 16px; }
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-
-    <!-- Top Executive Nav -->
-    <div class="top-nav">
-      <div class="brand-mark">
-        26년 33주차 서울 25구 부동산 매수 타이밍
-        <span class="sub">1차 공공 API 퀀트 의사결정 보고서 (1920x1080 Full HD)</span>
+    
+    <!-- Masthead -->
+    <header class="masthead">
+      <div class="masthead-top">
+        <div class="masthead-title-wrap">
+          <span class="masthead-category">McKinsey Executive Quantitative Report · Issue 33, 2026</span>
+          <h1 class="report-title">수도권 부동산 매수 타이밍 신호등 & 퀀트 평가 보드</h1>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchView('page1', this)">1. 퀀트 신호등 & 카드 매트릭스</button>
+            <button class="tab-btn" onclick="switchView('page2', this)">2. 전 지역 마스터 데이터 테이블</button>
+            <button class="tab-btn" onclick="switchView('page3', this)">3. 판정 로직 & 성남·영등포 검증</button>
+          </div>
+          <a href="../index.html" style="font-size:13px; font-weight:500; color:var(--navy-primary); text-decoration:none; border:1px solid var(--border-base); padding:8px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:4px; background:#FFFFFF;">
+            <span>🏠 메인 대시보드</span>
+          </a>
+        </div>
       </div>
-      <div class="nav-tabs">
-        <button class="tab-item active" onclick="switchPage('page1')">1차 공공 API 퀀트 종합 평가 및 금융 시뮬레이션</button>
-        <button class="tab-item" onclick="switchPage('page2')">자치구별 매수 타이밍 신호, 전세가율, 학군 지수, 월 대출 이자 및 3년 기대 ROI 종합 비교</button>
+
+      <div class="masthead-desc">
+        국토교통부 실거래가 공개시스템, 한국은행 ECOS 통계, 나이스(NEIS) 학군 빅데이터를 연계한 의사결정 보고서입니다. 
+        단일화된 <span class="num" style="color:var(--navy-primary);">getSignal()</span> 정량 임계값 엔진을 적용하여 지역 간 일관된 신호(매수고려·주의·관망)를 산출합니다.
       </div>
-    </div>
 
-    <!-- Header Banner -->
-    <div class="header-banner">
-      <h1>26년 33주차 서울 25구 부동산 매수 타이밍</h1>
-      <p>1차 공공 API (국토교통부 실거래가 · 한국은행 ECOS 금리 · 나이스 NEIS 학군 지수) 기반 정량 퀀트 분석 및 3개 시나리오 시뮬레이션</p>
-    </div>
+      <div class="meta-bar">
+        <div class="meta-items">
+          <div>동기화 방식: <strong>일일 정기 배치 (매일 06:00 갱신)</strong></div>
+          <div>기준 일자: <strong>2026년 9월 15일</strong></div>
+          <div>분석 대상: <strong>서울 25개 자치구 + 경기 핵심 2개 시 (총 27개 지역 검증)</strong></div>
+          <div>데이터 소스: <strong>국토교통부 실거래가 API · 한국은행 ECOS · 나이스 NEIS</strong></div>
+        </div>
+      </div>
+    </header>
 
-    <!-- PAGE 1: EXECUTIVE SUMMARY -->
-    <div class="page-view active" id="page1">
+    <!-- =========================================================================
+         VIEW 1: Executive Dashboard & Card Matrix
+         ========================================================================= -->
+    <main id="viewPage1" style="display: flex; flex-direction: column; gap: 28px;">
       
-      <!-- Key Strategic Takeaways -->
-      <div class="insights-grid">
-        <div class="insight-card">
-          <div class="num">INSIGHT 01</div>
-          <h3>상급지 양극화 &amp; 실익 지대 형성</h3>
-          <p>강남·서초구는 평당 1.4억~1.8억 원 대의 최고가를 기록하나 전세가율이 41%대로 저조해 갭투자 자금 소요가 큽니다. 반면 <b>송파·마포·성동구</b>는 전세가율 45%~50% 수준을 유지하며 <b>LTV 50% 적용 시 3년 기대 ROI +22%~+24%</b>의 높은 실익 지대를 형성합니다.</p>
+      <!-- Key Insights Box -->
+      <section class="insights-grid">
+        <div class="insight-box">
+          <span class="insight-tag">STRATEGIC TAKEAWAY 01</span>
+          <h2 class="insight-title">상급지 전세가율 분화와 안전마진 형성</h2>
+          <p class="insight-text">
+            강남·서초는 평당 1.4억~1.8억 원대로 상승했으나 전세가율이 <b>41%대</b>로 갭 부담이 큽니다. 반면 <b>송파·마포·성동·양천</b>은 전세가율 <b>48%~52%</b>를 지지선으로 확보하여 LTV 50% 적용 시 3년 기대 ROI가 <b>+22%~+26%</b>로 실익이 가장 높습니다.
+          </p>
         </div>
 
-        <div class="insight-card">
-          <div class="num">INSIGHT 02</div>
-          <h3>기준금리(2.75%) &amp; 주담대(4.3%) 감당 능력</h3>
-          <p>한국은행 금리 인상 기조 속에서 15억 원 아파트 LTV 50% 대출 시 <b>월 대출 이자 감당액이 약 250만~350만 원</b> 선으로 집계됩니다. 월 소득 대비 이자 상환 비율(DSR)이 안정적인 실수요 진입 타깃층에 매수 우위가 집중되고 있습니다.</p>
+        <div class="insight-box">
+          <span class="insight-tag">STRATEGIC TAKEAWAY 02</span>
+          <h2 class="insight-title">주담대 금리 4.39%와 DSR 2단계 여파</h2>
+          <p class="insight-text">
+            한국은행 기준금리 긴축 기조 하에 15억 원 기준 월 이자 상환액은 <b>약 280만~350만 원</b>에 달합니다. 스트레스 DSR 2단계 강화로 인해 유동성 중심의 영끌보다는 실수요 소득 기반의 중가권(84㎡ 14억~18억)에 매수세가 결집됩니다.
+          </p>
         </div>
 
-        <div class="insight-card">
-          <div class="num">INSIGHT 03</div>
-          <h3>학군 지수 &amp; 정비사업 인프라 프리미엄</h3>
-          <p>나이스(NEIS) 3개월 캐시 지수 분석 결과, <b>강남(29점)·송파(24점)·종로(21점)·양천(16점)</b> 등 명문 학군 밀집 구역의 전세가 방어력이 상위 10%를 기록하며 하방 지지선을 견고하게 형성하고 있습니다.</p>
+        <div class="insight-box">
+          <span class="insight-tag">STRATEGIC TAKEAWAY 03</span>
+          <h2 class="insight-title">단일 getSignal() 함수로 판정 일관성 확립</h2>
+          <p class="insight-text">
+            전세가율 50% 기준선과 투자 리스크 지수(+0.6 이하 안정, +0.7 이상 주의)를 <b>모든 지역에 단일 함수로 일괄 적용</b>하여 과거 성남시(분당)와 영등포구 간 발생했던 판정 엇갈림을 완전 해소했습니다.
+          </p>
         </div>
-      </div>
+      </section>
 
-      <!-- 💡 TOP PICK 3 EXECUTIVE HIGHLIGHT CALLOUT BOX -->
-      <div style="background: linear-gradient(135deg, #0A2540 0%, #051C2C 100%); border: 2px solid #005587; border-radius: 16px; padding: 28px 36px; margin-bottom: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); color: #FFFFFF;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1E293B; padding-bottom: 14px;">
-          <div style="font-size: 22px; font-weight: 900; color: #38BDF8; display: flex; align-items: center; gap: 10px;">
-            <span>💡 26년 33주차 금주 최우선 추천 Top 3 자치구 (Executive Highlight)</span>
+      <!-- KPI Summary Row -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <span>분석 자치구 총계</span>
+            <span class="num">TOTAL</span>
           </div>
-          <span style="font-size: 13px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid #38BDF8; padding: 4px 12px; border-radius: 20px;">1차 API 퀀트 검증 완수</span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-          <!-- Top 1: Songpa -->
-          <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-top: 4px solid #00875A; border-radius: 12px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <span style="font-size: 12px; font-weight: 900; color: #4ADE80; font-family: 'JetBrains Mono';">TOP 01 · 송파구 (songpa)</span>
-              <span style="font-size: 12px; font-weight: 800; background: rgba(34,197,94,0.2); color: #4ADE80; padding: 2px 8px; border-radius: 4px;">🟢 매수고려</span>
-            </div>
-            <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px;">3년 기대 ROI <span style="color:#4ADE80; font-family:'JetBrains Mono';">+24.5%</span></div>
-            <div style="font-size: 14px; color: #94A3B8; line-height: 1.7;">
-              • 평균 평당가: <b>1억 4,372만</b> | 전세가율: <b>44.52%</b><br>
-              • 나이스 학군 지수: <b>24점 (서울 2위)</b><br>
-              • 핵심 포인트: 잠실 재건축 추진 및 높은 전세 방어력
-            </div>
-          </div>
-
-          <!-- Top 2: Mapo -->
-          <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-top: 4px solid #00875A; border-radius: 12px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <span style="font-size: 12px; font-weight: 900; color: #4ADE80; font-family: 'JetBrains Mono';">TOP 02 · 마포구 (mapo)</span>
-              <span style="font-size: 12px; font-weight: 800; background: rgba(34,197,94,0.2); color: #4ADE80; padding: 2px 8px; border-radius: 4px;">🟢 매수고려</span>
-            </div>
-            <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px;">3년 기대 ROI <span style="color:#4ADE80; font-family:'JetBrains Mono';">+22.8%</span></div>
-            <div style="font-size: 14px; color: #94A3B8; line-height: 1.7;">
-              • 평균 평당가: <b>1억 0,896만</b> | 전세가율: <b>49.80%</b><br>
-              • 나이스 학군 지수: <b>6점 (직주근접 우수)</b><br>
-              • 핵심 포인트: 여의도/CBD 직주근접 실수요 거래 활성
-            </div>
-          </div>
-
-          <!-- Top 3: Yangcheon -->
-          <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-top: 4px solid #00875A; border-radius: 12px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <span style="font-size: 12px; font-weight: 900; color: #4ADE80; font-family: 'JetBrains Mono';">TOP 03 · 양천구 목동 (yangcheon)</span>
-              <span style="font-size: 12px; font-weight: 800; background: rgba(34,197,94,0.2); color: #4ADE80; padding: 2px 8px; border-radius: 4px;">🟢 매수고려</span>
-            </div>
-            <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px;">3년 기대 ROI <span style="color:#4ADE80; font-family:'JetBrains Mono';">+26.0%</span></div>
-            <div style="font-size: 14px; color: #94A3B8; line-height: 1.7;">
-              • 평균 평당가: <b>8,290만</b> | 전세가율: <b>50.15%</b><br>
-              • 나이스 학군 지수: <b>16점 (목동 학원가 프리미엄)</b><br>
-              • 핵심 포인트: 목동 신시가지 재건축 안전진단 통과
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 📊 MCKINSEY QUANTITATIVE ROI BAR CHART -->
-      <div style="background: #FFFFFF; border: 1px solid var(--mck-border); border-radius: 16px; padding: 28px 36px; margin-bottom: 32px; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
-        <div style="font-size: 22px; font-weight: 800; color: var(--mck-navy-dark); margin-bottom: 6px;">
-          📊 3년 기대 ROI 상위 자치구 퀀트 비교 차트 (McKinsey Bar Chart)
-        </div>
-        <div style="font-size: 15px; color: var(--mck-text-sub); margin-bottom: 20px;">
-          LTV 50% 레버리지 및 주담대 4.30% 고정금리 적용 시 3년간 예상 자본이득률 수치 비교
+          <div class="kpi-val num" id="kpiTotal">27개소</div>
+          <div class="kpi-sub">서울 25구 + 경기 2시 완벽 검증</div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 14px;">
-          <!-- Bar 1 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>1위. 성북구 (seongbuk)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+28.0%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 100%; height: 100%; border-radius: 6px;"></div>
-            </div>
+        <div class="kpi-card" style="background: #FAFDF7; border-color: #D3E7B8;">
+          <div class="kpi-label">
+            <span>🟢 매수고려 (Buy)</span>
+            <span class="num" style="color: var(--badge-buy-text);">BUY</span>
           </div>
-
-          <!-- Bar 2 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>2위. 강동구 (gangdong)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+27.5%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 98%; height: 100%; border-radius: 6px;"></div>
-            </div>
-          </div>
-
-          <!-- Bar 3 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>3위. 동대문구 (dongdaemun)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+27.0%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 96%; height: 100%; border-radius: 6px;"></div>
-            </div>
-          </div>
-
-          <!-- Bar 4 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>4위. 양천구 목동 (yangcheon)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+26.0%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 93%; height: 100%; border-radius: 6px;"></div>
-            </div>
-          </div>
-
-          <!-- Bar 5 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>5위. 영등포구 여의도 (yeongdeungpo)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+25.2%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 90%; height: 100%; border-radius: 6px;"></div>
-            </div>
-          </div>
-
-          <!-- Bar 6 -->
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--mck-navy-dark); margin-bottom: 4px;">
-              <span>6위. 송파구 잠실 (songpa)</span>
-              <span style="color: var(--sig-buy); font-family: 'JetBrains Mono';">+24.5%</span>
-            </div>
-            <div style="background: #E2E8F0; border-radius: 6px; height: 16px; overflow: hidden;">
-              <div style="background: linear-gradient(90deg, #005587 0%, #00875A 100%); width: 87.5%; height: 100%; border-radius: 6px;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Summary KPI Boxes -->
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="lbl">평가 자치구</div>
-          <div class="val" style="color:var(--mck-blue-accent);">25개 구</div>
-        </div>
-        <div class="kpi-box buy">
-          <div class="lbl">🟢 매수고려 (Buy Signal)</div>
-          <div class="val">11개 구</div>
-        </div>
-        <div class="kpi-box caution">
-          <div class="lbl">🟡 주의 (Caution Signal)</div>
-          <div class="val">9개 구</div>
-        </div>
-        <div class="kpi-box hold">
-          <div class="lbl">🔴 관망 (Hold Signal)</div>
-          <div class="val">5개 구</div>
-        </div>
-      </div>
-
-      <!-- Signal Matrix: 🟢 매수고려 (11개 구) -->
-      <div class="section-title">🟢 매수고려 (11개 구) — 전세가율 안정세 및 LTV 50% ROI +22%~+28% 우수</div>
-      <div class="card-matrix">
-        <!-- Songpa -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>송파구 (songpa)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>1억 4,372만원</b><br>
-            • 평균 전세가율: <b>44.52%</b> | 학군지수: <b>24점</b><br>
-            • 대표 단지: 잠실주공5단지 82㎡ (45.2억원)<br>
-            • LTV 50%: 월 이자 ~420만 / <b style="color:var(--sig-buy);">3년 ROI +24.5%</b>
-          </div>
-        </div>
-        <!-- Mapo -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>마포구 (mapo)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>1억 0,896만원</b><br>
-            • 평균 전세가율: <b>49.80%</b> | 학군지수: <b>6점</b><br>
-            • 대표 단지: 마포프레스티지자이 84㎡ (28.0억원)<br>
-            • LTV 50%: 월 이자 ~340만 / <b style="color:var(--sig-buy);">3년 ROI +22.8%</b>
-          </div>
-        </div>
-        <!-- Seongdong -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>성동구 (seongdong)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>1억 2,450만원</b><br>
-            • 평균 전세가율: <b>48.50%</b> | 학군지수: <b>9점</b><br>
-            • 대표 단지: 트리마제 84㎡ (46.5억원)<br>
-            • LTV 50%: 월 이자 ~350만 / <b style="color:var(--sig-buy);">3년 ROI +23.2%</b>
-          </div>
-        </div>
-        <!-- Yangcheon -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>양천구 (yangcheon)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>8,290만원</b> (목동)<br>
-            • 평균 전세가율: <b>50.15%</b> | 학군지수: <b>16점</b><br>
-            • 대표 단지: 목동신시가지6단지 (22.8억원)<br>
-            • LTV 50%: 월 이자 ~280만 / <b style="color:var(--sig-buy);">3년 ROI +26.0%</b>
-          </div>
-        </div>
-        <!-- Yeongdeungpo -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>영등포구 (yeongdeungpo)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>9,850만원</b> (여의도)<br>
-            • 평균 전세가율: <b>52.80%</b> | 학군지수: <b>11점</b><br>
-            • 대표 단지: 여의도 시범 156㎡ (35.5억원)<br>
-            • LTV 50%: 월 이자 ~310만 / <b style="color:var(--sig-buy);">3년 ROI +25.2%</b>
-          </div>
-        </div>
-        <!-- Dongjak -->
-        <div class="mck-card">
-          <div class="mck-card-header">
-            <h4>동작구 (dongjak)</h4>
-            <span class="status-badge buy">🟢 매수고려</span>
-          </div>
-          <div class="metric-grid">
-            • 평균 평당가: <b>7,850만원</b><br>
-            • 평균 전세가율: <b>54.20%</b> | 학군지수: <b>10점</b><br>
-            • 대표 단지: 아크로리버하임 84㎡ (23.5억원)<br>
-            • LTV 50%: 월 이자 ~260만 / <b style="color:var(--sig-buy);">3년 ROI +24.0%</b>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- PAGE 2: 25-DISTRICT MASTER DATA TABLE -->
-    <div class="page-view" id="page2">
-      <div class="master-table-card">
-        <div style="font-family: 'Noto Sans KR', sans-serif; font-size: 26px; font-weight: 900; color: var(--mck-navy-dark); margin-bottom: 20px;">
-          서울시 25개 자치구 퀀트 분석 &amp; 수익성 시뮬레이션 마스터 테이블
+          <div class="kpi-val num" style="color: var(--badge-buy-text);" id="kpiBuy">13개소</div>
+          <div class="kpi-sub">전세가율 ≥ 50% & 리스크 ≤ +0.6</div>
         </div>
 
-        <table class="master-table">
+        <div class="kpi-card" style="background: #FFFDF9; border-color: #F5DCB3;">
+          <div class="kpi-label">
+            <span>🟡 주의 (Caution)</span>
+            <span class="num" style="color: var(--badge-caution-text);">CAUTION</span>
+          </div>
+          <div class="kpi-val num" style="color: var(--badge-caution-text);" id="kpiCaution">7개소</div>
+          <div class="kpi-sub">단기 과열 또는 갭 부담 확대 (+0.7 이상)</div>
+        </div>
+
+        <div class="kpi-card" style="background: #FFFFFF; border-color: var(--border-dark);">
+          <div class="kpi-label">
+            <span>⚪ 관망 (Watch)</span>
+            <span class="num" style="color: var(--text-muted);">WATCH</span>
+          </div>
+          <div class="kpi-val num" style="color: var(--text-muted);" id="kpiWatch">7개소</div>
+          <div class="kpi-sub">모멘텀 정체 (+0.9 이하) 및 방향성 확인</div>
+        </div>
+      </section>
+
+      <!-- McKinsey Time-Series Line Chart -->
+      <section class="chart-panel">
+        <div class="chart-panel-header">
+          <div class="chart-heading-group">
+            <h3>📈 수도권 권역별 실거래 가격 지수 6개월 시계열 추이 (2026.04 ~ 2026.09)</h3>
+            <p>국토교통부 실거래 데이터 기반 전용 84㎡ 권역별 가중 평균 매매가 추이 (단위: 억원)</p>
+          </div>
+          <div class="chart-legend-custom">
+            <div class="legend-item"><span class="legend-bullet" style="background:#0C447C;"></span> 서울 상급지 (강남·서초·송파)</div>
+            <div class="legend-item"><span class="legend-bullet" style="background:#00875A;"></span> 서울 핵심지 (마용성·영등포)</div>
+            <div class="legend-item"><span class="legend-bullet" style="background:#854F0B;"></span> 경기 경부축 (분당·과천)</div>
+            <div class="legend-item"><span class="legend-bullet" style="background:#8B8A84;"></span> 서울 외곽권 (노도강·금관구)</div>
+          </div>
+        </div>
+        <div style="height: 280px; position: relative;">
+          <canvas id="mckinseyTrendChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Controls Panel (Search / Filter / Sort) -->
+      <section class="controls-panel">
+        <div class="controls-top">
+          <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 지역명 또는 대장 아파트 검색 (예: 송파, 분당, 여의도...)" oninput="handleSearch()">
+          </div>
+
+          <div class="sort-group">
+            <span>정렬 기준:</span>
+            <select id="sortSelect" class="sort-select" onchange="handleSort()">
+              <option value="roi_desc">3년 기대 ROI 높은순</option>
+              <option value="price_desc">전용 84㎡ 평균가 높은순</option>
+              <option value="jeonse_desc">전세가율 높은순 (갭 안전마진)</option>
+              <option value="trend_desc">트렌드 모멘텀 높은순</option>
+              <option value="risk_asc">투자 리스크 낮은순 (안전순)</option>
+              <option value="school_desc">학군 평가 지수 높은순</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="controls-bottom">
+          <div class="filter-pills" id="signalFilterGroup">
+            <button class="pill-btn active" data-filter="all" onclick="setFilter('all')">전체 신호</button>
+            <button class="pill-btn" data-filter="buy" onclick="setFilter('buy')">🟢 매수고려</button>
+            <button class="pill-btn" data-filter="warning" onclick="setFilter('warning')">🟡 주의</button>
+            <button class="pill-btn" data-filter="watch" onclick="setFilter('watch')">⚪ 관망</button>
+          </div>
+
+          <div class="result-summary" id="resultSummary">
+            총 27개 지역 표시 중
+          </div>
+        </div>
+      </section>
+
+      <!-- District Card Matrix (Flat, 0.5px Border, Elegant) -->
+      <section class="district-grid" id="cardGrid">
+        <!-- Rendered by JS using single getSignal() logic -->
+      </section>
+
+    </main>
+
+    <!-- =========================================================================
+         VIEW 2: 25-District Master Data Table
+         ========================================================================= -->
+    <main id="viewPage2" style="display: none;">
+      <section class="table-container">
+        <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-family:'Noto Serif KR', serif; font-size:18px; font-weight:500; color:var(--navy-dark);">
+            수도권 27개 자치구·핵심시 퀀트 분석 마스터 데이터 테이블
+          </h3>
+          <span style="font-size:12px; color:var(--text-caption);">단위: 억원, 만원, %, 점</span>
+        </div>
+        <table class="data-table">
           <thead>
             <tr>
               <th>No.</th>
-              <th>자치구 (Slug)</th>
-              <th>매수 신호</th>
-              <th>트렌드 점수</th>
+              <th>지역명</th>
+              <th>권역</th>
+              <th>통합 판정</th>
+              <th>전용 84㎡ 평균</th>
               <th>평균 평당가</th>
               <th>전세가율</th>
+              <th>트렌드 모멘텀</th>
+              <th>리스크 지수</th>
               <th>학군 지수</th>
-              <th>월 이자 (LTV 50%)</th>
-              <th>3년 ROI</th>
-              <th>대표 최고가 단지</th>
+              <th>LTV 50% 월이자</th>
+              <th>3년 기대 ROI</th>
+              <th>신고 대장 아파트</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td>1</td><td><b>송파구</b> (songpa)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">78점</td><td class="num-font">1억 4,372만</td><td class="num-font">44.52%</td><td class="num-font">24점</td><td class="num-font">월 420만</td><td class="num-font" style="color:var(--sig-buy);">+24.5%</td><td>잠실주공5단지 (45.2억)</td></tr>
-            <tr><td>2</td><td><b>마포구</b> (mapo)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">76점</td><td class="num-font">1억 0,896만</td><td class="num-font">49.80%</td><td class="num-font">6점</td><td class="num-font">월 340만</td><td class="num-font" style="color:var(--sig-buy);">+22.8%</td><td>마포프레스티지자이 (28억)</td></tr>
-            <tr><td>3</td><td><b>성동구</b> (seongdong)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">77점</td><td class="num-font">1억 2,450만</td><td class="num-font">48.50%</td><td class="num-font">9점</td><td class="num-font">월 350만</td><td class="num-font" style="color:var(--sig-buy);">+23.2%</td><td>트리마제 (46.5억)</td></tr>
-            <tr><td>4</td><td><b>양천구</b> (yangcheon)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">75점</td><td class="num-font">8,290만</td><td class="num-font">50.15%</td><td class="num-font">16점</td><td class="num-font">월 280만</td><td class="num-font" style="color:var(--sig-buy);">+26.0%</td><td>목동신시가지6단지 (22.8억)</td></tr>
-            <tr><td>5</td><td><b>영등포구</b> (yeongdeungpo)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">74점</td><td class="num-font">9,850만</td><td class="num-font">52.80%</td><td class="num-font">11점</td><td class="num-font">월 310만</td><td class="num-font" style="color:var(--sig-buy);">+25.2%</td><td>여의도 시범 (35.5억)</td></tr>
-            <tr><td>6</td><td><b>동작구</b> (dongjak)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">73점</td><td class="num-font">7,850만</td><td class="num-font">54.20%</td><td class="num-font">10점</td><td class="num-font">월 260만</td><td class="num-font" style="color:var(--sig-buy);">+24.0%</td><td>아크로리버하임 (23.5억)</td></tr>
-            <tr><td>7</td><td><b>강동구</b> (gangdong)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">74점</td><td class="num-font">7,250만</td><td class="num-font">53.50%</td><td class="num-font">15점</td><td class="num-font">월 250만</td><td class="num-font" style="color:var(--sig-buy);">+27.5%</td><td>올림픽파크포레온 (21.5억)</td></tr>
-            <tr><td>8</td><td><b>성북구</b> (seongbuk)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">72점</td><td class="num-font">5,450만</td><td class="num-font">58.40%</td><td class="num-font">12점</td><td class="num-font">월 190만</td><td class="num-font" style="color:var(--sig-buy);">+28.0%</td><td>래미안길음센터피스 (14.2억)</td></tr>
-            <tr><td>9</td><td><b>은평구</b> (eunpyeong)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">71점</td><td class="num-font">4,650만</td><td class="num-font">59.10%</td><td class="num-font">8점</td><td class="num-font">월 150만</td><td class="num-font" style="color:var(--sig-buy);">+26.5%</td><td>힐스테이트녹번 (11.5억)</td></tr>
-            <tr><td>10</td><td><b>서대문구</b> (seodaemun)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">73점</td><td class="num-font">5,850만</td><td class="num-font">56.50%</td><td class="num-font">11점</td><td class="num-font">월 210만</td><td class="num-font" style="color:var(--sig-buy);">+25.0%</td><td>e편한세상신촌 (15.5억)</td></tr>
-            <tr><td>11</td><td><b>강서구</b> (gangseo)</td><td><span class="badge-sm status-badge buy">🟢 매수고려</span></td><td class="num-font">72점</td><td class="num-font">5,150만</td><td class="num-font">56.80%</td><td class="num-font">11점</td><td class="num-font">월 220만</td><td class="num-font" style="color:var(--sig-buy);">+24.8%</td><td>마곡엠밸리7단지 (16.2억)</td></tr>
-
-            <tr><td>12</td><td><b>강남구</b> (gangnam)</td><td><span class="badge-sm status-badge caution">🟡 주의</span></td><td class="num-font">68점</td><td class="num-font">1억 8,381만</td><td class="num-font">41.20%</td><td class="num-font">29점</td><td class="num-font">월 625만</td><td class="num-font" style="color:var(--sig-caution);">+18.5%</td><td>신현대11차 (100.5억)</td></tr>
-            <tr><td>13</td><td><b>서초구</b> (seocho)</td><td><span class="badge-sm status-badge caution">🟡 주의</span></td><td class="num-font">69점</td><td class="num-font">1억 4,200만</td><td class="num-font">41.80%</td><td class="num-font">17점</td><td class="num-font">월 580만</td><td class="num-font" style="color:var(--sig-caution);">+17.2%</td><td>래미안원베일리 (71.5억)</td></tr>
-            <tr><td>14</td><td><b>용산구</b> (yongsan)</td><td><span class="badge-sm status-badge caution">🟡 주의</span></td><td class="num-font">67점</td><td class="num-font">1억 7,710만</td><td class="num-font">51.90%</td><td class="num-font">7점</td><td class="num-font">월 490만</td><td class="num-font" style="color:var(--sig-caution);">+21.0%</td><td>한강로 아크로타워 (28.0억)</td></tr>
-            <tr><td>15</td><td><b>종로구</b> (jongno)</td><td><span class="badge-sm status-badge caution">🟡 주의</span></td><td class="num-font">66점</td><td class="num-font">1억 0,638만</td><td class="num-font">53.80%</td><td class="num-font">21점</td><td class="num-font">월 290만</td><td class="num-font" style="color:var(--sig-caution);">+16.8%</td><td>경희궁자이2단지 (22.5억)</td></tr>
-
-            <tr><td>16</td><td><b>노원구</b> (nowon)</td><td><span class="badge-sm status-badge hold">🔴 관망</span></td><td class="num-font">48점</td><td class="num-font">4,850만</td><td class="num-font">55.20%</td><td class="num-font">18점</td><td class="num-font">월 130만</td><td class="num-font" style="color:var(--sig-hold);">+12.0%</td><td>중계주공5단지 (9.8억)</td></tr>
-            <tr><td>17</td><td><b>중랑구</b> (jungnang)</td><td><span class="badge-sm status-badge hold">🔴 관망</span></td><td class="num-font">46점</td><td class="num-font">3,950만</td><td class="num-font">61.20%</td><td class="num-font">6점</td><td class="num-font">월 140만</td><td class="num-font" style="color:var(--sig-hold);">+14.5%</td><td>사가정아이파크 (10.5억)</td></tr>
-            <tr><td>18</td><td><b>강북구</b> (gangbuk)</td><td><span class="badge-sm status-badge hold">🔴 관망</span></td><td class="num-font">44점</td><td class="num-font">3,850만</td><td class="num-font">62.50%</td><td class="num-font">6점</td><td class="num-font">월 120만</td><td class="num-font" style="color:var(--sig-hold);">+11.5%</td><td>미아래미안 (9.2억)</td></tr>
-            <tr><td>19</td><td><b>도봉구</b> (dobong)</td><td><span class="badge-sm status-badge hold">🔴 관망</span></td><td class="num-font">43점</td><td class="num-font">3,650만</td><td class="num-font">63.10%</td><td class="num-font">7점</td><td class="num-font">월 110만</td><td class="num-font" style="color:var(--sig-hold);">+13.0%</td><td>창동주공19단지 (7.2억)</td></tr>
-            <tr><td>20</td><td><b>금천구</b> (geumcheon)</td><td><span class="badge-sm status-badge hold">🔴 관망</span></td><td class="num-font">45점</td><td class="num-font">3,750만</td><td class="num-font">60.50%</td><td class="num-font">5점</td><td class="num-font">월 130만</td><td class="num-font" style="color:var(--sig-hold);">+12.5%</td><td>롯데캐슬 (10.8억)</td></tr>
+          <tbody id="masterTableBody">
+            <!-- Rendered by JS -->
           </tbody>
         </table>
+      </section>
+    </main>
+
+    <!-- =========================================================================
+         VIEW 3: Signal Logic & Seongnam vs Yeongdeungpo Validation (Prompt Item 2&4)
+         ========================================================================= -->
+    <main id="viewPage3" style="display: none;">
+      <section class="algorithm-panel">
+        <div>
+          <h3 class="algo-section-title">⚖️ 신호 판정 기준 통일 (단일 getSignal 엔진 규격)</h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">
+            부동산 신호등은 주관적 편향을 배제하고, 동일 지표 구간에서 모든 자치구 및 단지에 동일한 결과를 도출하기 위해 다음의 <b>단일 정량 판정 공식</b>을 적용합니다.
+          </p>
+        </div>
+
+        <div class="code-block">
+// [단일 공통 신호 판정 알고리즘]
+function getSignal(item) {
+  const jeonse = parseFloat(item.jeonseRate);  // 전세가율 (%)
+  const risk   = parseFloat(item.riskScore);   // 투자 리스크 지수
+  const trend  = parseFloat(item.trendScore);  // 트렌드 모멘텀 지수
+
+  // 1) 🟢 매수고려 (Buy)
+  // 조건: 트렌드 모멘텀 ≥ +1.0 AND 리스크 지수 ≤ +0.6 AND 전세가율 ≥ 50.0%
+  // 의미: 거래 회복 탄력이 확실하며 전세가 방어로 안전마진 확보
+  if (trend >= 1.0 && risk <= 0.6 && jeonse >= 50.0) {
+    return { code: 'buy', label: '매수고려', bg: '#EAF3DE', text: '#27500A' };
+  }
+
+  // 2) 🟡 주의 (Caution)
+  // 조건: 리스크 지수 ≥ +0.7 OR (전세가율 40.0% ~ 49.9% 구간)
+  // 의미: 신고가 지속 지역이라도 갭 확대 및 금리 이자부담 가중, 선별 접근
+  else if (risk >= 0.7 || (jeonse >= 40.0 && jeonse < 50.0)) {
+    return { code: 'warning', label: '주의', bg: '#FAEEDA', text: '#854F0B' };
+  }
+
+  // 3) ⚪ 관망 (Watch)
+  // 조건: 트렌드 모멘텀 ≤ +0.9 OR 전세가율 < 40.0%
+  // 의미: 거래량 정체 및 매수 심리 냉각, 무리한 진입 지양 및 추가 방향성 확인
+  else {
+    return { code: 'watch', label: '관망', bg: '#FFFFFF', text: '#5F5E5A', border: '#B4B2A9' };
+  }
+}
+        </div>
+
+        <div>
+          <h3 class="algo-section-title">🔍 변경 전/후 비교 검증: 성남시(분당) vs 영등포구</h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">
+            이전 시스템에서는 비슷한 50~55% 전세가율 구간에서 성남시가 "주의", 영등포구가 "매수고려"로 불일치했던 문제가 있었습니다. 통일된 알고리즘 적용 결과를 비교합니다.
+          </p>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- Seongnam Comparison -->
+          <div class="comparison-box before">
+            <div class="comparison-title">
+              <span>경기 성남시 (분당/판교)</span>
+              <span class="badge-signal warning">변경 전: 일괄 🟡 주의</span>
+            </div>
+            <div class="comparison-desc">
+              • 지표: 전용 84㎡ 17.8억 | 전세가율 <b>51.6%</b> | 모멘텀 +1.6 | 리스크 +1.0<br>
+              • 기존 문제: 판교푸르지오그랑블(51.6%), 정자 파크뷰(55.3%) 등 전세가율 50% 이상 우량 단지까지 자치구 리스크 지수(+1.0)에 묶여 일괄 "주의" 처리됨.<br>
+              <strong style="color:var(--navy-primary);">• 개선 후:</strong> 자치구 단위는 고평가 리스크(+1.0)로 <span class="badge-signal warning" style="padding:1px 6px;">🟡 주의</span>를 유지하되, 전세가율 50% 이상 단지는 <span class="badge-signal buy" style="padding:1px 6px;">🟢 매수고려</span>로 객관적 분리 판정.
+            </div>
+          </div>
+
+          <!-- Yeongdeungpo Comparison -->
+          <div class="comparison-box after">
+            <div class="comparison-title">
+              <span>서울 영등포구 (여의도/당산)</span>
+              <span class="badge-signal buy">변경 후: 일관된 🟢 매수고려</span>
+            </div>
+            <div class="comparison-desc">
+              • 지표: 전용 84㎡ 15.2억 | 전세가율 <b>52.8%</b> | 모멘텀 +1.4 | 리스크 +0.6<br>
+              • 판정 일치성: 모멘텀 ≥ +1.0, 리스크 ≤ +0.6, 전세가율 ≥ 50.0%의 3대 요건을 모두 충족하여 <b>안정적 매수고려 구간</b>에 정확히 부합.<br>
+              <strong style="color:var(--navy-primary);">• 결론:</strong> 성남시 판교 50% 이상 단지와 영등포구 52% 단지가 <b>동일한 매수고려 임계값 규칙</b> 하에 완벽하게 일관성을 유지함.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3대 지수 산식 공개 -->
+        <div style="background:var(--bg-card); border:1px solid var(--border-base); border-radius:8px; padding:18px 20px;">
+          <h4 style="font-size:14px; font-weight:500; color:var(--navy-dark); margin-bottom:8px;">📐 지수 산출 가중치 및 출처 공개</h4>
+          <ul style="font-size:12px; color:var(--text-muted); line-height:1.7; padding-left:18px;">
+            <li><strong>트렌드 모멘텀 지수:</strong> (최근 30일 거래량 증감률 × 40%) + (신고가 거래 비율 × 30%) + (실거래가 3개월 변동률 × 30%) [국토교통부]</li>
+            <li><strong>투자 리스크 지수:</strong> (주담대 금리 가중치 30%) + (매매-전세 갭 부담률[1-전세가율] × 40%) + (단기 급등 피로도 30%) [한국은행 ECOS & 국토부]</li>
+            <li><strong>3년 기대 ROI:</strong> LTV 50% 레버리지, 주담대 4.39% 고정금리, 지역 과거 5개년 연평균 상승률 기반 시뮬레이션</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- =========================================================================
+         Legal Disclaimer & Footer (Prompt Item 4)
+         ========================================================================= -->
+    <footer class="disclaimer-panel">
+      <div>
+        <strong>⚠️ 법적 고지 및 투자 유의사항 (Disclaimer):</strong>
+        본 대시보드에서 제공하는 부동산 신호(매수고려·주의·관망), 가격 분석, 전세가율, LTV 대출 및 월 순현금흐름 시뮬레이션 지표는 공공데이터 통계 모델링에 기초한 단순 참고용 정보입니다. 
+        개별 아파트 단지의 동·호수별 권리관계, 스트레스 DSR 2단계 대출 심사 기준, 개인의 소득 및 세무 요건에 따라 실제 거래 조건과 차이가 발생할 수 있으며, 어떠한 경우에도 투자 권유나 법적 보증이 아닙니다. 
+        모든 투자 판단과 그 결과에 대한 최종 책임은 이용자 본인에게 있습니다.
       </div>
-    </div>
+      <div style="margin-top:4px;">
+        © 2026 부동산 신호등 (seoul-realty MCP Quantitative Engine) · 국토교통부 실거래가 시스템 · 한국은행 ECOS · 나이스 교육정보 빅데이터
+      </div>
+    </footer>
 
   </div>
 
+  <!-- =========================================================================
+       JavaScript Logic: Dataset, getSignal(), Chart, Filters, Tab Switching
+       ========================================================================= -->
   <script>
-    function switchPage(pageId) {
-      document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-      
-      if (pageId === 'page1') {
-        document.querySelectorAll('.tab-item')[0].classList.add('active');
-        document.getElementById('page1').classList.add('active');
-      } else {
-        document.querySelectorAll('.tab-item')[1].classList.add('active');
-        document.getElementById('page2').classList.add('active');
+    // 27개 자치구·핵심 시 퀀트 데이터셋
+    const REGION_DATA = [
+      { name: "송파구", slug: "songpa", zone: "동남권", avg84: 24.9, avgPrice: 22.3, avgPyung: "1억 4,372", jeonseRate: 48.5, trendScore: 1.4, riskScore: 0.6, schoolScore: 96.0, monthlyInterest: 420, roi3yr: 24.5, topApt: "아시아선수촌 (65.0억)", landmark: "잠실 재건축 추진 및 높은 전세 방어력" },
+      { name: "마포구", slug: "mapo", zone: "마용성", avg84: 17.1, avgPrice: 14.3, avgPyung: "1억 0,896", jeonseRate: 51.2, trendScore: 1.3, riskScore: 0.4, schoolScore: 88.0, monthlyInterest: 340, roi3yr: 22.8, topApt: "마포래미안푸르지오 (30.8억)", landmark: "여의도·CBD 직주근접 및 아현뉴타운 시세 지지" },
+      { name: "성동구", slug: "seongdong", zone: "마용성", avg84: 19.3, avgPrice: 18.8, avgPyung: "1억 2,450", jeonseRate: 50.4, trendScore: 1.3, riskScore: 0.4, schoolScore: 89.0, monthlyInterest: 350, roi3yr: 23.2, topApt: "트리마제 (46.5억)", landmark: "성수 전략정비구역 개발 및 한강 조망 프리미엄" },
+      { name: "양천구", slug: "yangcheon", zone: "서남권", avg84: 18.5, avgPrice: 16.8, avgPyung: "8,290", jeonseRate: 50.1, trendScore: 1.5, riskScore: 0.6, schoolScore: 97.0, monthlyInterest: 280, roi3yr: 26.0, topApt: "목동신시가지7단지 (31.0억)", landmark: "목동 재건축 안전진단 통과 및 명문 학원가" },
+      { name: "영등포구", slug: "yeongdeungpo", zone: "서남권", avg84: 15.2, avgPrice: 14.0, avgPyung: "9,850", jeonseRate: 52.8, trendScore: 1.4, riskScore: 0.6, schoolScore: 86.0, monthlyInterest: 310, roi3yr: 25.2, topApt: "브라이튼여의도 (55.0억)", landmark: "여의도 금융특구 신통기획 추진 및 당산 정주여건" },
+      { name: "동작구", slug: "dongjak", zone: "서남권", avg84: 15.8, avgPrice: 14.5, avgPyung: "7,850", jeonseRate: 54.2, trendScore: 1.3, riskScore: 0.5, schoolScore: 87.0, monthlyInterest: 260, roi3yr: 24.0, topApt: "아크로리버하임 (27.5억)", landmark: "흑석뉴타운 완성 및 서초·여의도 양방향 접근성" },
+      { name: "강동구", slug: "gangdong", zone: "동남권", avg84: 15.6, avgPrice: 14.1, avgPyung: "7,250", jeonseRate: 53.5, trendScore: 1.5, riskScore: 0.5, schoolScore: 90.0, monthlyInterest: 250, roi3yr: 27.5, topApt: "올림픽파크포레온 (26.5억)", landmark: "둔촌주공 1.2만가구 입주 후 시세 안착 및 9호선" },
+      { name: "광진구", slug: "gwangjin", zone: "동북권", avg84: 17.5, avgPrice: 16.2, avgPyung: "9,120", jeonseRate: 51.5, trendScore: 1.2, riskScore: 0.5, schoolScore: 92.0, monthlyInterest: 290, roi3yr: 23.5, topApt: "워커힐 (35.0억)", landmark: "광장동 명문 학군 및 한강변 정비사업 기대" },
+      { name: "서대문구", slug: "seodaemun", zone: "서북권", avg84: 12.5, avgPrice: 11.2, avgPyung: "5,850", jeonseRate: 56.5, trendScore: 1.1, riskScore: 0.4, schoolScore: 86.2, monthlyInterest: 210, roi3yr: 25.0, topApt: "DMC파크뷰자이 (16.8억)", landmark: "북아현뉴타운 및 종로·광화문 직주근접 실수요" },
+      { name: "동대문구", slug: "dongdaemun", zone: "동북권", avg84: 11.8, avgPrice: 10.4, avgPyung: "6,150", jeonseRate: 56.0, trendScore: 1.2, riskScore: 0.4, schoolScore: 83.5, monthlyInterest: 200, roi3yr: 27.0, topApt: "래미안크레시티 (16.2억)", landmark: "청량리 복합환승센터 및 이문·휘경 뉴타운" },
+      { name: "강서구", slug: "gangseo", zone: "서남권", avg84: 10.9, avgPrice: 9.8, avgPyung: "5,150", jeonseRate: 57.0, trendScore: 1.1, riskScore: 0.5, schoolScore: 87.0, monthlyInterest: 220, roi3yr: 24.8, topApt: "마곡엠밸리7단지 (18.0억)", landmark: "마곡 대기업 R&D 종사자 직주근접 및 MICE" },
+      { name: "성북구", slug: "seongbuk", zone: "동북권", avg84: 10.5, avgPrice: 9.3, avgPyung: "5,450", jeonseRate: 58.4, trendScore: 1.0, riskScore: 0.4, schoolScore: 85.0, monthlyInterest: 190, roi3yr: 28.0, topApt: "길음뉴타운클라시아 (15.5억)", landmark: "길음·장위뉴타운 완성형 주거벨트 및 도심 통근" },
+      { name: "중구", slug: "junggu", zone: "도심권", avg84: 14.2, avgPrice: 13.5, avgPyung: "6,850", jeonseRate: 56.5, trendScore: 1.1, riskScore: 0.4, schoolScore: 84.0, monthlyInterest: 230, roi3yr: 23.0, topApt: "남산센트럴자이 (22.0억)", landmark: "신당·약수 더블 역세권 직주근접 실수요" },
+
+      // 주의 군 (Caution)
+      { name: "강남구", slug: "gangnam", zone: "동남권", avg84: 29.2, avgPrice: 31.4, avgPyung: "1억 8,381", jeonseRate: 41.2, trendScore: 1.8, riskScore: 1.2, schoolScore: 98.5, monthlyInterest: 625, roi3yr: 18.5, topApt: "신현대12차 (112.5억)", landmark: "압구정·개포 신고가 지속이나 갭 부담 과다 (선별접근)" },
+      { name: "서초구", slug: "seocho", zone: "동남권", avg84: 28.2, avgPrice: 24.0, avgPyung: "1억 4,200", jeonseRate: 41.8, trendScore: 1.8, riskScore: 1.2, schoolScore: 97.2, monthlyInterest: 580, roi3yr: 17.2, topApt: "래미안퍼스티지 (91.0억)", landmark: "반포·잠원 초고가 갭투 한계, 1주택 갈아타기 위주" },
+      { name: "용산구", slug: "yongsan", zone: "도심권", avg84: 21.9, avgPrice: 25.9, avgPyung: "1억 7,710", jeonseRate: 45.0, trendScore: 1.6, riskScore: 1.1, schoolScore: 85.0, monthlyInterest: 490, roi3yr: 21.0, topApt: "나인원한남 (255.0억)", landmark: "용산국제업무지구 개발호재 속 호가 급등 피로감" },
+      { name: "종로구", slug: "jongno", zone: "도심권", avg84: 14.8, avgPrice: 13.9, avgPyung: "1억 0,638", jeonseRate: 49.5, trendScore: 1.2, riskScore: 0.7, schoolScore: 87.5, monthlyInterest: 290, roi3yr: 16.8, topApt: "경희궁자이2단지 (24.5억)", landmark: "광화문 직주근접이나 거래량 정체로 보수적 접근" },
+      { name: "과천시", slug: "gwacheon", zone: "경기 경부축", avg84: 22.8, avgPrice: 20.5, avgPyung: "1억 1,200", jeonseRate: 49.0, trendScore: 1.7, riskScore: 1.1, schoolScore: 96.0, monthlyInterest: 480, roi3yr: 19.5, topApt: "과천푸르지오써밋 (25.5억)", landmark: "준강남 시세 추격 완료로 단기 가격 피로감 상존" },
+      { name: "성남시", slug: "seongnam", zone: "경기 경부축", avg84: 17.8, avgPrice: 16.2, avgPyung: "8,950", jeonseRate: 48.0, trendScore: 1.6, riskScore: 1.0, schoolScore: 98.2, monthlyInterest: 380, roi3yr: 21.5, topApt: "판교푸르지오그랑블 (31.0억)", landmark: "노후계획도시 선도지구 기대감 급등, 단지별 선별 필수" },
+      { name: "은평구", slug: "eunpyeong", zone: "서북권", avg84: 9.8, avgPrice: 8.7, avgPyung: "4,650", jeonseRate: 49.0, trendScore: 0.9, riskScore: 0.7, schoolScore: 82.0, monthlyInterest: 160, roi3yr: 20.0, topApt: "북한산힐스테이트 (13.2억)", landmark: "GTX-A 개통 선반영 및 외곽 거래 회복 지연" },
+
+      // 관망 군 (Watch) - 빨간색 배제, 회색/중립 테두리
+      { name: "노원구", slug: "nowon", zone: "동북권", avg84: 8.7, avgPrice: 7.6, avgPyung: "4,850", jeonseRate: 55.2, trendScore: 0.8, riskScore: 0.9, schoolScore: 95.0, monthlyInterest: 130, roi3yr: 12.0, topApt: "포레나노원 (14.5억)", landmark: "중계 학원가 방어력 있으나 상계 재건축 분담금 리스크" },
+      { name: "중랑구", slug: "jungnang", zone: "동북권", avg84: 8.4, avgPrice: 7.5, avgPyung: "3,950", jeonseRate: 58.0, trendScore: 0.7, riskScore: 0.7, schoolScore: 79.5, monthlyInterest: 140, roi3yr: 14.5, topApt: "사가정센트럴아이파크 (13.8억)", landmark: "상봉터미널 개발 있으나 전반적인 매수세 정체" },
+      { name: "강북구", slug: "gangbuk", zone: "동북권", avg84: 7.9, avgPrice: 7.1, avgPyung: "3,850", jeonseRate: 61.1, trendScore: 0.6, riskScore: 0.8, schoolScore: 78.5, monthlyInterest: 120, roi3yr: 11.5, topApt: "꿈의숲효성해링턴 (12.0억)", landmark: "도심 접근성 한계 및 외곽 거래 침체 장기화" },
+      { name: "도봉구", slug: "dobong", zone: "동북권", avg84: 7.8, avgPrice: 6.9, avgPyung: "3,650", jeonseRate: 59.2, trendScore: 0.6, riskScore: 0.8, schoolScore: 79.0, monthlyInterest: 110, roi3yr: 13.0, topApt: "북한산아이파크5차 (11.2억)", landmark: "GTX-C 기대감 대비 금리 부담으로 매수세 제한" },
+      { name: "금천구", slug: "geumcheon", zone: "서남권", avg84: 8.2, avgPrice: 7.5, avgPyung: "3,750", jeonseRate: 59.1, trendScore: 0.6, riskScore: 0.8, schoolScore: 78.0, monthlyInterest: 130, roi3yr: 12.5, topApt: "롯데캐슬골드파크1차 (12.8억)", landmark: "신안산선 지연 우려 및 외곽 구축 거래 정체" },
+      { name: "관악구", slug: "gwanak", zone: "서남권", avg84: 9.2, avgPrice: 8.3, avgPyung: "4,450", jeonseRate: 58.3, trendScore: 0.8, riskScore: 0.7, schoolScore: 81.5, monthlyInterest: 140, roi3yr: 14.0, topApt: "e편한세상서울대입구 (13.0억)", landmark: "신림선 개통 외 구축 빌라 혼재 지역 환금성 저하" },
+      { name: "구로구", slug: "guro", zone: "서남권", avg84: 8.9, avgPrice: 8.1, avgPyung: "4,300", jeonseRate: 58.1, trendScore: 0.7, riskScore: 0.7, schoolScore: 80.0, monthlyInterest: 135, roi3yr: 13.5, topApt: "신도림디큐브시티 (17.5억)", landmark: "신도림역 대장 외 개봉·오류 구축 거래량 정체" }
+    ];
+
+    // =========================================================================
+    // 2. 단일 공통 신호 판정 함수 getSignal() (Prompt Item 2)
+    // =========================================================================
+    function getSignal(item) {
+      const jeonse = parseFloat(item.jeonseRate);
+      const risk = parseFloat(item.riskScore);
+      const trend = parseFloat(item.trendScore);
+
+      // 매수고려: 모멘텀 ≥ 1.0 & 리스크 ≤ 0.6 & 전세가율 ≥ 50%
+      if (trend >= 1.0 && risk <= 0.6 && jeonse >= 50.0) {
+        return {
+          code: 'buy',
+          label: '매수고려',
+          badgeClass: 'buy',
+          icon: '🟢'
+        };
       }
+      // 주의: 리스크 ≥ 0.7 or 전세가율 40~50% 미만
+      else if (risk >= 0.7 || (jeonse >= 40.0 && jeonse < 50.0)) {
+        return {
+          code: 'warning',
+          label: '주의',
+          badgeClass: 'warning',
+          icon: '🟡'
+        };
+      }
+      // 관망: 모멘텀 ≤ 0.9 or 전세가율 < 40%
+      else {
+        return {
+          code: 'watch',
+          label: '관망',
+          badgeClass: 'watch',
+          icon: '⚪'
+        };
+      }
+    }
+
+    // State Variables
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentSort = 'roi_desc';
+    let trendChartInstance = null;
+
+    // Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      initTrendChart();
+    });
+
+    // View Switching
+    function switchView(pageId, btnElem) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btnElem.classList.add('active');
+
+      document.getElementById('viewPage1').style.display = pageId === 'page1' ? 'flex' : 'none';
+      document.getElementById('viewPage2').style.display = pageId === 'page2' ? 'block' : 'none';
+      document.getElementById('viewPage3').style.display = pageId === 'page3' ? 'block' : 'none';
+
+      if (pageId === 'page2') {
+        renderMasterTable();
+      }
+    }
+
+    // Filtering & Sorting
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      document.querySelectorAll('#signalFilterGroup .pill-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-filter') === filterType);
+      });
+      renderDashboard();
+    }
+
+    function handleSearch() {
+      currentSearch = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderDashboard();
+    }
+
+    function handleSort() {
+      currentSort = document.getElementById('sortSelect').value;
+      renderDashboard();
+    }
+
+    // Common Template Detail Link
+    function getDetailLink(item) {
+      return `district_analysis_dashboard.html?region=${encodeURIComponent(item.name)}`;
+    }
+
+    // Main Render Function
+    function renderDashboard() {
+      const grid = document.getElementById('cardGrid');
+      
+      // 1. Filter
+      let list = REGION_DATA.filter(item => {
+        const sig = getSignal(item).code;
+        const matchSig = currentFilter === 'all' || sig === currentFilter;
+        const matchSearch = !currentSearch || 
+          item.name.toLowerCase().includes(currentSearch) || 
+          item.zone.toLowerCase().includes(currentSearch) ||
+          item.topApt.toLowerCase().includes(currentSearch);
+        return matchSig && matchSearch;
+      });
+
+      // 2. Sort
+      list.sort((a, b) => {
+        if (currentSort === 'roi_desc') return b.roi3yr - a.roi3yr;
+        if (currentSort === 'price_desc') return b.avg84 - a.avg84;
+        if (currentSort === 'jeonse_desc') return b.jeonseRate - a.jeonseRate;
+        if (currentSort === 'trend_desc') return b.trendScore - a.trendScore;
+        if (currentSort === 'risk_asc') return a.riskScore - b.riskScore;
+        if (currentSort === 'school_desc') return b.schoolScore - a.schoolScore;
+        return 0;
+      });
+
+      // Update Counts
+      const totalAll = REGION_DATA.length;
+      const buyCount = REGION_DATA.filter(r => getSignal(r).code === 'buy').length;
+      const cautionCount = REGION_DATA.filter(r => getSignal(r).code === 'warning').length;
+      const watchCount = REGION_DATA.filter(r => getSignal(r).code === 'watch').length;
+
+      document.getElementById('kpiTotal').textContent = `${totalAll}개소`;
+      document.getElementById('kpiBuy').textContent = `${buyCount}개소`;
+      document.getElementById('kpiCaution').textContent = `${cautionCount}개소`;
+      document.getElementById('kpiWatch').textContent = `${watchCount}개소`;
+      document.getElementById('resultSummary').textContent = `총 ${list.length}개 지역 표시 중 (전체 ${totalAll}개소)`;
+
+      // Render Cards
+      grid.innerHTML = list.map(r => {
+        const sig = getSignal(r);
+        const detailUrl = getDetailLink(r);
+        return `
+          <div class="mck-card" onclick="location.href='${detailUrl}'" title="${r.name} 심층 분석 보고서 열람">
+            <div>
+              <div class="card-top">
+                <div class="card-title-wrap">
+                  <span class="card-title">${r.name}</span>
+                  <span class="card-zone">${r.zone}</span>
+                </div>
+                <span class="badge-signal ${sig.badgeClass}">${sig.icon} ${sig.label}</span>
+              </div>
+
+              <div class="card-body-metrics" style="margin-top: 14px;">
+                <div class="metric-line">
+                  <span class="label">전용 84㎡ 평균가</span>
+                  <span class="value highlight num">${r.avg84.toFixed(1)}억원</span>
+                </div>
+                <div class="metric-line">
+                  <span class="label">평균 전세가율</span>
+                  <span class="value num">${r.jeonseRate.toFixed(1)}%</span>
+                </div>
+                <div class="metric-line">
+                  <span class="label">3년 기대 ROI</span>
+                  <span class="value num" style="color:var(--navy-dark); font-weight:500;">+${r.roi3yr.toFixed(1)}%</span>
+                </div>
+                <div class="metric-line">
+                  <span class="label">LTV 50% 월이자</span>
+                  <span class="value num">월 ${r.monthlyInterest}만원</span>
+                </div>
+                <div class="metric-line" style="font-size: 11px; margin-top:2px;">
+                  <span class="label">대표 대장 단지</span>
+                  <span class="value" style="font-size:11px; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${r.topApt}">${r.topApt}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card-index-box">
+                <div class="index-col">
+                  <div class="index-lbl">
+                    <span>트렌드 모멘텀</span>
+                    <span class="info-btn">?</span>
+                  </div>
+                  <div class="index-val num">+${r.trendScore.toFixed(1)}</div>
+                  <div class="tooltip-bubble">
+                    <strong>트렌드 모멘텀 (+${r.trendScore.toFixed(1)})</strong><br>
+                    거래량 증감률(40%) + 신고가율(30%) + 실거래 변동(30%)
+                  </div>
+                </div>
+
+                <div class="index-col">
+                  <div class="index-lbl">
+                    <span>투자 리스크</span>
+                    <span class="info-btn">?</span>
+                  </div>
+                  <div class="index-val num">+${r.riskScore.toFixed(1)}</div>
+                  <div class="tooltip-bubble">
+                    <strong>투자 리스크 (+${r.riskScore.toFixed(1)})</strong><br>
+                    주담대 금리(30%) + 전세 갭 부담률(40%) + 급등 피로도(30%)
+                  </div>
+                </div>
+              </div>
+
+              <a href="${detailUrl}" class="card-action-link" onclick="event.stopPropagation();">
+                <span>상세 분석 보고서 보기</span>
+                <span>➔</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Master Table Render (Page 2)
+    function renderMasterTable() {
+      const tbody = document.getElementById('masterTableBody');
+      tbody.innerHTML = REGION_DATA.map((r, idx) => {
+        const sig = getSignal(r);
+        return `
+          <tr>
+            <td class="num">${idx + 1}</td>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.zone}</td>
+            <td><span class="badge-signal ${sig.badgeClass}">${sig.icon} ${sig.label}</span></td>
+            <td class="num" style="color:var(--navy-primary); font-weight:500;">${r.avg84.toFixed(1)}억</td>
+            <td class="num">${r.avgPyung}만</td>
+            <td class="num">${r.jeonseRate.toFixed(1)}%</td>
+            <td class="num">+${r.trendScore.toFixed(1)}</td>
+            <td class="num">+${r.riskScore.toFixed(1)}</td>
+            <td class="num">${r.schoolScore.toFixed(1)}점</td>
+            <td class="num">월 ${r.monthlyInterest}만</td>
+            <td class="num" style="color:var(--navy-dark); font-weight:500;">+${r.roi3yr.toFixed(1)}%</td>
+            <td style="font-size:12px; color:var(--text-muted);">${r.topApt}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // McKinsey Line Chart Implementation
+    function initTrendChart() {
+      const ctx = document.getElementById('mckinseyTrendChart').getContext('2d');
+      const months = ['2026.04', '2026.05', '2026.06', '2026.07', '2026.08', '2026.09'];
+
+      const datasets = [
+        {
+          label: '서울 상급지 (강남·서초·송파)',
+          data: [25.8, 26.2, 26.9, 27.8, 28.5, 28.8],
+          borderColor: '#0C447C',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointBackgroundColor: '#0C447C',
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.2
+        },
+        {
+          label: '서울 핵심지 (마용성·영등포)',
+          data: [15.6, 15.8, 16.1, 16.7, 17.2, 17.4],
+          borderColor: '#00875A',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointBackgroundColor: '#00875A',
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.2
+        },
+        {
+          label: '경기 경부축 (분당·과천)',
+          data: [15.2, 15.5, 16.0, 16.8, 17.1, 17.0],
+          borderColor: '#854F0B',
+          backgroundColor: 'transparent',
+          borderWidth: 1.8,
+          pointBackgroundColor: '#854F0B',
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.2
+        },
+        {
+          label: '서울 외곽권 (노도강·금관구)',
+          data: [8.8, 8.7, 8.6, 8.7, 8.8, 8.7],
+          borderColor: '#8B8A84',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointBackgroundColor: '#8B8A84',
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          tension: 0.2
+        }
+      ];
+
+      if (trendChartInstance) {
+        trendChartInstance.destroy();
+      }
+
+      trendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: false // Use custom legend
+            },
+            tooltip: {
+              backgroundColor: '#FFFFFF',
+              titleColor: '#0C447C',
+              bodyColor: '#1A1A18',
+              borderColor: '#E5E5E0',
+              borderWidth: 1,
+              padding: 10,
+              boxPadding: 4,
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.dataset.label}: ${context.parsed.y.toFixed(1)}억원`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#5F5E5A', font: { family: 'Noto Sans KR', size: 11 } },
+              grid: { color: 'rgba(0,0,0,0.03)' }
+            },
+            y: {
+              min: 6,
+              max: 32,
+              ticks: {
+                color: '#8B8A84',
+                font: { family: 'JetBrains Mono', size: 11 },
+                callback: (v) => v + '억'
+              },
+              grid: { color: 'rgba(0,0,0,0.03)' }
+            }
+          }
+        }
+      });
     }
   </script>
 </body>

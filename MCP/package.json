@@ -5,12 +5,20 @@
   "type": "module",
   "bin": {
     "seoul-realty-mcp": "realestate-server.js",
-    "schoolinfo-mcp": "check_schools.js"
+    "schoolinfo-mcp": "check_schools.js",
+    "crime-mcp": "crime-collector-server.js"
   },
   "scripts": {
     "start": "node realestate-server.js",
     "start:realty": "node realestate-server.js",
     "start:school": "node check_schools.js",
+    "start:crime": "node crime-collector-server.js",
+    "fetch:crime": "node fetch_crime.js",
+    "dashboard:crime": "node generate_crime_dashboard.js",
+    "sync:crime": "node schedule_crime_sync.js",
+    "sync:crime:check": "node schedule_crime_sync.js --check",
+    "sync:crime:force": "node schedule_crime_sync.js --force",
+    "sync:crime:daemon": "node schedule_crime_sync.js --daemon",
     "daily:sync": "node daily_pipeline_sync.js"
   },
   "keywords": [

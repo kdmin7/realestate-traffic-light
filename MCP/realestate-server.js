@@ -30,6 +30,13 @@ import {
   callRemoteMcp as callRemoteSchoolMcp,
 } from "./check_schools.js";
 
+// crime-service.js (경찰청 범죄통계 OpenAPI 수집 모듈) 임포트
+import {
+  collectAndSaveYear,
+  collectAllYears,
+  getLocalCrimeStatus,
+} from "./crime-service.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // .env 파일 자동 로드
@@ -333,6 +340,7 @@ const median = (arr) => {
   return s.length % 2 ? s[i] : (s[i - 1] + s[i]) / 2;
 };
 const errorResult = (m) => ({ isError: true, content: [{ type: "text", text: `❌ 오류: ${m}` }] });
+const jsonResult = (obj) => ({ content: [{ type: "text", text: JSON.stringify(obj, null, 2) }] });
 
 async function pool(items, limit, worker) {
   const results = new Array(items.length);
@@ -868,7 +876,7 @@ server.registerTool(
       "경찰청 '범죄 발생 지역별 통계' CSV(자치구별 컬럼)를 읽어 자치구별 5대 범죄 발생건수와 " +
       "인구 1천명당 범죄율을 반환합니다. data/crime/ 폴더에 연도별 CSV를 두어야 합니다.",
     inputSchema: {
-      district: z.string().optional().describe("자치구 이름/코드(생략 시 25개 구 전체)"),
+      district: z.string().optional().describe("서울·경기 지역 이름/코드(생략 시 수도권 전체)"),
       year: z.number().optional().describe("조회 연도(생략 시 폴더의 모든 연도)"),
       allCategories: z.boolean().default(false).describe("true면 5대범죄가 아닌 전체 범죄 합산"),
       populationOverride: z.record(z.number()).optional().describe("자치구별 인구 수동 지정 {구이름:인구}"),
@@ -894,11 +902,11 @@ server.registerTool(
       try { ({ header, rows } = readCsvSmart(file)); }
       catch (e) { results.push({ 연도: fy, 오류: `읽기 실패: ${e.message}` }); continue; }
 
-      // 자치구 컬럼 매핑: 헤더 셀을 정규화해 25개 구 이름과 매칭
+      // 지역 컬럼 매핑: 서울·경기 표준 지역명과 헤더를 매칭
       const guCols = {}; // guName -> colIndex
       header.forEach((h, i) => {
         const nh = norm(h);
-        for (const name of Object.keys(SEOUL_GU)) if (nh === norm(name)) guCols[name] = i;
+        for (const name of Object.keys(CANONICAL_REGIONS)) if (nh === norm(name)) guCols[name] = i;
       });
       if (!Object.keys(guCols).length) {
         results.push({ 연도: fy, 오류: "자치구 컬럼을 찾지 못했습니다(헤더 형식 확인)." });
@@ -919,7 +927,7 @@ server.registerTool(
           if (Number.isFinite(v)) sums[gname] += v;
         }
       }
-      const targets = gu ? [gu.name] : Object.keys(SEOUL_GU);
+      const targets = gu ? [gu.name] : Object.keys(CANONICAL_REGIONS);
       const perGu = targets.map((gname) => {
         const cnt = sums[gname] ?? 0;
         const p = pop[gname];
@@ -945,6 +953,46 @@ server.registerTool(
 );
 
 // ---------------------------------------------------------------------------
+// 도구 4-1 · collect_crime_data (경찰청 범죄통계 OpenAPI 실시간 수집 및 data/crime/ 동기화)
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  "collect_crime_data",
+  {
+    title: "경찰청 범죄 데이터 수집 및 동기화",
+    description:
+      "공공데이터포털 경찰청_범죄발생지역별 통계 OpenAPI (https://infuser.odcloud.kr/oas/docs?namespace=3074462/v1)에서 " +
+      "범죄 데이터를 실시간 수집하여 data/crime/{year}.csv 및 json 파일로 저장합니다. " +
+      "year를 생략하면 2012년부터 2024년까지 전체 연도를 일괄 수집/동기화합니다.",
+    inputSchema: {
+      year: z.number().optional().describe("수집할 연도(2012~2024, 생략 시 전체 수집)"),
+      overwrite: z.boolean().default(true).describe("기존 파일 덮어쓰기 여부"),
+    },
+  },
+  async ({ year, overwrite }) => {
+    try {
+      if (year) {
+        const res = await collectAndSaveYear(year, { overwrite });
+        return jsonResult({
+          message: `${year}년 범죄 데이터 수집 완료`,
+          result: res,
+          status: getLocalCrimeStatus(),
+        });
+      } else {
+        const manifest = await collectAllYears({ overwrite });
+        return jsonResult({
+          message: "전체 연도(2012~2024) 범죄 데이터 일괄 수집 완료",
+          manifest,
+          status: getLocalCrimeStatus(),
+        });
+      }
+    } catch (e) {
+      return errorResult(`범죄 데이터 수집 실패: ${e.message}`);
+    }
+  }
+);
+
+// ---------------------------------------------------------------------------
 // 도구 5 · get_living_population (유동인구/생활인구 · 파일 기반)
 // ---------------------------------------------------------------------------
 
@@ -956,7 +1004,7 @@ server.registerTool(
       "서울시 '자치구 단위 생활인구(내국인)' CSV를 읽어 자치구별 월평균 총생활인구와 증감 추세를 " +
       "반환합니다. data/living_pop/ 폴더에 LOCAL_PEOPLE_GU_YYYY.csv 를 두어야 합니다.",
     inputSchema: {
-      district: z.string().optional().describe("자치구 이름/코드(생략 시 25개 구 전체 요약)"),
+      district: z.string().optional().describe("서울·경기 지역 이름/코드(생략 시 수도권 전체 요약)"),
       startYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").optional().describe("시작 연월(생략 시 전체)"),
       endYearMonth: z.string().regex(/^\d{6}$/, "YYYYMM").optional().describe("종료 연월(생략 시 전체)"),
     },
@@ -994,7 +1042,7 @@ server.registerTool(
         if (from && ym < from) continue;
         if (to && ym > to) continue;
         const guRaw = String(row[iGu] || "").trim();
-        const gname = CODE_TO_GU[guRaw] || (Object.keys(SEOUL_GU).find((n) => norm(n) === norm(guRaw)));
+        const gname = CODE_TO_GU[guRaw] || (Object.keys(CANONICAL_REGIONS).find((n) => norm(n) === norm(guRaw)));
         if (!gname) continue;
         const v = Number(String(row[iPop] || "").replace(/[,\s]/g, ""));
         if (!Number.isFinite(v)) continue;
@@ -1029,7 +1077,7 @@ server.registerTool(
       };
     }
     // 전체 구 요약(증감률 순)
-    const all = Object.keys(SEOUL_GU).map(buildSeries).filter(Boolean)
+    const all = Object.keys(CANONICAL_REGIONS).map(buildSeries).filter(Boolean)
       .sort((a, b) => (b.증감률_퍼센트 ?? -999) - (a.증감률_퍼센트 ?? -999));
     const lines = all.map((s) => `• ${s.자치구}  ${s.최근_월평균.toLocaleString()}명 · 증감 ${s.증감률_퍼센트 ?? "-"}%`);
     return {
@@ -1179,7 +1227,7 @@ server.registerTool(
           ? Object.keys(CANONICAL_REGIONS).filter((k) => CANONICAL_REGIONS[k].startsWith("41"))
           : targetProvince === "all"
           ? Object.keys(CANONICAL_REGIONS)
-          : Object.keys(SEOUL_GU));
+          : Object.keys(CANONICAL_REGIONS));
 
     // 시·구별 집계
     const stat = {};
@@ -1238,7 +1286,7 @@ server.registerTool(
       "KOSIS/국세청에서 내려받은 시군구 소득 CSV(data/income/)를 읽어 자치구별 소득과 연도별 추이를 " +
       "반환합니다. wide(연도가 컬럼)·long(소득/연도 컬럼) 포맷을 자동 감지합니다.",
     inputSchema: {
-      district: z.string().optional().describe("자치구 이름/코드(생략 시 25개 구)"),
+      district: z.string().optional().describe("서울·경기 지역 이름/코드(생략 시 수도권 전체)"),
       year: z.number().optional().describe("특정 연도(생략 시 전체 연도)"),
     },
   },
@@ -1268,7 +1316,7 @@ server.registerTool(
       const fileYear = yearFromName(file);
 
       for (const row of rows) {
-        const gname = Object.keys(SEOUL_GU).find((n) => norm(row[iRegion] || "") === norm(n) || String(row[iRegion] || "").includes(n));
+        const gname = Object.keys(CANONICAL_REGIONS).find((n) => norm(row[iRegion] || "") === norm(n) || String(row[iRegion] || "").includes(n));
         if (!gname) continue;
         matched = true;
         if (yearCols.length) {                       // wide: 연도별 컬럼
@@ -1306,7 +1354,7 @@ server.registerTool(
         ],
       };
     }
-    const all = Object.keys(SEOUL_GU).map(build).filter(Boolean).sort((a, b) => b.최근소득 - a.최근소득);
+    const all = Object.keys(CANONICAL_REGIONS).map(build).filter(Boolean).sort((a, b) => b.최근소득 - a.최근소득);
     const lines = all.map((s, i) => `${String(i + 1).padStart(2)}. ${s.자치구}  ${s.최근소득.toLocaleString()} (${s.최근연도})`);
     return {
       content: [
@@ -1398,7 +1446,7 @@ async function collectSchool(targets) {
       rows = await fetchSchoolsForProvince("seoul");
     }
 
-    const targetNames = targets ? targets.map((t) => t.name) : Object.keys(SEOUL_GU);
+    const targetNames = targets ? targets.map((t) => t.name) : Object.keys(CANONICAL_REGIONS);
     const acc = {};
     for (const n of targetNames) acc[n] = { t: 0, s: 0 };
 
@@ -1510,7 +1558,7 @@ server.registerTool(
       "종합 순위를 반환합니다. 가중치는 입력으로 조정 가능하며, 가용한 지표만 사용합니다. " +
       "⚠️ 투자 조언이 아니라 지표 종합입니다.",
     inputSchema: {
-      districts: z.array(z.string()).optional().describe("대상 자치구 목록(생략 시 서울 25개 구 기본, 경기도 구/시 지정 가능)"),
+      districts: z.array(z.string()).optional().describe("대상 서울·경기 지역 목록(생략 시 수도권 56개 지역 전체)"),
       priceFrom: z.string().regex(/^\d{6}$/, "YYYYMM").default("202301").describe("가격/전세가율 CAGR 산정 시작 연월"),
       crimeYear: z.number().optional().describe("범죄 기준 연도(생략 시 최신 파일)"),
       incomeYear: z.number().optional().describe("소득 기준 연도(생략 시 최신)"),
@@ -1524,7 +1572,7 @@ server.registerTool(
       targets = districts.map(resolveGu);
       if (targets.some((t) => !t)) return errorResult("인식할 수 없는 자치구가 포함되어 있습니다.");
     } else {
-      targets = Object.entries(SEOUL_GU).map(([name, code]) => ({ name, code }));
+      targets = Object.entries(CANONICAL_REGIONS).map(([name, code]) => ({ name, code }));
     }
     const names = targets.map((t) => t.name);
 
@@ -2706,5 +2754,3 @@ main().catch((e) => {
   console.error("치명적 오류:", e);
   process.exit(1);
 });
-
-

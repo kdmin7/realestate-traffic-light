@@ -1,0 +1,1360 @@
+#!/usr/bin/env node
+/**
+ * generate_crime_dashboard.js
+ * 
+ * data/crime 디렉토리의 연도별 범죄 통계 데이터(2012 ~ 2024)를 집계하여
+ * 인터랙티브 웹 대시보드(crime_dashboard.html)를 자동 생성하는 스크립트.
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CRIME_DIR = path.join(__dirname, 'data', 'crime');
+const OUTPUT_HTML = path.join(__dirname, 'crime_dashboard.html');
+
+// 수도권 및 주요 지자체 인구수 (2024년 기준 추정치)
+const POPULATION_MAP = {
+  // 서울 25개 자치구
+  '강남구': 535000, '강동구': 462000, '강북구': 293000, '강서구': 565000,
+  '관악구': 496000, '광진구': 348000, '구로구': 413000, '금천구': 240000,
+  '노원구': 500000, '도봉구': 310000, '동대문구': 355000, '동작구': 388000,
+  '마포구': 374000, '서대문구': 318000, '서초구': 410000, '성동구': 280000,
+  '성북구': 430000, '송파구': 658000, '양천구': 439000, '영등포구': 398000,
+  '용산구': 218000, '은평구': 468000, '종로구': 148000, '중구': 122000, '중랑구': 386000,
+  '서울': 9400000,
+
+  // 경기도 시·군
+  '수원시': 1190000, '고양시': 1070000, '용인시': 1075000, '성남시': 920000,
+  '부천시': 780000, '화성시': 960000, '안산시': 630000, '남양주시': 735000,
+  '안양시': 545000, '평택시': 595000, '시흥시': 520000, '파주시': 500000,
+  '의정부시': 462000, '김포시': 490000, '광주시': 402000, '광명시': 282000,
+  '군포시': 263000, '하남시': 330000, '오산시': 240000, '양주시': 275000,
+  '이천시': 225000, '구리시': 190000, '안성시': 190000, '포천시': 145000,
+  '의왕시': 160000, '양평군': 125000, '여주시': 115000, '동두천시': 90000,
+  '과천시': 84000, '가평군': 63000, '연천군': 42000,
+};
+
+// 5대 강력범죄 키워드
+const CRIME5_KEYWORDS = ['살인', '강도', '강간', '추행', '절도', '폭력'];
+
+function norm(name) {
+  let s = String(name || '').trim();
+  if (s === '서울' || s === '서울특별시') return '서울';
+  s = s.replace(/^(서울특별시|서울|경기도|경기)\s*/g, '').replace(/\s+/g, '');
+  if (!s.endsWith('시') && !s.endsWith('군') && !s.endsWith('구')) {
+    if (POPULATION_MAP[s + '시']) return s + '시';
+    if (POPULATION_MAP[s + '군']) return s + '군';
+    if (POPULATION_MAP[s + '구']) return s + '구';
+  }
+  return s;
+}
+
+function processAllData() {
+  const years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+  const byYearData = {};
+  const regionTrends = {}; // regionKey -> [{ year, total, crime5 }]
+
+  for (const y of years) {
+    const jsonPath = path.join(CRIME_DIR, `${y}.json`);
+    if (!fs.existsSync(jsonPath)) continue;
+
+    const rows = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    if (!rows.length) continue;
+
+    const sample = rows[0];
+    const regionCols = Object.keys(sample).filter(k => !['범죄대분류', '범죄중분류'].includes(k));
+
+    const regionSummaries = {};
+
+    for (const col of regionCols) {
+      let total = 0;
+      let crime5 = 0;
+      const categories = {};
+      const crime5Detail = {
+        '살인': 0,
+        '강도': 0,
+        '성범죄': 0,
+        '절도': 0,
+        '폭력': 0,
+      };
+
+      for (const row of rows) {
+        const major = row['범죄대분류'] || '기타';
+        const mid = row['범죄중분류'] || '';
+        const cnt = Number(row[col]) || 0;
+
+        total += cnt;
+        categories[major] = (categories[major] || 0) + cnt;
+
+        const catFull = `${major} ${mid}`;
+        if (mid.includes('살인')) {
+          crime5Detail['살인'] += cnt;
+          crime5 += cnt;
+        } else if (mid.includes('강도')) {
+          crime5Detail['강도'] += cnt;
+          crime5 += cnt;
+        } else if (mid.includes('강간') || mid.includes('추행')) {
+          crime5Detail['성범죄'] += cnt;
+          crime5 += cnt;
+        } else if (major.includes('절도') || mid.includes('절도')) {
+          crime5Detail['절도'] += cnt;
+          crime5 += cnt;
+        } else if (major.includes('폭력') || mid.includes('폭력') || mid.includes('폭행') || mid.includes('상해')) {
+          crime5Detail['폭력'] += cnt;
+          crime5 += cnt;
+        }
+      }
+
+      const cleanName = norm(col);
+      const isSeoul = col.includes('서울') || Object.keys(POPULATION_MAP).some(g => g.endsWith('구') && cleanName === g) || cleanName === '서울';
+      const isGyeonggi = col.includes('경기') || Object.keys(POPULATION_MAP).some(g => (g.endsWith('시') || g.endsWith('군')) && cleanName === g && g !== '서울');
+      const pop = POPULATION_MAP[cleanName] || null;
+      const ratePer1k = pop ? Number(((crime5 / pop) * 1000).toFixed(2)) : null;
+
+      regionSummaries[col] = {
+        name: col,
+        cleanName,
+        isSeoul,
+        isGyeonggi,
+        total,
+        crime5,
+        pop,
+        ratePer1k,
+        crime5Detail,
+        categories,
+      };
+
+      // 시계열 트렌드 누적 (cleanName 기반 통일)
+      if (cleanName) {
+        if (!regionTrends[cleanName]) regionTrends[cleanName] = [];
+        regionTrends[cleanName].push({
+          year: y,
+          colName: col,
+          total,
+          crime5,
+        });
+      }
+    }
+
+    byYearData[y] = {
+      year: y,
+      regionCount: regionCols.length,
+      regions: regionSummaries,
+    };
+  }
+
+  return { byYearData, regionTrends };
+}
+
+function buildHtml(data) {
+  const dataJson = JSON.stringify(data);
+
+  return `<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>경찰청 범죄 발생 지역별 통계 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      /* Dark Theme (Default) */
+      --bg: #0b0f19;
+      --panel: #131b2e;
+      --panel-hover: #1c2742;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-bright: rgba(255, 255, 255, 0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --cyan: #06b6d4;
+      --input-bg: #090d16;
+      --table-stripe: rgba(255, 255, 255, 0.02);
+      --table-selected: rgba(59, 130, 246, 0.18);
+      --chart-grid: rgba(255, 255, 255, 0.06);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="light"] {
+      --bg: #f1f5f9;
+      --panel: #ffffff;
+      --panel-hover: #f8fafc;
+      --border: #cbd5e1;
+      --border-bright: #94a3b8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.25);
+      --accent: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --purple: #7c3aed;
+      --cyan: #0284c7;
+      --input-bg: #ffffff;
+      --table-stripe: #f8fafc;
+      --table-selected: #eff6ff;
+      --chart-grid: rgba(0, 0, 0, 0.06);
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* 글로벌 네비게이션 바 */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      transition: all 0.2s;
+    }
+    .nav-link:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+    .nav-link.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--primary);
+    }
+
+    /* 상단 헤더 */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .badge-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+      flex-shrink: 0;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tag-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #10b981;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    [data-theme="light"] .tag-live {
+      color: #047857;
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+    .tag-live::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .tag-sync-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 공공데이터 안내 배너 (서울 2012-2022 통계 구조 설명) */
+    .notice-banner {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text);
+    }
+    [data-theme="light"] .notice-banner {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1e3a8a;
+    }
+    .notice-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* 컨트롤 툴바 */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
+    }
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .label-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    select, input {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+    }
+    select:focus, input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    .btn-group {
+      display: flex;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .btn-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-tab.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-tab:hover:not(.active) {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    [data-theme="light"] .btn-tab:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* KPI 카드 그리드 */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-bright);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .kpi-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .kpi-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .kpi-card.emerald::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .kpi-card.amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .kpi-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 10px 0 6px 0;
+      letter-spacing: -0.5px;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    /* 메인 그리드 레이아웃 */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1080px) {
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+
+    .chart-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--card-shadow);
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 340px;
+    }
+
+    /* 상세 테이블 */
+    .table-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    th {
+      background: var(--input-bg);
+      padding: 12px 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    th:hover {
+      color: var(--text);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      white-space: nowrap;
+    }
+    tr:hover td {
+      background: var(--panel-hover);
+    }
+    tr.selected td {
+      background: var(--table-selected);
+      font-weight: 700;
+    }
+    .tag-grade {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .grade-safe { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .grade-normal { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .grade-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .grade-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+    [data-theme="light"] .grade-safe { background: #ecfdf5; color: #059669; }
+    [data-theme="light"] .grade-normal { background: #eff6ff; color: #2563eb; }
+    [data-theme="light"] .grade-warn { background: #fef3c7; color: #d97706; }
+    [data-theme="light"] .grade-danger { background: #fef2f2; color: #dc2626; }
+
+    .btn-export {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-export:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 네비게이션 헤더 -->
+    <nav class="top-nav">
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
+        <a href="crime_dashboard.html" class="nav-link active">🛡️ 경찰청 범죄 대시보드</a>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">🌓 라이트 모드 전환</button>
+    </nav>
+
+    <!-- 메인 타이틀 헤더 -->
+    <header>
+      <div class="header-title">
+        <div class="badge-icon">🛡️</div>
+        <div>
+          <h1>경찰청 범죄 발생 지역별 통계 대시보드</h1>
+          <div class="subtitle">공공데이터포털(odcloud.kr) 연계 2012 ~ 2024년 전국 및 수도권 범죄 데이터 실시간 분석</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="tag-live">13개 연도(2012-2024) 취합 완료</span>
+        <span class="tag-sync-info">최근 갱신: 2026-09-18 · 3개월 주기 연동</span>
+      </div>
+    </header>
+
+    <!-- 공공데이터 집계 정책 안내 배너 -->
+    <div class="notice-banner" id="noticeBanner">
+      <span class="notice-icon">💡</span>
+      <div id="noticeText">
+        <strong>데이터 안내:</strong> 경찰청 공공데이터 지침에 따라 2023~2024년은 서울 25개 자치구가 개별 제공되며, 2012~2022년은 서울시 전체 통합 집계로 제공됩니다. 경기도 31개 시·군은 13개년 전체 연속 시계열 분석이 지원됩니다.
+      </div>
+    </div>
+
+    <!-- 컨트롤 툴바 -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <span class="label-text">기준 연도:</span>
+        <select id="yearSelect" onchange="onYearChange()">
+          <!-- options populated dynamically -->
+        </select>
+
+        <span class="label-text" style="margin-left: 12px;">권역 필터:</span>
+        <div class="btn-group">
+          <button class="btn-tab active" id="tabSeoul" onclick="setScope('seoul', this)">서울 자치구</button>
+          <button class="btn-tab" id="tabGyeonggi" onclick="setScope('gyeonggi', this)">경기 시·군</button>
+          <button class="btn-tab" id="tabAll" onclick="setScope('all', this)">전체 지역</button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <span class="label-text">지역 검색:</span>
+        <input type="text" id="searchInput" placeholder="예: 강남구, 분당, 수원, 마포..." oninput="onSearch()">
+
+        <span class="label-text" style="margin-left: 8px;">선택 지역 상세:</span>
+        <select id="regionDetailSelect" onchange="onRegionDetailChange()">
+          <!-- options populated dynamically -->
+        </select>
+      </div>
+    </div>
+
+    <!-- KPI 메트릭 카드 -->
+    <div class="kpi-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-title" id="kpiTargetName">서울시 강남구</div>
+        <div class="kpi-value" id="kpiTotalCount">-</div>
+        <div class="kpi-sub">연간 전체 범죄 발생 건수</div>
+      </div>
+
+      <div class="kpi-card red">
+        <div class="kpi-title">5대 강력범죄 건수</div>
+        <div class="kpi-value" id="kpiCrime5Count">-</div>
+        <div class="kpi-sub" id="kpiCrime5Ratio">전체 대비 비중 -%</div>
+      </div>
+
+      <div class="kpi-card amber">
+        <div class="kpi-title">인구 1,000명당 범죄율</div>
+        <div class="kpi-value" id="kpiRatePer1k">-</div>
+        <div class="kpi-sub" id="kpiPopInfo">주민등록인구 -명 기준</div>
+      </div>
+
+      <div class="kpi-card emerald">
+        <div class="kpi-title">지역 안전도 등급</div>
+        <div class="kpi-value" id="kpiSafeGrade">-</div>
+        <div class="kpi-sub" id="kpiRankInfo">권역 내 범죄율 순위: -위</div>
+      </div>
+    </div>
+
+    <!-- 차트 영역 1단 -->
+    <div class="grid-2col">
+      <!-- 지역별 범죄율 랭킹 차트 -->
+      <div class="chart-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            📊 <span id="rankingChartTitle">지역별 인구 1,000명당 범죄율 순위</span>
+          </div>
+          <div class="panel-badge">낮을수록 안전</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="rankingChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 5대 강력범죄 비중 도넛 차트 -->
+      <div class="chart-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            🍩 <span id="donutChartTitle">5대 강력범죄 구성비</span>
+          </div>
+          <div class="panel-badge">절도·폭력·성범죄·강도·살인</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 영역 2단 -->
+    <div class="grid-2col">
+      <!-- 2012 ~ 2024 연도별 범죄 추이 -->
+      <div class="chart-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            📈 <span id="trendChartTitle">연도별 범죄 발생 추이 (2012 ~ 2024)</span>
+          </div>
+          <div class="panel-badge">다년도 시계열</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 범죄 대분류별 발생 현황 -->
+      <div class="chart-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            📑 <span id="categoryChartTitle">범죄 대분류별 발생 현황</span>
+          </div>
+          <div class="panel-badge">지능·교통·폭력·절도 등</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 지역별 상세 데이터 테이블 -->
+    <div class="table-panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          📋 <span id="tableTitle">2024년 지역별 범죄 상세 데이터 현황</span>
+        </div>
+        <button class="btn-export" onclick="exportCsv()">💾 CSV 내보내기</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">지역명 ⬍</th>
+              <th onclick="sortTable(1)">추정 인구 ⬍</th>
+              <th onclick="sortTable(2)">5대 강력범죄 ⬍</th>
+              <th onclick="sortTable(3)">전체 범죄 ⬍</th>
+              <th onclick="sortTable(4)">1천명당 범죄율 ⬍</th>
+              <th onclick="sortTable(5)">안전 등급 ⬍</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RAW_DATA = \${dataJson};
+
+    let currentYear = 2024;
+    let currentScope = 'seoul';
+    let currentSelectedRegion = '서울 강남구';
+    let searchQuery = '';
+
+    let rankingChartInstance = null;
+    let donutChartInstance = null;
+    let trendChartInstance = null;
+    let categoryChartInstance = null;
+
+    // 테마 토글 (Dark <-> Light)
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeBtn(next);
+      refreshDashboard();
+    }
+
+    function updateThemeBtn(theme) {
+      const btn = document.getElementById('themeBtn');
+      if (btn) {
+        btn.textContent = theme === 'dark' ? '☀️ 라이트 모드로 보기' : '🌙 다크 모드로 보기';
+      }
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeBtn(savedTheme);
+
+      initYearSelect();
+      updateRegionSelectOptions();
+      refreshDashboard();
+    });
+
+    function getChartThemeColors() {
+      const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+      return {
+        textColor: isDark ? '#f8fafc' : '#0f172a',
+        mutedColor: isDark ? '#94a3b8' : '#64748b',
+        gridColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)',
+        donutBorder: isDark ? '#131b2e' : '#ffffff',
+      };
+    }
+
+    function initYearSelect() {
+      const select = document.getElementById('yearSelect');
+      select.innerHTML = '';
+      const years = Object.keys(RAW_DATA.byYearData).map(Number).sort((a, b) => b - a);
+      for (const y of years) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y + '년' + (y === 2024 ? ' (최신)' : '');
+        if (y === currentYear) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    function onYearChange() {
+      currentYear = Number(document.getElementById('yearSelect').value);
+      updateNoticeBanner();
+      updateRegionSelectOptions();
+      refreshDashboard();
+    }
+
+    function updateNoticeBanner() {
+      const banner = document.getElementById('noticeBanner');
+      const text = document.getElementById('noticeText');
+      if (currentScope === 'seoul' && currentYear < 2023) {
+        banner.style.display = 'flex';
+        banner.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        banner.style.background = document.documentElement.getAttribute('data-theme') === 'light' ? '#fffbeb' : 'rgba(245, 158, 11, 0.12)';
+        text.innerHTML = '<strong>알림:</strong> ' + currentYear + '년 경찰청 공공데이터는 서울시가 25개 자치구 분리 없이 <strong>서울 전체(1개 행)</strong>로 집계되어 있습니다. 25개 구별 비교는 <strong>2023년 또는 2024년</strong>을 선택하시면 확인하실 수 있습니다.';
+      } else {
+        banner.style.display = 'flex';
+        banner.style.borderColor = 'rgba(59, 130, 246, 0.25)';
+        banner.style.background = document.documentElement.getAttribute('data-theme') === 'light' ? '#eff6ff' : 'rgba(59, 130, 246, 0.1)';
+        text.innerHTML = '<strong>데이터 안내:</strong> 경찰청 공공데이터 지침에 따라 2023~2024년은 서울 25개 자치구가 개별 제공되며, 2012~2022년은 서울시 전체 통합 집계로 제공됩니다. 경기도 31개 시·군은 13개년 연속 분석이 지원됩니다.';
+      }
+    }
+
+    function setScope(scope, btn) {
+      currentScope = scope;
+      document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateNoticeBanner();
+      updateRegionSelectOptions();
+      refreshDashboard();
+    }
+
+    function onSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderTable();
+    }
+
+    function getFilteredRegions() {
+      const yearData = RAW_DATA.byYearData[currentYear];
+      if (!yearData) return [];
+
+      let list = Object.values(yearData.regions).filter(r => {
+        if (currentScope === 'seoul') {
+          return r.isSeoul;
+        } else if (currentScope === 'gyeonggi') {
+          return r.isGyeonggi;
+        }
+        return true;
+      });
+
+      // 서울 자치구 필터 선택 시, 만약 2012-2022처럼 '서울' 1개만 있거나 자치구가 없을 때 안내를 포함
+      return list;
+    }
+
+    function updateRegionSelectOptions() {
+      const select = document.getElementById('regionDetailSelect');
+      select.innerHTML = '';
+
+      const regions = getFilteredRegions();
+      if (!regions.length) {
+        const opt = document.createElement('option');
+        opt.textContent = '선택 가능한 지역 없음';
+        select.appendChild(opt);
+        return;
+      }
+
+      // 기본 선택값 유지 시도
+      let matched = regions.find(r => r.name === currentSelectedRegion || r.cleanName === currentSelectedRegion);
+      if (!matched) {
+        matched = regions[0];
+        currentSelectedRegion = matched.name;
+      }
+
+      for (const r of regions) {
+        const opt = document.createElement('option');
+        opt.value = r.name;
+        opt.textContent = r.name;
+        if (r.name === matched.name) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    function onRegionDetailChange() {
+      currentSelectedRegion = document.getElementById('regionDetailSelect').value;
+      refreshDashboard();
+    }
+
+    function refreshDashboard() {
+      renderKpis();
+      renderRankingChart();
+      renderDonutChart();
+      renderTrendChart();
+      renderCategoryChart();
+      renderTable();
+    }
+
+    function renderKpis() {
+      const yearData = RAW_DATA.byYearData[currentYear];
+      if (!yearData) return;
+
+      const region = yearData.regions[currentSelectedRegion] || 
+        Object.values(yearData.regions).find(r => r.cleanName === currentSelectedRegion) ||
+        Object.values(yearData.regions)[0];
+
+      if (!region) return;
+
+      document.getElementById('kpiTargetName').textContent = region.name + ' (' + currentYear + '년)';
+      document.getElementById('kpiTotalCount').textContent = region.total.toLocaleString() + '건';
+      document.getElementById('kpiCrime5Count').textContent = region.crime5.toLocaleString() + '건';
+
+      const ratio = region.total > 0 ? ((region.crime5 / region.total) * 100).toFixed(1) : '0';
+      document.getElementById('kpiCrime5Ratio').textContent = '전체 범죄 중 ' + ratio + '% 차지';
+
+      if (region.ratePer1k != null) {
+        document.getElementById('kpiRatePer1k').textContent = region.ratePer1k + '건';
+        document.getElementById('kpiPopInfo').textContent = '주민등록인구 ' + (region.pop ? region.pop.toLocaleString() : '-') + '명 기준';
+      } else {
+        document.getElementById('kpiRatePer1k').textContent = '인구 정보 미등록';
+        document.getElementById('kpiPopInfo').textContent = '인구수 데이터 필요';
+      }
+
+      // 순위 산출
+      const filtered = getFilteredRegions().filter(r => r.ratePer1k != null).sort((a, b) => a.ratePer1k - b.ratePer1k);
+      const rankIdx = filtered.findIndex(r => r.name === region.name || r.cleanName === region.cleanName);
+
+      let gradeBadge = '보통';
+      if (region.ratePer1k != null) {
+        if (region.ratePer1k < 6.0) { gradeBadge = '안전 🟢'; }
+        else if (region.ratePer1k < 9.0) { gradeBadge = '양호 🔵'; }
+        else if (region.ratePer1k < 12.0) { gradeBadge = '주의 🟡'; }
+        else { gradeBadge = '경계 🔴'; }
+      }
+      document.getElementById('kpiSafeGrade').textContent = gradeBadge;
+
+      if (rankIdx >= 0) {
+        document.getElementById('kpiRankInfo').textContent = '권역 내 안전도: ' + (rankIdx + 1) + '위 / ' + filtered.length + '개 지역';
+      } else {
+        document.getElementById('kpiRankInfo').textContent = '인구 대비 순위 미산정';
+      }
+    }
+
+    function renderRankingChart() {
+      const themeColors = getChartThemeColors();
+      const regions = getFilteredRegions().filter(r => r.ratePer1k != null)
+        .sort((a, b) => b.ratePer1k - a.ratePer1k); // 높은 순으로 바 정렬
+
+      const scopeTitle = currentScope === 'seoul' ? '서울 자치구' : (currentScope === 'gyeonggi' ? '경기 시·군' : '전체 지역');
+      document.getElementById('rankingChartTitle').textContent = currentYear + '년 ' + scopeTitle + ' 1,000명당 범죄율 순위';
+
+      const labels = regions.map(r => r.cleanName);
+      const values = regions.map(r => r.ratePer1k);
+      const colors = regions.map(r => {
+        if (r.name === currentSelectedRegion || r.cleanName === currentSelectedRegion) return '#ef4444';
+        if (r.ratePer1k < 6.0) return '#10b981';
+        if (r.ratePer1k < 9.0) return '#3b82f6';
+        if (r.ratePer1k < 12.0) return '#f59e0b';
+        return '#f87171';
+      });
+
+      const ctx = document.getElementById('rankingChart').getContext('2d');
+      if (rankingChartInstance) rankingChartInstance.destroy();
+
+      rankingChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.slice(0, 20),
+          datasets: [{
+            label: '1,000명당 5대 범죄율(건)',
+            data: values.slice(0, 20),
+            backgroundColor: colors.slice(0, 20),
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ' 1천명당 범죄율: ' + ctx.raw + '건'
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: themeColors.gridColor },
+              ticks: { color: themeColors.mutedColor }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: themeColors.textColor, font: { size: 11, weight: '600' } }
+            }
+          }
+        }
+      });
+    }
+
+    function renderDonutChart() {
+      const themeColors = getChartThemeColors();
+      const yearData = RAW_DATA.byYearData[currentYear];
+      if (!yearData) return;
+
+      const region = yearData.regions[currentSelectedRegion] || 
+        Object.values(yearData.regions).find(r => r.cleanName === currentSelectedRegion);
+
+      if (!region) return;
+
+      document.getElementById('donutChartTitle').textContent = region.name + ' (' + currentYear + '년) 5대 강력범죄 구성비';
+
+      const d = region.crime5Detail;
+      const labels = ['절도', '폭력', '성범죄', '강도', '살인'];
+      const values = [d['절도'], d['폭력'], d['성범죄'], d['강도'], d['살인']];
+
+      const ctx = document.getElementById('donutChart').getContext('2d');
+      if (donutChartInstance) donutChartInstance.destroy();
+
+      donutChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: ['#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#dc2626'],
+            borderWidth: 2,
+            borderColor: themeColors.donutBorder
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: themeColors.textColor, font: { size: 12, weight: '600' } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ' ' + ctx.label + ': ' + ctx.raw.toLocaleString() + '건 (' + 
+                  (region.crime5 > 0 ? ((ctx.raw / region.crime5) * 100).toFixed(1) : 0) + '%)'
+              }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
+
+    function renderTrendChart() {
+      const themeColors = getChartThemeColors();
+      const yearData = RAW_DATA.byYearData[currentYear];
+      const region = yearData ? (yearData.regions[currentSelectedRegion] || 
+        Object.values(yearData.regions).find(r => r.cleanName === currentSelectedRegion || r.name === currentSelectedRegion)) : null;
+      
+      const cleanName = region ? region.cleanName : (currentSelectedRegion || '').replace(/^(서울특별시|서울|경기도|경기)\s*/g, '').replace(/\s+/g, '');
+      const matchedClean = Object.keys(RAW_DATA.regionTrends).find(k => k === cleanName || cleanName.includes(k) || k.includes(cleanName));
+      const trendList = matchedClean ? RAW_DATA.regionTrends[matchedClean] : [];
+
+      const targetTitle = matchedClean || (region ? region.name : currentSelectedRegion);
+      document.getElementById('trendChartTitle').textContent = targetTitle + ' 연도별 범죄 발생 추이 (2012 ~ 2024)';
+
+      const labels = trendList.map(t => t.year + '년');
+      const totalVals = trendList.map(t => t.total);
+      const crime5Vals = trendList.map(t => t.crime5);
+
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (trendChartInstance) trendChartInstance.destroy();
+
+      trendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: '전체 범죄건수',
+              data: totalVals,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.12)',
+              fill: true,
+              tension: 0.3,
+            },
+            {
+              label: '5대 강력범죄건수',
+              data: crime5Vals,
+              borderColor: '#ef4444',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              tension: 0.3,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: themeColors.textColor, font: { weight: '600' } } }
+          },
+          scales: {
+            x: { grid: { color: themeColors.gridColor }, ticks: { color: themeColors.mutedColor } },
+            y: { grid: { color: themeColors.gridColor }, ticks: { color: themeColors.mutedColor } }
+          }
+        }
+      });
+    }
+
+    function renderCategoryChart() {
+      const themeColors = getChartThemeColors();
+      const yearData = RAW_DATA.byYearData[currentYear];
+      if (!yearData) return;
+
+      const region = yearData.regions[currentSelectedRegion] || 
+        Object.values(yearData.regions).find(r => r.cleanName === currentSelectedRegion);
+
+      if (!region) return;
+
+      document.getElementById('categoryChartTitle').textContent = region.name + ' 범죄 대분류별 발생 현황';
+
+      const sortedCats = Object.entries(region.categories)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8); // 상위 8개 대분류
+
+      const labels = sortedCats.map(c => c[0]);
+      const values = sortedCats.map(c => c[1]);
+
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      if (categoryChartInstance) categoryChartInstance.destroy();
+
+      categoryChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '발생 건수',
+            data: values,
+            backgroundColor: '#8b5cf6',
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: themeColors.mutedColor, font: { size: 11, weight: '600' } } },
+            y: { grid: { color: themeColors.gridColor }, ticks: { color: themeColors.mutedColor } }
+          }
+        }
+      });
+    }
+
+    function renderTable() {
+      document.getElementById('tableTitle').textContent = currentYear + '년 지역별 범죄 상세 데이터 현황 (' + currentScope.toUpperCase() + ')';
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      let regions = getFilteredRegions();
+      if (searchQuery) {
+        regions = regions.filter(r => r.name.toLowerCase().includes(searchQuery) || r.cleanName.toLowerCase().includes(searchQuery));
+      }
+
+      // 기본 정렬: 1천명당 범죄율 기준 (있으면 오름차순, 없으면 건수순)
+      regions.sort((a, b) => (a.ratePer1k ?? 999) - (b.ratePer1k ?? 999));
+
+      if (regions.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="6" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px;">선택하신 조건에 해당하는 데이터가 없습니다. 상단 연도 또는 권역 필터를 변경해 보세요.</td>';
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for (const r of regions) {
+        const isSelected = r.name === currentSelectedRegion || r.cleanName === currentSelectedRegion;
+        const tr = document.createElement('tr');
+        if (isSelected) tr.classList.add('selected');
+        tr.style.cursor = 'pointer';
+        tr.onclick = () => {
+          currentSelectedRegion = r.name;
+          document.getElementById('regionDetailSelect').value = r.name;
+          refreshDashboard();
+        };
+
+        let gradeBadge = '-';
+        if (r.ratePer1k != null) {
+          if (r.ratePer1k < 6.0) gradeBadge = '<span class="tag-grade grade-safe">안전</span>';
+          else if (r.ratePer1k < 9.0) gradeBadge = '<span class="tag-grade grade-normal">양호</span>';
+          else if (r.ratePer1k < 12.0) gradeBadge = '<span class="tag-grade grade-warn">주의</span>';
+          else gradeBadge = '<span class="tag-grade grade-danger">경계</span>';
+        }
+
+        tr.innerHTML = \`
+          <td style="font-weight: 700;">\${isSelected ? '👉 ' : ''}\${r.name}</td>
+          <td>\${r.pop ? r.pop.toLocaleString() + '명' : '-'}</td>
+          <td style="color: var(--danger); font-weight: 700;">\${r.crime5.toLocaleString()}건</td>
+          <td>\${r.total.toLocaleString()}건</td>
+          <td style="font-weight: 800; color: \${r.ratePer1k ? (r.ratePer1k > 10 ? 'var(--danger)' : 'var(--accent)') : 'var(--text-muted)'};">
+            \${r.ratePer1k != null ? r.ratePer1k + '건' : '-'}
+          </td>
+          <td>\${gradeBadge}</td>
+        \`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    let sortDir = {};
+    function sortTable(colIdx) {
+      const tbody = document.getElementById('tableBody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      if (rows.length <= 1 && rows[0].children.length === 1) return; // empty row guard
+      sortDir[colIdx] = !sortDir[colIdx];
+      const isAsc = sortDir[colIdx];
+
+      rows.sort((a, b) => {
+        let valA = a.children[colIdx].textContent.trim().replace(/[^0-9.-]/g, '');
+        let valB = b.children[colIdx].textContent.trim().replace(/[^0-9.-]/g, '');
+
+        if (valA !== '' && valB !== '' && !isNaN(valA) && !isNaN(valB)) {
+          return isAsc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
+        } else {
+          return isAsc ? a.children[colIdx].textContent.localeCompare(b.children[colIdx].textContent)
+                       : b.children[colIdx].textContent.localeCompare(a.children[colIdx].textContent);
+        }
+      });
+
+      tbody.innerHTML = '';
+      rows.forEach(r => tbody.appendChild(r));
+    }
+
+    function exportCsv() {
+      const regions = getFilteredRegions();
+      let csv = '\uFEFF지역명,추정인구,5대강력범죄,전체범죄,1천명당범죄율,살인,강도,성범죄,절도,폭력\r\n';
+
+      for (const r of regions) {
+        const d = r.crime5Detail;
+        csv += \`"\${r.name}",\${r.pop || ''},\${r.crime5},\${r.total},\${r.ratePer1k || ''},\${d['살인']},\${d['강도']},\${d['성범죄']},\${d['절도']},\${d['폭력']}\r\n\`;
+      }
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = \`경찰청_범죄통계_\${currentYear}_\${currentScope}.csv\`;
+      link.click();
+    }
+  </script>
+</body>
+</html>`;
+}
+
+async function main() {
+  console.log('[Dashboard Generator] 경찰청 범죄 데이터 집계 중...');
+  const data = processAllData();
+  console.log(`[Dashboard Generator] ${Object.keys(data.byYearData).length}개 연도 데이터 집계 완료.`);
+
+  console.log('[Dashboard Generator] crime_dashboard.html 생성 중...');
+  const html = buildHtml(data);
+  fs.writeFileSync(OUTPUT_HTML, html, 'utf8');
+  console.log(`[Dashboard Generator] 대시보드 생성 완료: ${OUTPUT_HTML}`);
+
+  const ROOT_OUTPUT_HTML = path.join(__dirname, '..', 'crime_dashboard.html');
+  fs.writeFileSync(ROOT_OUTPUT_HTML, html, 'utf8');
+  console.log(`[Dashboard Generator] 루트 대시보드 동기화 완료: ${ROOT_OUTPUT_HTML}`);
+}
+
+main().catch(err => {
+  console.error('[오류]', err);
+  process.exit(1);
+});

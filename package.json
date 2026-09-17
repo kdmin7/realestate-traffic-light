@@ -4,7 +4,9 @@
   "description": "> **4개의 AI 에이전트가 켜주는 매수 타이밍 신호**",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/validate-project.js",
+    "check": "node scripts/validate-project.js",
+    "serve": "python -m http.server 8000"
   },
   "keywords": [],
   "author": "",

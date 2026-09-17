@@ -60,7 +60,7 @@ re-data-collector  →  re-trend-risk-analyst  →  re-timing-judge  →  re-bri
 
 `MCP/` 폴더에는 파이프라인과 연동된 로컬 MCP 서버가 있다 (Node 18+, stdio 트랜스포트):
 
-- **realestate-server.js (seoul-realty)** — 수도권 거시분석(금리/학군/범죄/인구/소득) + 유형별 실거래(아파트/오피스텔/빌라/단독/상업) + 청약 + 재무계산기 + A2A 위치/역세권/투자가치/삶의질/맞춤추천, 총 27개 도구. 등록 시 `mcp__seoul-realty__*`로 노출되며 re-data-collector 및 후속 에이전트의 핵심 데이터 소스가 된다.
+- **realestate-server.js (seoul-realty)** — 수도권 거시분석(금리/학군/범죄/인구/소득) + 유형별 실거래(아파트/오피스텔/빌라/단독/상업) + 청약 + 재무계산기 + A2A 위치/역세권/투자가치/삶의질/맞춤추천, 총 28개 도구. 등록 시 `mcp__seoul-realty__*`로 노출되며 re-data-collector 및 후속 에이전트의 핵심 데이터 소스가 된다.
 
 등록 명령(경로는 이 저장소 기준으로 갱신된 것):
 ```
