@@ -657,8 +657,8 @@ function buildHtml(data) {
     <!-- 네비게이션 헤더 -->
     <nav class="top-nav">
       <div class="nav-links">
-        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
-        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
+        <a href="../index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
+        <a href="../schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
         <a href="crime_dashboard.html" class="nav-link active">🛡️ 경찰청 범죄 대시보드</a>
       </div>
       <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">🌓 라이트 모드 전환</button>
@@ -684,6 +684,23 @@ function buildHtml(data) {
       <span class="notice-icon">💡</span>
       <div id="noticeText">
         <strong>데이터 안내:</strong> 경찰청 공공데이터 지침에 따라 2023~2024년은 서울 25개 자치구가 개별 제공되며, 2012~2022년은 서울시 전체 통합 집계로 제공됩니다. 경기도 31개 시·군은 13개년 전체 연속 시계열 분석이 지원됩니다.
+      </div>
+    </div>
+
+    <!-- 치안 데이터 에이전트 & MCP 파이프라인 연동 배너 -->
+    <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 26px;">🤖</span>
+        <div>
+          <div style="font-size: 14px; font-weight: 800; color: var(--text);">경찰청 범죄통계 독립 MCP &amp; 멀티 에이전트 연동 체계</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+            <code>crime-collector MCP</code>(독립 서버) ➔ <code>re-data-collector</code>(수집) ➔ <code>re-trend-risk-analyst</code>(치안 리스크 스코어링) ➔ <code>re-safety-analyst</code>(치안 심층 등급 진단)
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <span class="tag-live" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #10b981; font-weight: 700;">re-safety-analyst 가동</span>
+        <a href="../data/re-safety-analyst/gangnam_safety_report.md" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; background: var(--input-bg);">📄 강남구 치안 리포트</a>
       </div>
     </div>
 
@@ -1348,10 +1365,6 @@ async function main() {
   const html = buildHtml(data);
   fs.writeFileSync(OUTPUT_HTML, html, 'utf8');
   console.log(`[Dashboard Generator] 대시보드 생성 완료: ${OUTPUT_HTML}`);
-
-  const ROOT_OUTPUT_HTML = path.join(__dirname, '..', 'crime_dashboard.html');
-  fs.writeFileSync(ROOT_OUTPUT_HTML, html, 'utf8');
-  console.log(`[Dashboard Generator] 루트 대시보드 동기화 완료: ${ROOT_OUTPUT_HTML}`);
 }
 
 main().catch(err => {

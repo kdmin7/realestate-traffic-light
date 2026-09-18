@@ -1,0 +1,1084 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const root = path.resolve(__dirname, '..');
+
+const datasetPath = path.join(root, 'MCP', 'data', 'crime_board_dataset.json');
+const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ 경찰청 범죄통계 및 수도권 치안 종합 게시판</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --panel: #111827;
+      --panel-hover: #1b2438;
+      --panel-border: #1f293d;
+      --border-bright: #2e3d5b;
+      --text: #f9fafb;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-bg: rgba(56, 189, 248, 0.12);
+      --accent-green: #22c55e;
+      --accent-green-bg: rgba(34, 197, 94, 0.15);
+      --accent-yellow: #f59e0b;
+      --accent-yellow-bg: rgba(245, 158, 11, 0.15);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.15);
+      --accent-purple: #a855f7;
+      --input-bg: #0b1120;
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-hover: #f1f5f9;
+      --panel-border: #e2e8f0;
+      --border-bright: #cbd5e1;
+      --text: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-bg: rgba(2, 132, 199, 0.1);
+      --accent-green: #16a34a;
+      --accent-green-bg: #dcfce7;
+      --accent-yellow: #d97706;
+      --accent-yellow-bg: #fef3c7;
+      --accent-red: #dc2626;
+      --accent-red-bg: #fee2e2;
+      --accent-purple: #7c3aed;
+      --input-bg: #ffffff;
+      --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 32px 24px;
+      transition: background-color 0.25s, color 0.25s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+
+    .container {
+      max-width: 1680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 12px 24px;
+      box-shadow: var(--card-shadow);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+      background: var(--input-bg);
+      transition: all 0.2s;
+    }
+    .nav-link:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+    .nav-link.active {
+      background: var(--primary);
+      color: #090d16;
+      font-weight: 800;
+      border-color: var(--primary);
+      box-shadow: 0 0 14px var(--primary-bg);
+    }
+    [data-theme="light"] .nav-link.active {
+      color: #ffffff;
+    }
+
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--primary);
+    }
+
+    /* Header Masthead */
+    .header-masthead {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 28px 36px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .header-title-box {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .header-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
+      flex-shrink: 0;
+    }
+    .header-title h1 {
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 1.0rem;
+      margin-top: 4px;
+    }
+    .header-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border: 1px solid var(--panel-border);
+      background: var(--input-bg);
+      color: var(--text-sub);
+    }
+    .badge-pill.live {
+      background: var(--accent-green-bg);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+    /* Multi-Agent Pipeline Status Banner */
+    .agent-pipeline-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: var(--card-shadow);
+    }
+    .pipeline-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .pipeline-info h4 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .pipeline-info p {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .pipeline-steps-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .step-chip {
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+    .step-chip strong { color: var(--primary); }
+    .btn-report-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-bg);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 9px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.94rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-report-link:hover {
+      background: var(--primary);
+      color: #090d16;
+      font-weight: 800;
+    }
+    [data-theme="light"] .btn-report-link:hover { color: #ffffff; }
+
+    /* KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); }
+    .kpi-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .kpi-desc {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    /* Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.4fr;
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chart-card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .chart-card-badge {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .chart-canvas-box {
+      position: relative;
+      height: 280px;
+      width: 100%;
+    }
+
+    /* Board Controls & Table Panel */
+    .board-panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 28px 32px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .board-title h3 {
+      font-size: 1.45rem;
+      font-weight: 900;
+    }
+    .board-title p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      padding: 14px 20px;
+      border-radius: 14px;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-filter {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-filter:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+    .btn-filter.active {
+      background: var(--primary);
+      color: #090d16;
+      border-color: var(--primary);
+      font-weight: 800;
+    }
+    [data-theme="light"] .btn-filter.active { color: #ffffff; }
+
+    .search-sort-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 0.94rem;
+      min-width: 240px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+    .sort-select {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Table Styling */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      text-align: left;
+    }
+    thead th {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      padding: 14px 18px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--panel-border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    tbody tr {
+      border-bottom: 1px solid var(--panel-border);
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: var(--panel-hover);
+    }
+    tbody td {
+      padding: 14px 18px;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    /* Grade Badges */
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .grade-badge.S { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .grade-badge.A { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
+    .grade-badge.B { background: var(--accent-yellow-bg); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+    .grade-badge.C { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid #fb923c; }
+    .grade-badge.D { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+    .btn-detail {
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--primary);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-detail:hover {
+      background: var(--primary);
+      color: #090d16;
+      border-color: var(--primary);
+    }
+    [data-theme="light"] .btn-detail:hover { color: #ffffff; }
+
+    /* Modal Overlay */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border-bright);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 680px;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-close-btn:hover { color: var(--text); }
+    .modal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .modal-title-row h2 {
+      font-size: 1.8rem;
+      font-weight: 900;
+    }
+    .modal-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .modal-kpi-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .modal-kpi-item span { font-size: 0.82rem; color: var(--text-muted); }
+    .modal-kpi-item strong { font-size: 1.25rem; font-weight: 800; }
+    .modal-details-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .crime-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.92rem;
+    }
+    .crime-bar-label { width: 70px; color: var(--text-muted); font-weight: 600; }
+    .crime-bar-val { width: 60px; text-align: right; font-weight: 700; }
+    .crime-progress-track {
+      flex: 1;
+      height: 8px;
+      background: var(--input-bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .crime-progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--primary);
+    }
+    .modal-comment-box {
+      background: var(--input-bg);
+      border-left: 4px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1280px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px 12px; }
+      .header-masthead { padding: 20px; }
+      .header-title h1 { font-size: 1.6rem; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .board-panel { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Nav -->
+    <nav class="top-nav">
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
+        <a href="crime_board.html" class="nav-link active">🛡️ 경찰청 치안 종합 게시판</a>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">🌓 라이트 모드 전환</button>
+    </nav>
+
+    <!-- Header Masthead -->
+    <header class="header-masthead">
+      <div class="header-title-box">
+        <div class="header-icon">🛡️</div>
+        <div class="header-title">
+          <h1>경찰청 13개년 범죄통계 및 수도권 치안 종합 게시판</h1>
+          <p>공공데이터포털(odcloud.kr) 연계 2012 ~ 2024년 전국 249개 지자체 &amp; 수도권 56개 전 지역 5대 강력범죄 심층 진단</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge-pill live">● LIVE 실시간 연동</span>
+        <span class="badge-pill">기준 연도: 2024년 최신 확정치</span>
+        <span class="badge-pill">데이터 수: 13개 연도 전수 캐시</span>
+      </div>
+    </header>
+
+    <!-- Multi-Agent Pipeline Status Banner -->
+    <section class="agent-pipeline-card">
+      <div class="pipeline-left">
+        <span style="font-size: 28px;">🤖</span>
+        <div class="pipeline-info">
+          <h4>독립 MCP(crime-collector) &amp; 멀티 에이전트 치안 평가 파이프라인 가동 중</h4>
+          <p>원천 수집부터 퀀트 스코어링 및 범죄 프로파일링까지 완결된 자율 체인</p>
+        </div>
+      </div>
+      <div class="pipeline-steps-inline">
+        <div class="step-chip"><strong>MCP</strong> crime-collector</div>
+        <span style="color: var(--text-muted);">➔</span>
+        <div class="step-chip"><strong>01</strong> re-data-collector</div>
+        <span style="color: var(--text-muted);">➔</span>
+        <div class="step-chip"><strong>02</strong> re-trend-risk-analyst</div>
+        <span style="color: var(--text-muted);">➔</span>
+        <div class="step-chip" style="border-color: var(--accent-green); color: var(--accent-green);"><strong>03</strong> re-safety-analyst</div>
+        <a href="data/re-safety-analyst/gangnam_safety_report.md" class="btn-report-link">📄 강남구 치안 리포트 열기</a>
+      </div>
+    </section>
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">수도권 전체 5대 범죄율</div>
+        <div class="kpi-value num" style="color: var(--primary);">7.80<span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">건/천명</span></div>
+        <div class="kpi-desc">살인·강도·성범죄·절도·폭력 기준</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">서울 최우수 안심 자치구</div>
+        <div class="kpi-value" style="color: var(--accent-green);">성북구 <span style="font-size: 1.1rem; color: var(--text-muted);">(5.2건)</span></div>
+        <div class="kpi-desc">도봉구(5.8건) · 노원구(6.3건) 순</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">경기 최우수 안심 시·군</div>
+        <div class="kpi-value" style="color: var(--accent-green);">의왕시 <span style="font-size: 1.1rem; color: var(--text-muted);">(4.0건)</span></div>
+        <div class="kpi-desc">남양주(5.5건) · 하남(6.1건) 순</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">서울 광역 상업·유흥지</div>
+        <div class="kpi-value" style="color: #fb923c;">강남구 <span style="font-size: 1.1rem; color: var(--text-muted);">(11.5건)</span></div>
+        <div class="kpi-desc">유동인구 범죄 집중 (주거벨트 분리)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">13개년 장기 시계열 추이</div>
+        <div class="kpi-value num" style="color: var(--primary);">-25.3%</div>
+        <div class="kpi-desc">10년 전 대비 지속 하향 안정세</div>
+      </div>
+    </div>
+
+    <!-- Charts Analytics Section -->
+    <div class="charts-grid">
+      <!-- Chart 1: Bar Chart of Crime Rates -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">📊 수도권 주요 지역 1천명당 5대 범죄율 비교</div>
+          <span class="chart-card-badge">낮을수록 안전</span>
+        </div>
+        <div class="chart-canvas-box">
+          <canvas id="rankingChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Donut Chart -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">🍩 5대 강력범죄 유형별 비중</div>
+          <span class="chart-card-badge">전체 강력범죄</span>
+        </div>
+        <div class="chart-canvas-box">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: Multi-year Trend Line -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">📈 13개년 강력범죄 지수 추이 (2012~2024)</div>
+          <span class="chart-card-badge">시계열 인덱스</span>
+        </div>
+        <div class="chart-canvas-box">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board Table Panel -->
+    <section class="board-panel">
+      <div class="board-header">
+        <div class="board-title">
+          <h3>📋 수도권 자치구 및 시·군 치안 안전 게시판</h3>
+          <p>경찰청 확정 빅데이터 기반 정량 랭킹, 치안 안전 등급(S~D) 및 세부 프로파일</p>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="filter-tabs">
+          <button class="btn-filter active" onclick="filterData('all', this)">전체 지역 (55개)</button>
+          <button class="btn-filter" onclick="filterData('seoul', this)">🏛️ 서울 25개 구</button>
+          <button class="btn-filter" onclick="filterData('gyeonggi', this)">🌲 경기 주요 시·군</button>
+          <button class="btn-filter" onclick="filterData('safe', this)">🟢 최우수 안심 (S·A등급)</button>
+          <button class="btn-filter" onclick="filterData('caution', this)">🔴 선별 주의 (C·D등급)</button>
+        </div>
+        <div class="search-sort-group">
+          <input type="text" id="searchInput" class="search-input" placeholder="지역명 검색 (예: 강남, 성북, 분당, 의왕...)" oninput="onSearch()">
+          <select id="sortSelect" class="sort-select" onchange="onSortChange()">
+            <option value="rate-asc">범죄율 낮은 순 (안전순)</option>
+            <option value="rate-desc">범죄율 높은 순</option>
+            <option value="total-desc">총 범죄수 많은 순</option>
+            <option value="name-asc">지역명 가나다순</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="crimeTable">
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th>지역명</th>
+              <th>권역</th>
+              <th>인구수</th>
+              <th>총 범죄수</th>
+              <th>5대 강력범죄수</th>
+              <th>1천명당 범죄율</th>
+              <th>치안 안전 등급</th>
+              <th>치안 리스크</th>
+              <th>세부 분석</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Rows dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBg(event)">
+    <div class="modal-box" id="modalBox">
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+      <div class="modal-title-row">
+        <h2 id="mDistrictName">지역명</h2>
+        <span id="mGradeBadge" class="grade-badge S">S 등급</span>
+      </div>
+
+      <div class="modal-kpi-grid">
+        <div class="modal-kpi-item">
+          <span>인구 1천명당 범죄율</span>
+          <strong id="mRate" class="num" style="color: var(--primary);">-</strong>
+        </div>
+        <div class="modal-kpi-item">
+          <span>5대 강력범죄수</span>
+          <strong id="mC5" class="num">-</strong>
+        </div>
+        <div class="modal-kpi-item">
+          <span>치안 리스크 점수</span>
+          <strong id="mRisk" class="num">-</strong>
+        </div>
+      </div>
+
+      <div class="modal-details-box">
+        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">5대 강력범죄 세부 발생 내역</div>
+        <div class="crime-bar-row">
+          <span class="crime-bar-label">폭력</span>
+          <div class="crime-progress-track"><div class="crime-progress-fill" id="barViolence" style="width: 50%; background: #ef4444;"></div></div>
+          <span class="crime-bar-val num" id="valViolence">-</span>
+        </div>
+        <div class="crime-bar-row">
+          <span class="crime-bar-label">절도</span>
+          <div class="crime-progress-track"><div class="crime-progress-fill" id="barTheft" style="width: 30%; background: #f59e0b;"></div></div>
+          <span class="crime-bar-val num" id="valTheft">-</span>
+        </div>
+        <div class="crime-bar-row">
+          <span class="crime-bar-label">성범죄</span>
+          <div class="crime-progress-track"><div class="crime-progress-fill" id="barSexual" style="width: 15%; background: #a855f7;"></div></div>
+          <span class="crime-bar-val num" id="valSexual">-</span>
+        </div>
+        <div class="crime-bar-row">
+          <span class="crime-bar-label">강도</span>
+          <div class="crime-progress-track"><div class="crime-progress-fill" id="barRobbery" style="width: 5%; background: #38bdf8;"></div></div>
+          <span class="crime-bar-val num" id="valRobbery">-</span>
+        </div>
+        <div class="crime-bar-row">
+          <span class="crime-bar-label">살인</span>
+          <div class="crime-progress-track"><div class="crime-progress-fill" id="barMurder" style="width: 2%; background: #64748b;"></div></div>
+          <span class="crime-bar-val num" id="valMurder">-</span>
+        </div>
+      </div>
+
+      <div class="modal-comment-box" id="mComment">
+        생활권 진단 코멘트 로딩 중...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RAW_DATA = ${JSON.stringify(dataset)};
+    let currentFilter = 'all';
+    let currentSort = 'rate-asc';
+    let searchQuery = '';
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('themeBtn').innerText = isDark ? '🌙 다크 모드 전환' : '🌓 라이트 모드 전환';
+    }
+
+    function renderTable() {
+      let list = RAW_DATA.filter(item => {
+        if (currentFilter === 'seoul' && item.province !== 'seoul') return false;
+        if (currentFilter === 'gyeonggi' && item.province !== 'gyeonggi') return false;
+        if (currentFilter === 'safe' && !['S', 'A'].includes(item.grade)) return false;
+        if (currentFilter === 'caution' && !['C', 'D'].includes(item.grade)) return false;
+        if (searchQuery && !item.name.includes(searchQuery)) return false;
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (currentSort === 'rate-asc') return a.rate - b.rate;
+        if (currentSort === 'rate-desc') return b.rate - a.rate;
+        if (currentSort === 'total-desc') return b.total - a.total;
+        if (currentSort === 'name-asc') return a.name.localeCompare(b.name, 'ko');
+        return 0;
+      });
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      list.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        const provBadge = row.province === 'seoul' ? '<span style="color: #38bdf8; font-weight:700;">서울</span>' : '<span style="color: #22c55e; font-weight:700;">경기</span>';
+        const riskFormat = row.riskScore > 0 ? \`+\${row.riskScore}\` : \`\${row.riskScore}\`;
+        const riskColor = row.riskScore <= -1 ? 'var(--accent-green)' : (row.riskScore === 0 ? 'var(--text-muted)' : 'var(--accent-red)');
+
+        tr.innerHTML = \`
+          <td class="num" style="font-weight:700; color: var(--text-muted);">\${idx + 1}</td>
+          <td style="font-weight: 800; font-size: 1.02rem;">\${row.name}</td>
+          <td>\${provBadge}</td>
+          <td class="num">\${row.pop.toLocaleString()}명</td>
+          <td class="num">\${row.total.toLocaleString()}건</td>
+          <td class="num" style="font-weight: 700;">\${row.c5.toLocaleString()}건</td>
+          <td class="num" style="font-weight: 800; color: var(--primary); font-size: 1.0rem;">\${row.rate.toFixed(2)}</td>
+          <td><span class="grade-badge \${row.grade}">\${row.grade}등급 (\${row.gradeText})</span></td>
+          <td class="num" style="font-weight: 800; color: \${riskColor}">\${riskFormat}</td>
+          <td><button class="btn-detail" onclick="openDetail('\${row.name}')">상세 보기</button></td>
+        \`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterData(type, btn) {
+      currentFilter = type;
+      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    }
+
+    function onSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim();
+      renderTable();
+    }
+
+    function onSortChange() {
+      currentSort = document.getElementById('sortSelect').value;
+      renderTable();
+    }
+
+    function openDetail(name) {
+      const item = RAW_DATA.find(d => d.name === name);
+      if (!item) return;
+
+      document.getElementById('mDistrictName').innerText = item.name;
+      const b = document.getElementById('mGradeBadge');
+      b.className = \`grade-badge \${item.grade}\`;
+      b.innerText = \`\${item.grade}등급 (\${item.gradeText})\`;
+
+      document.getElementById('mRate').innerText = \`\${item.rate.toFixed(2)}건/천명\`;
+      document.getElementById('mC5').innerText = \`\${item.c5.toLocaleString()}건\`;
+      document.getElementById('mRisk').innerText = item.riskScore > 0 ? \`+\${item.riskScore}\` : \`\${item.riskScore}\`;
+
+      const dt = item.detail;
+      const totalDet = (dt.violence + dt.theft + dt.sexual + dt.robbery + dt.murder) || 1;
+      
+      document.getElementById('valViolence').innerText = \`\${dt.violence.toLocaleString()}건\`;
+      document.getElementById('barViolence').style.width = \`\${(dt.violence / totalDet * 100).toFixed(1)}%\`;
+      
+      document.getElementById('valTheft').innerText = \`\${dt.theft.toLocaleString()}건\`;
+      document.getElementById('barTheft').style.width = \`\${(dt.theft / totalDet * 100).toFixed(1)}%\`;
+
+      document.getElementById('valSexual').innerText = \`\${dt.sexual.toLocaleString()}건\`;
+      document.getElementById('barSexual').style.width = \`\${(dt.sexual / totalDet * 100).toFixed(1)}%\`;
+
+      document.getElementById('valRobbery').innerText = \`\${dt.robbery.toLocaleString()}건\`;
+      document.getElementById('barRobbery').style.width = \`\${(dt.robbery / totalDet * 100).toFixed(1)}%\`;
+
+      document.getElementById('valMurder').innerText = \`\${dt.murder.toLocaleString()}건\`;
+      document.getElementById('barMurder').style.width = \`\${(dt.murder / totalDet * 100).toFixed(1)}%\`;
+
+      let comment = '';
+      if (item.grade === 'S' || item.grade === 'A') {
+        comment = \`<strong>[치안 우수 안심 주거지]</strong> \${item.name}은(는) 1천명당 5대 범죄율이 \${item.rate}건으로 수도권 평균(7.8건)을 크게 하회하는 매우 안전한 정주 환경을 자랑합니다. 대단지 아파트 및 학군 중심의 치안 인프라가 촘촘히 구축되어 있습니다.\`;
+      } else if (item.grade === 'B') {
+        comment = \`<strong>[수도권 평균 수준]</strong> \${item.name}은(는) 1천명당 5대 범죄율이 \${item.rate}건으로 수도권 표준선에 형성되어 있습니다. 주거 밀집 구역은 안전성이 우수하나, 일부 지하철 역세권 상업지와 분리 진단이 권장됩니다.\`;
+      } else {
+        comment = \`<strong>[선별 주의 생활권]</strong> \${item.name}은(는) 1천명당 5대 범죄율이 \${item.rate}건으로 상업·업무·유흥가 밀집에 따른 유동인구 음주 시비 및 절도 빈도가 높습니다. 아파트 주거벨트(치안 안전)와 역세권 유흥상권을 명확히 분리하여 임장하시기 바랍니다.\`;
+      }
+      document.getElementById('mComment').innerHTML = comment;
+
+      document.getElementById('modalBackdrop').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('active');
+    }
+
+    function closeModalOnBg(e) {
+      if (e.target.id === 'modalBackdrop') closeModal();
+    }
+
+    // Initialize Charts
+    function initCharts() {
+      // 1. Ranking Chart (Top 7 Safe vs Top 5 Alert)
+      const ctxRank = document.getElementById('rankingChart').getContext('2d');
+      const sampleDistricts = ['의왕시', '성북구', '남양주', '도봉구', '노원구', '동작구', '수도권평균', '송파구', '서초구', '마포구', '강남구', '용산구'];
+      const sampleRates = [4.02, 5.20, 5.51, 5.80, 6.31, 6.48, 7.80, 7.45, 7.82, 9.80, 11.50, 15.66];
+      const barColors = sampleRates.map(r => r < 7.0 ? 'rgba(34, 197, 94, 0.75)' : (r <= 8.0 ? 'rgba(56, 189, 248, 0.75)' : 'rgba(239, 68, 68, 0.75)'));
+
+      new Chart(ctxRank, {
+        type: 'bar',
+        data: {
+          labels: sampleDistricts,
+          datasets: [{
+            label: '1,000명당 범죄율 (건)',
+            data: sampleRates,
+            backgroundColor: barColors,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } }
+          }
+        }
+      });
+
+      // 2. Donut Chart
+      const ctxDonut = document.getElementById('donutChart').getContext('2d');
+      new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['폭력범죄', '절도범죄', '성범죄', '강도/공갈', '살인'],
+          datasets: [{
+            data: [53.4, 34.2, 10.5, 1.6, 0.3],
+            backgroundColor: ['#ef4444', '#f59e0b', '#a855f7', '#38bdf8', '#64748b'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 3. Trend Line Chart
+      const ctxTrend = document.getElementById('trendChart').getContext('2d');
+      new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: ['2012', '2014', '2016', '2018', '2020', '2022', '2023', '2024'],
+          datasets: [{
+            label: '수도권 강력범죄 지수 (2012=100)',
+            data: [100.0, 95.2, 89.4, 82.1, 75.6, 74.2, 76.8, 74.7],
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 4,
+            pointBackgroundColor: '#38bdf8'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 60, max: 110, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTable();
+      initCharts();
+    });
+  </script>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(root, 'crime_board.html'), htmlContent, 'utf8');
+console.log('✔ Successfully generated root crime_board.html');

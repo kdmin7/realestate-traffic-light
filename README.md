@@ -42,42 +42,47 @@
 
 ---
 
-## 🛠️ 최근 업데이트 내역 (2026-09-18)
+## 🛠️ 최근 업데이트 내역 (2026-09-19)
 
-오늘 진행된 주요 개선 및 결함 해결 작업 내역입니다.
+오늘(2026-09-19) 진행된 자치구별 심층 치안 대시보드 신설, 치안 종합 게시판 양방향 연동, 뒤로가기 내비게이션 및 에이전트 파이프라인 고도화 내역입니다.
 
-### 1. 성남시(분당/판교) 심층 리포트 모듈 ② (NEIS 학군) 연동 복구 및 Blank 결함 완전 해결
-- **문제 진단**: `index.html`에서 "성남시 (분당/판교)" 심층 분석 리포트 진입 시 모듈 ②(명문 학군 & 학원가 인프라 지수)가 Blank(빈칸)으로 출력되거나 기본 폴백값으로 떨어지는 현상 확인.
-- **원인**: 로컬 파일(`file://`) 프로토콜 실행 시 브라우저 보안 정책에 의해 `fetch('regions_detail.json')`가 차단되어 데이터 연동이 실패함.
-- **조치 사항**:
-  - `data/district_analysis_dashboard.html`에 31개 자치구 정밀 빅데이터를 `EMBEDDED_REGIONS_DETAIL` 상수로 내장 컴파일하여 로컬/오프라인 환경에서도 100% 즉시 렌더링되도록 개선.
-  - `findRegionTarget` 지능형 매칭 엔진을 도입하여 `성남시 (분당/판교)`, `성남`, `분당`, `판교` 등 다양한 키워드를 완벽히 인식하도록 처리.
-  - NEIS 대표 학교 목록을 시각적인 뱃지 칩(`school-tag`) UI로 고도화 (낙생고, 서현고, 분당대진고, 내정중, 수내중 등).
+### 1. 자치구별 심층 치안 대시보드 (`district_safety_dashboard.html`) 신설
+- **개요**: 마크다운 텍스트 리포트(`gangnam_safety_report.md`) 수준의 치안 전문 분석가(`re-safety-analyst`) 심층 분석을 수도권 55개 전 지자체 인터랙티브 HTML 대시보드로 승격.
+- **핵심 모듈 구현**:
+  - **치안 KPI 매트릭스**: 인구 1천명당 5대 범죄율, 5대 강력범죄 총건수, 수도권 평균(7.80건) 대비 편차율, 치안 리스크 점수
+  - **5대 범죄 구성비 분석**: 폭행·절도·성범죄·강도·살인 상세 발생건수와 점유율 프로그레스 바 + Chart.js 도넛 차트
+  - **13개년 시계열 추이 (2012 ~ 2024)**: 경찰청 13개년 통계 기반 연도별 강력범죄 발생 추세 및 증감률 라인 차트
+  - **생활권 이원화 정밀 진단**: Zone A(대단지 아파트 안심 주거벨트) vs Zone B(역세권·유흥상업 구역) 분리 평가
+  - **수요자별 맞춤 실전 행동 가이드**: 가족 실수요자 / 1인 가구·임차인 / 투자 신호등 연계 체크리스트
+  - **동적 지역 전환 & 테마 지원**: 우측 상단 55개 지역 셀렉터 및 다크/라이트 모드 지원
 
-### 2. 경찰청 범죄통계 대시보드 (`crime_dashboard.html`) 정상화 및 최신화
-- `crime_dashboard.html`의 2012~2024년 13개년 범죄 발생 통계 및 지자체별 순위 데이터 렌더링 점검 및 동기화 완료.
-- 5대 강력범죄 구성비 및 시계열 추이 그래프 표시 안정화.
+### 2. 상단 "조금 전 이동했던 페이지로 이동" 내비게이션 복귀 버튼 탑재
+- `district_safety_dashboard.html` 최상단 좌측에 **`⬅️ 조금 전 페이지로 이동`** 버튼을 눈에 띄게 배치하여, 게시판(`crime_board.html`)이나 메인 대시보드(`index.html`)에서 유입된 사용자가 직전 탐색 위치와 스크롤 상태로 1-클릭 즉시 복귀할 수 있도록 구현.
+- `window.history.back()` 우선 처리 및 `document.referrer`, `crime_board.html` 3단계 폴백 로직 탑재.
 
-### 3. 메인 대시보드 (`index.html`) 대화면 고가독성 & 모바일 반응형 전면 개편
-- **폰트 크기 및 시인성 대폭 상향**:
-  - 메인 타이틀 (`1.85rem` ➔ `2.1rem`, 굵기 900)
-  - 지역 카드 타이틀 (`1.35rem` ➔ `1.45rem`, 가독성 극대화)
-  - 핵심 전용 84㎡ 실거래가 (`1.22rem` ➔ `1.35rem`, 스카이블루 고대비 강조)
-  - 매크로 지표 수치 (`1.8rem` ➔ `2.1rem`)
-  - 카드 테이블 상세 지표 (`0.9rem ~ 1.0rem` ➔ `0.98rem ~ 1.1rem`)
-- **Chart.js 비교 그래프 가독성 강화**:
-  - 차트 높이 `400px`로 확대, 축 라벨 폰트(`13px`, 굵기 600) 및 막대 테두리 선명도 증대.
-  - 범례 및 툴팁 폰트 확대(`14px`)로 호버 시 가격 비교 용이.
-- **모바일/태블릿 반응형 무결점 점검**:
-  - 상단 메뉴 가로 터치 스크롤(`nowrap`) 처리로 스마트폰에서 메뉴 줄바꿈 깨짐 방지.
-  - 모바일(≤768px)에서 지역 카드를 1열 전폭(`1fr`)으로 자동 전환하여 텍스트 말림/잘림 원천 방지.
-  - 모바일 최소 터치 타깃 `44px~48px` 확보.
+### 3. 치안 종합 게시판 (`crime_board.html`) 양방향 연동 고도화
+- **지역명 원클릭 이동**: 테이블 내 수도권 자치구 및 시·군 이름(예: `강남구 ↗`) 클릭 시 해당 지역 심층 치안 대시보드로 즉시 전환.
+- **행별 대시보드 버튼**: 테이블 각 행에 `[대시보드 ↗]` 및 `[요약]` 버튼을 배치하여 직관적 이동 지원.
+- **요약 모달 내부 바로가기**: 팝업 모달 하단에 `[🛡️ 선택 지역 심층 치안 리포트 대시보드 열기 ➔]` 버튼 추가.
+- **에이전트 배너 링크 연계**: 상단 파이프라인 배너에서 강남구 심층 대시보드로 즉시 연결.
+- 불필요하고 중복되었던 구형 `crime_dashboard.html` 완전 정리 및 신규 게시판 체계로 일원화.
+
+### 4. 치안 전문 분석가 에이전트 (`re-safety-analyst`) 및 통합 파이프라인 검증
+- 경찰청 13개년 범죄통계(odcloud)와 5대 강력범죄 시계열 추이, 인구 천명당 범죄율을 전문 진단하는 `re-safety-analyst` 정의 등록 (`.agents/agents/re-safety-analyst/agent.md`, `.claude/agents/re-safety-analyst.md`).
+- `crime-collector` MCP(4개 도구) ➔ `re-data-collector` ➔ `re-trend-risk-analyst` ➔ `re-safety-analyst` 체인 무결성 점검 완료 (`scripts/verify_full_system.js` 전 항목 PASS).
+
+<details>
+<summary><strong>이전 업데이트 내역 접기/펼치기 (2026-09-18)</strong></summary>
+
+- **성남시(분당/판교) 심층 리포트 모듈 ② (NEIS 학군) 연동 복구 및 Blank 결함 완전 해결**: `EMBEDDED_REGIONS_DETAIL` 내장 컴파일로 `file://` 보안 차단 해결 및 `findRegionTarget` 지능형 매칭 도입.
+- **메인 대시보드 (`index.html`) 대화면 고가독성 & 모바일 반응형 전면 개편**: 메인 타이틀(2.1rem), 실거래가(1.35rem 스카이블루), Chart.js(400px 대화면), 모바일 터치 스크롤 칩 네비게이션 적용.
+</details>
 
 ---
 
 ## 🔄 Agent · MCP · 데이터 흐름 (Data Flow Architecture)
 
-전체 시스템은 **공공데이터 원천 → 3개 MCP 서버 → 5개 전문 에이전트 체인 → 대시보드 & 산출물 계층**의 4단계 파이프라인으로 유기적으로 연결됩니다.
+전체 시스템은 **공공데이터 원천 → 3개 MCP 서버 → 6개 전문 에이전트 체인 → 대시보드 & 산출물 계층**의 파이프라인으로 유기적으로 연결됩니다.
 
 ```mermaid
 flowchart TD
@@ -95,18 +100,20 @@ flowchart TD
     end
 
     subgraph AGENTCHAIN ["🤖 멀티 에이전트 파이프라인"]
-        A1["01. re-market-data<br/>(공공데이터 원천 수집)"]
-        A2["02. re-trend-risk-analyst<br/>(트렌드 모멘텀 & 리스크 스코어링)"]
-        A3["03. re-investment-strategist<br/>(규칙 기반 신호등 판정: BUY/WARN/WATCH)"]
-        A4["04. re-briefing-reporter<br/>(투자 브리핑 리포트 생성)"]
-        A5["05. re-tax-strategist<br/>(취득세·보유세·양도세 세후 수익률 시뮬레이션)"]
+        A1["01. re-market-data<br/>(공공데이터 원천 수집 - 국토부/한은/나이스/경찰청)"]
+        A2["02. re-trend-risk-analyst<br/>(트렌드 모멘텀 & 4대 리스크 스코어링: 고점/환금/금리/치안)"]
+        A6["03. re-safety-analyst<br/>(경찰청 13개년 범죄통계 & 자치구 치안 안전 등급 진단)"]
+        A3["04. re-investment-strategist<br/>(규칙 기반 신호등 판정: BUY/WARN/WATCH)"]
+        A4["05. re-briefing-reporter<br/>(투자 브리핑 리포트 생성)"]
+        A5["06. re-tax-strategist<br/>(취득세·보유세·양도세 세후 수익률 시뮬레이션)"]
     end
 
     subgraph OUTPUTLAYER ["📊 최종 산출물 및 대시보드"]
         OUT1["index.html<br/>56개 지역 신호등 메인 대시보드"]
-        OUT2["crime_dashboard.html<br/>2012~2024 경찰청 범죄통계 대시보드"]
+        OUT2["crime_board.html<br/>2012~2024 경찰청 범죄통계 종합 게시판"]
         OUT3["schoolinfo_dashboard.html<br/>나이스 학군 심층 분석 대시보드"]
-        OUT4["data/re-*/*.md<br/>지역별 raw / scores / signal / briefing 리포트"]
+        OUT4["district_safety_dashboard.html<br/>55개 지자체 심층 치안 대시보드 (복귀 버튼 탑재)"]
+        OUT5["data/re-*/*.md<br/>지역별 raw / scores / safety / signal / briefing 리포트"]
     end
 
     D1 & D2 --> M1
@@ -116,13 +123,18 @@ flowchart TD
 
     M1 & M2 & M3 --> A1
     A1 -->|raw.md| A2
+    M3 & A1 --> A6
+    A6 -->|치안 대시보드 연동| OUT4
+    A6 -->|safety_report.md| OUT5
     A2 -->|scores.md| A3
     A3 -->|signal.md| A4
     A3 -.-> A5
-    A4 -->|briefing.md| OUT4
+    A4 -->|briefing.md| OUT5
 
     A3 & A4 -->|REGION_DATA 갱신| OUT1
     M3 -->|13개년 집계| OUT2
+    OUT2 -->|지역명/버튼 클릭| OUT4
+    OUT4 -->|조금 전 페이지로 이동| OUT2
     M2 -->|학군 데이터| OUT3
 ```
 
@@ -193,7 +205,7 @@ flowchart TD
 
 ### 시나리오 1. 👨‍👩‍👧 실수요자 / 학부모 (안전 + 학군 중심 지역 선정)
 1. **메인 화면 탐색**: [`index.html`](index.html)에서 `🌲 경기도` 또는 `🏛️ 서울특별시` 탭을 선택하고 신호등 상태가 `🟢 매수고려` 또는 `🟡 주의`인 후보 지역을 1차 선별합니다.
-2. **치안 안전도 점검**: 상단 링크의 [`🛡️ 경찰청 범죄통계 대시보드`](crime_dashboard.html)를 열어 후보 지역의 **인구 1,000명당 5대 범죄율 랭킹**을 확인합니다.
+2. **치안 안전도 점검**: 상단 링크의 [`🛡️ 경찰청 치안 종합 게시판`](crime_board.html)을 열어 후보 지역의 **인구 1,000명당 5대 범죄율 랭킹**을 확인합니다.
 3. **학군 우수성 비교**: [`🏫 나이스 학군 대시보드`](schoolinfo_dashboard.html)에서 자치구별 특목고·자율고 배정 현황과 명문고 분포를 비교하여 최종 이사 후보지를 확정합니다.
 
 ### 시나리오 2. 💼 갭투자자 / 자산가 (저평가·고수익 매물 발굴)
@@ -202,7 +214,7 @@ flowchart TD
 3. **지역별 심층 분석**: 카드를 클릭하여 [상세 분석 페이지](data/district_analysis_dashboard.html)로 이동, **모듈 ③(LTV 40% 대출 및 월 순현금흐름 시뮬레이션)**을 통해 월 이자 부담액과 전세/월세 기대수익 간의 실수익성을 검증합니다.
 
 ### 시나리오 3. 📊 공공데이터 리서처 / 부동산 분석가 (시계열 심층 연구)
-1. **13개년 범죄 추이 분석**: [`crime_dashboard.html`](crime_dashboard.html)에서 2012년부터 2024년까지의 5대 범죄 추이를 시계열로 비교 분석하고, `💾 CSV 내보내기`로 엑셀 모델링을 진행합니다.
+1. **13개년 범죄 추이 분석**: [`crime_board.html`](crime_board.html)에서 2012년부터 2024년까지의 5대 범죄 추이를 시계열로 비교 분석하고, 자치구별 치안 등급과 리스크 스코어를 모니터링합니다.
 2. **MCP 도구 직접 호출**: Claude Code 또는 터미널 환경에서 `get_price_trend`, `get_jeonse_ratio`, `get_district_score` 도구를 직접 호출하여 논문 및 브리핑 보고서용 원자재 데이터를 즉시 추출합니다.
 
 ---
@@ -212,7 +224,7 @@ flowchart TD
 ```bash
 # 1. [웹 대시보드 브라우징 (PowerShell 실행)]
 Start-Process "index.html"
-Start-Process "crime_dashboard.html"
+Start-Process "crime_board.html"
 Start-Process "schoolinfo_dashboard.html"
 Start-Process "data\district_analysis_dashboard.html?region=성남시 (분당/판교)"
 
@@ -279,7 +291,8 @@ npm run daily:sync         # 일일 증분 파이프라인
 ## 🔍 대시보드 파일 맵
 
 - [`index.html`](index.html): **부동산 신호등 메인 대시보드** (수도권 56개 전 지역 종합 현황 및 비교 차트)
-- [`crime_dashboard.html`](crime_dashboard.html): **경찰청 범죄통계 대시보드** (2012~2024년 13개년 5대 강력범죄 추이 및 지자체 치안 순위)
+- [`crime_board.html`](crime_board.html): **경찰청 범죄통계 종합 게시판** (2012~2024년 13개년 5대 강력범죄 추이 및 지자체 치안 안전 등급)
+- [`district_safety_dashboard.html`](district_safety_dashboard.html): **자치구별 심층 치안 대시보드** (55개 지자체 5대 범죄 구성비, 13개년 추이, 생활권 이원화 진단, 상단 뒤로가기 복귀 버튼 탑재)
 - [`schoolinfo_dashboard.html`](schoolinfo_dashboard.html): **나이스 학군 대시보드** (자치구별 초·중·고 학군 및 명문 학교 인프라)
 - [`data/district_analysis_dashboard.html`](data/district_analysis_dashboard.html): **지역 심층 분석 대시보드** (랜드마크, 학군·학원가, LTV 40% 현금흐름, 에이전트 진단)
 - [`mcp_architecture_dashboard.html`](mcp_architecture_dashboard.html): MCP 아키텍처 및 도구 파이프라인 시각화 화면

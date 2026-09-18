@@ -307,7 +307,7 @@
     }
     .pipeline-flow {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 12px;
     }
     .pipeline-step {
@@ -843,7 +843,7 @@
       <div class="nav-links">
         <a href="index.html" class="nav-link active">🚦 메인 대시보드 (신호등)</a>
         <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
-        <a href="crime_dashboard.html" class="nav-link">🛡️ 경찰청 범죄 대시보드</a>
+        <a href="crime_board.html" class="nav-link">🛡️ 경찰청 치안 종합 게시판</a>
       </div>
       <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="테마 전환">
         <span id="themeToggleIcon">☀️</span>
@@ -910,7 +910,7 @@
       <div class="pipeline-header">
         <div>
           <h3 id="pipeline-title">🔗 Agent · MCP · 산출물 실행 상태</h3>
-          <p>최종 점검: 2026-09-18 00:25 (KST) · 3개 MCP 서버(39개 도구) 및 56개 지역 데이터 연동 검증 완료</p>
+          <p>최종 점검: 2026-09-18 (KST) · 3개 독립 MCP 서버(39개 도구) 및 6개 전문 에이전트 연동 검증 완료</p>
         </div>
         <span class="pipeline-status">✅ 검증 완료 (39 Tools / PASS)</span>
       </div>
@@ -918,31 +918,36 @@
         <div class="pipeline-step">
           <strong>01 · 수집</strong>
           <span>re-data-collector</span>
-          <small>국토부 실거래가 + 나이스 학군 + 경찰청 범죄통계(3개월 주기)</small>
+          <small>국토부 실거래가 + 나이스 학군 + 경찰청 범죄통계 (crime-collector MCP)</small>
         </div>
         <div class="pipeline-step">
-          <strong>02 · 분석</strong>
+          <strong>02 · 스코어링</strong>
           <span>re-trend-risk-analyst</span>
-          <small>raw → data/re-trend-risk-analyst/{slug}_scores.md</small>
+          <small>트렌드 모멘텀 & 4대 리스크(고점·환금성·금리·치안 리스크)</small>
         </div>
         <div class="pipeline-step">
-          <strong>03 · 판정</strong>
+          <strong>03 · 치안 진단</strong>
+          <span>re-safety-analyst</span>
+          <small>경찰청 13개년 범죄·5대 강력범죄·자치구 안전등급(S~D)</small>
+        </div>
+        <div class="pipeline-step">
+          <strong>04 · 판정</strong>
           <span>re-timing-judge</span>
-          <small>scores → data/re-timing-judge/{slug}_signal.md</small>
+          <small>규칙 기반 신호등 판정 (🟢매수고려 / 🟡주의 / 🔴관망)</small>
         </div>
         <div class="pipeline-step">
-          <strong>04 · 브리핑</strong>
+          <strong>05 · 브리핑</strong>
           <span>re-briefing-reporter</span>
-          <small>signal → data/re-briefing-reporter/{slug}_briefing.md</small>
+          <small>투자 브리핑 리포트 및 56개 지역 대시보드 데이터 발행</small>
         </div>
       </div>
       <div class="pipeline-links">
         <a href="data/pipeline_validation_20260917.md">점검 보고서 열기</a>
-        <a href="crime_dashboard.html" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 700;">🛡️ 경찰청 범죄통계 대시보드</a>
+        <a href="crime_board.html" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 700;">🛡️ 경찰청 치안 종합 게시판</a>
         <a href="schoolinfo_dashboard.html" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399; font-weight: 700;">🏫 나이스 학군 대시보드</a>
         <a href="MCP/dashboard.html">MCP 도구 대시보드</a>
         <a href="mcp_architecture_dashboard.html">MCP 아키텍처</a>
-        <span class="pipeline-status">MCP 3개 서버 · 39개 도구 (부동산 29 + 학군 6 + 범죄 4) · 산출물 체인 PASS</span>
+        <span class="pipeline-status">MCP 3개 서버 · 39개 도구 (부동산 29 + 학군 6 + 범죄 4) · 6대 에이전트 PASS</span>
       </div>
     </section>
 

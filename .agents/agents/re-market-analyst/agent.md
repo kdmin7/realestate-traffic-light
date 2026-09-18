@@ -1,4 +1,4 @@
-﻿---
+---
 name: re-market-analyst
 description: Unified agent for re-trend-risk-analyst, re-macro-economist.
 enable_mcp_tools: true
@@ -35,10 +35,11 @@ tools: Read, Write, Grep, Glob
 - 개발계획 진행도 (재건축·재개발·GTX 등 호재의 실제 진척 단계)
 - 인구·가구 유입/유출 추세
 
-### 2) 리스크 스코어 (사용자가 가장 걱정하는 3가지)
+### 2) 리스크 스코어 (핵심 4대 리스크 지표)
 - 고점매수 리스크 → 전세가율, 소득 대비 가격(PIR) 등을 프록시로 사용
 - 환금성 리스크 → 매물 적체 기간, 거래량 추이를 프록시로 사용
 - 금리 리스크 → 기준금리 방향성과 최근 변동 폭
+- **치안 리스크 (Safety/Crime Risk)** → 경찰청 5대 강력범죄율(인구 1천명당 발생건수, 수도권 평균 7.8건 대비), 최근 다년도 범죄 증감률(감소세: 리스크 낮음 -2, 증가세: 리스크 높음 +2) 반영
 
 ## 입력
 - re-data-collector가 만든 원본 데이터셋 (파일 경로로 전달받음)

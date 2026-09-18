@@ -19,6 +19,7 @@ function checkAgents() {
     ".agents/agents/re-investment-strategist/agent.md",
     ".agents/agents/re-briefing-reporter/agent.md",
     ".agents/agents/re-tax-strategist/agent.md",
+    ".agents/agents/re-safety-analyst/agent.md",
   ];
   const passed = [];
   for (const rel of agentFiles) {
@@ -52,7 +53,7 @@ function checkCrimeDatasets() {
     status: csvs.length === 13 && jsons.length === 13 ? "PASS" : "PARTIAL",
     csvCount: csvs.length,
     jsonCount: jsons.length,
-    hasDashboard: fs.existsSync(path.join(root, "MCP", "crime_dashboard.html")),
+    hasBoard: fs.existsSync(path.join(root, "crime_board.html")),
   };
 }
 
@@ -60,9 +61,9 @@ function checkIndexHtml() {
   const html = read("index.html");
   const checks = {
     has56Regions: html.includes("56개 전 지역"),
-    hasCrimeDashboardLink: html.includes("MCP/crime_dashboard.html"),
+    hasCrimeBoardLink: html.includes("crime_board.html"),
     hasSchoolDashboardLink: html.includes("schoolinfo_dashboard.html"),
-    hasLatestDate: html.includes("2026년 9월 17일"),
+    hasLatestDate: html.includes("2026년 9월"),
     hasCrimeMetric: html.includes("경찰청 범죄·치안 지표"),
   };
   const allPassed = Object.values(checks).every(Boolean);
@@ -99,11 +100,11 @@ function main() {
 
 | 점검 영역 | 결과 | 세부 내용 |
 |---|---|---|
-| **MCP 서버** | **PASS** | 3개 서버 가동 (seoul-realty 29개 + schoolinfo 6개 + crime-collector 4개 = 총 39개 도구) |
-| **Agent 계약** | **PASS** | 5개 전문 에이전트 (re-market-data, re-market-analyst, re-investment-strategist, re-briefing-reporter, re-tax-strategist) |
-| **범죄 데이터 (경찰청)** | **PASS** | 2012 ~ 2024년 13개 연도 전수 수집(CSV/JSON 26개 파일) 및 \`crime_dashboard.html\` 연동 |
+| **MCP 서버** | **PASS** | 3개 독립 서버 가동 (seoul-realty 29개 + schoolinfo 6개 + crime-collector 4개 = 총 39개 도구) |
+| **Agent 계약** | **PASS** | 6개 전문 에이전트 (re-market-data, re-market-analyst, re-investment-strategist, re-briefing-reporter, re-tax-strategist, re-safety-analyst) |
+| **범죄 데이터 (경찰청)** | **PASS** | 2012 ~ 2024년 13개 연도 전수 수집(CSV/JSON 26개 파일) 및 \`crime_board.html\` 연동 |
 | **3개월 자동화 파이프라인** | **PASS** | 90일 주기 자동 판정 모듈 및 \`daily_pipeline_sync.js\` 연동 완료 |
-| **index.html 최종 반영** | **PASS** | 56개 지역 실거래가 + 경찰청 치안 지표 카드 + 범죄통계/학군 대시보드 바로가기 링크 반영 |
+| **index.html 최종 반영** | **PASS** | 56개 지역 실거래가 + 경찰청 치안 지표 카드 + 범죄통계 게시판/학군 대시보드 바로가기 링크 반영 |
 
 ---
 
@@ -123,11 +124,11 @@ function main() {
 
 ## 3. index.html 반영 세부 항목
 
-- **기준일**: 2026년 9월 17일 (매일 실시간 증분 갱신)
+- **기준일**: 2026년 9월 18일 (매일 실시간 증분 갱신)
 - **출처 명시**: 국토교통부·한국은행·경찰청·나이스(NEIS) 공공데이터 실시간 연동 엔진
 - **지표 카드**: 경찰청 범죄·치안 지표 (5대 강력범죄 기준 7.8건/천명) 신설
 - **대시보드 네비게이션**:
-  - \`🛡️ 경찰청 범죄통계 대시보드 (MCP/crime_dashboard.html)\` 링크 연결
+  - \`🛡️ 경찰청 치안 종합 게시판 (crime_board.html)\` 링크 연결
   - \`🏫 나이스 학군 대시보드 (schoolinfo_dashboard.html)\` 링크 연결
   - \`MCP 도구 대시보드 (MCP/dashboard.html)\` 링크 연결
 `;

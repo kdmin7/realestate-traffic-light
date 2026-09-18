@@ -1,0 +1,992 @@
+[
+  {
+    "name": "강서구",
+    "province": "seoul",
+    "pop": 560000,
+    "total": 5172,
+    "c5": 1122,
+    "rate": 2,
+    "grade": "S",
+    "gradeText": "최우수 안심",
+    "riskScore": -2,
+    "detail": {
+      "murder": 3,
+      "robbery": 2,
+      "sexual": 46,
+      "theft": 446,
+      "violence": 592
+    }
+  },
+  {
+    "name": "의왕시",
+    "province": "gyeonggi",
+    "pop": 160000,
+    "total": 3307,
+    "c5": 643,
+    "rate": 4.02,
+    "grade": "S",
+    "gradeText": "최우수 안심",
+    "riskScore": -2,
+    "detail": {
+      "murder": 1,
+      "robbery": 0,
+      "sexual": 42,
+      "theft": 237,
+      "violence": 341
+    }
+  },
+  {
+    "name": "성북구",
+    "province": "seoul",
+    "pop": 420000,
+    "total": 9158,
+    "c5": 2182,
+    "rate": 5.2,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 2,
+      "robbery": 1,
+      "sexual": 146,
+      "theft": 884,
+      "violence": 1106
+    }
+  },
+  {
+    "name": "남양주시",
+    "province": "gyeonggi",
+    "pop": 730000,
+    "total": 17045,
+    "c5": 4022,
+    "rate": 5.51,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 7,
+      "robbery": 9,
+      "sexual": 182,
+      "theft": 1566,
+      "violence": 2190
+    }
+  },
+  {
+    "name": "도봉구",
+    "province": "seoul",
+    "pop": 300000,
+    "total": 6356,
+    "c5": 1739,
+    "rate": 5.8,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 7,
+      "robbery": 0,
+      "sexual": 74,
+      "theft": 800,
+      "violence": 840
+    }
+  },
+  {
+    "name": "하남시",
+    "province": "gyeonggi",
+    "pop": 330000,
+    "total": 9339,
+    "c5": 2003,
+    "rate": 6.07,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 4,
+      "robbery": 1,
+      "sexual": 80,
+      "theft": 876,
+      "violence": 997
+    }
+  },
+  {
+    "name": "과천시",
+    "province": "gyeonggi",
+    "pop": 84000,
+    "total": 1677,
+    "c5": 523,
+    "rate": 6.23,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 2,
+      "robbery": 0,
+      "sexual": 15,
+      "theft": 327,
+      "violence": 176
+    }
+  },
+  {
+    "name": "노원구",
+    "province": "seoul",
+    "pop": 490000,
+    "total": 10005,
+    "c5": 3093,
+    "rate": 6.31,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 7,
+      "robbery": 3,
+      "sexual": 143,
+      "theft": 1506,
+      "violence": 1384
+    }
+  },
+  {
+    "name": "고양시",
+    "province": "gyeonggi",
+    "pop": 1060000,
+    "total": 26595,
+    "c5": 6709,
+    "rate": 6.33,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 11,
+      "robbery": 10,
+      "sexual": 276,
+      "theft": 2645,
+      "violence": 3670
+    }
+  },
+  {
+    "name": "용인시",
+    "province": "gyeonggi",
+    "pop": 1060000,
+    "total": 25505,
+    "c5": 6713,
+    "rate": 6.33,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 12,
+      "robbery": 1,
+      "sexual": 255,
+      "theft": 3200,
+      "violence": 3162
+    }
+  },
+  {
+    "name": "동작구",
+    "province": "seoul",
+    "pop": 380000,
+    "total": 9014,
+    "c5": 2461,
+    "rate": 6.48,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 1,
+      "robbery": 1,
+      "sexual": 181,
+      "theft": 1091,
+      "violence": 1136
+    }
+  },
+  {
+    "name": "군포시",
+    "province": "gyeonggi",
+    "pop": 260000,
+    "total": 6274,
+    "c5": 1720,
+    "rate": 6.62,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 3,
+      "robbery": 1,
+      "sexual": 69,
+      "theft": 876,
+      "violence": 746
+    }
+  },
+  {
+    "name": "안양시",
+    "province": "gyeonggi",
+    "pop": 540000,
+    "total": 12683,
+    "c5": 3614,
+    "rate": 6.69,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 0,
+      "robbery": 0,
+      "sexual": 210,
+      "theft": 1596,
+      "violence": 1751
+    }
+  },
+  {
+    "name": "양평군",
+    "province": "gyeonggi",
+    "pop": 120000,
+    "total": 3797,
+    "c5": 813,
+    "rate": 6.77,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 2,
+      "robbery": 0,
+      "sexual": 40,
+      "theft": 288,
+      "violence": 463
+    }
+  },
+  {
+    "name": "서대문구",
+    "province": "seoul",
+    "pop": 300000,
+    "total": 7453,
+    "c5": 2046,
+    "rate": 6.82,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 3,
+      "robbery": 0,
+      "sexual": 131,
+      "theft": 1012,
+      "violence": 874
+    }
+  },
+  {
+    "name": "화성시",
+    "province": "gyeonggi",
+    "pop": 960000,
+    "total": 27300,
+    "c5": 6661,
+    "rate": 6.94,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 14,
+      "robbery": 7,
+      "sexual": 262,
+      "theft": 2895,
+      "violence": 3351
+    }
+  },
+  {
+    "name": "양천구",
+    "province": "seoul",
+    "pop": 430000,
+    "total": 9869,
+    "c5": 2987,
+    "rate": 6.95,
+    "grade": "A",
+    "gradeText": "우수 안심",
+    "riskScore": -1,
+    "detail": {
+      "murder": 4,
+      "robbery": 1,
+      "sexual": 105,
+      "theft": 1513,
+      "violence": 1329
+    }
+  },
+  {
+    "name": "은평구",
+    "province": "seoul",
+    "pop": 460000,
+    "total": 10708,
+    "c5": 3220,
+    "rate": 7,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 9,
+      "robbery": 1,
+      "sexual": 131,
+      "theft": 1520,
+      "violence": 1483
+    }
+  },
+  {
+    "name": "여주시",
+    "province": "gyeonggi",
+    "pop": 110000,
+    "total": 3715,
+    "c5": 781,
+    "rate": 7.1,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 0,
+      "robbery": 0,
+      "sexual": 47,
+      "theft": 298,
+      "violence": 418
+    }
+  },
+  {
+    "name": "구리시",
+    "province": "gyeonggi",
+    "pop": 190000,
+    "total": 5387,
+    "c5": 1358,
+    "rate": 7.15,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 1,
+      "robbery": 0,
+      "sexual": 76,
+      "theft": 572,
+      "violence": 693
+    }
+  },
+  {
+    "name": "광명시",
+    "province": "gyeonggi",
+    "pop": 280000,
+    "total": 7241,
+    "c5": 2032,
+    "rate": 7.26,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 4,
+      "robbery": 2,
+      "sexual": 60,
+      "theft": 872,
+      "violence": 1052
+    }
+  },
+  {
+    "name": "강동구",
+    "province": "seoul",
+    "pop": 460000,
+    "total": 11267,
+    "c5": 3354,
+    "rate": 7.29,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 3,
+      "robbery": 4,
+      "sexual": 166,
+      "theft": 1662,
+      "violence": 1472
+    }
+  },
+  {
+    "name": "파주시",
+    "province": "gyeonggi",
+    "pop": 500000,
+    "total": 15840,
+    "c5": 3669,
+    "rate": 7.34,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 11,
+      "robbery": 6,
+      "sexual": 173,
+      "theft": 1421,
+      "violence": 1986
+    }
+  },
+  {
+    "name": "이천시",
+    "province": "gyeonggi",
+    "pop": 220000,
+    "total": 6965,
+    "c5": 1650,
+    "rate": 7.5,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 1,
+      "robbery": 1,
+      "sexual": 83,
+      "theft": 605,
+      "violence": 936
+    }
+  },
+  {
+    "name": "성동구",
+    "province": "seoul",
+    "pop": 280000,
+    "total": 8798,
+    "c5": 2122,
+    "rate": 7.58,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 5,
+      "robbery": 2,
+      "sexual": 114,
+      "theft": 968,
+      "violence": 996
+    }
+  },
+  {
+    "name": "강북구",
+    "province": "seoul",
+    "pop": 290000,
+    "total": 8620,
+    "c5": 2284,
+    "rate": 7.88,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 6,
+      "robbery": 0,
+      "sexual": 141,
+      "theft": 968,
+      "violence": 1131
+    }
+  },
+  {
+    "name": "송파구",
+    "province": "seoul",
+    "pop": 650000,
+    "total": 18321,
+    "c5": 5170,
+    "rate": 7.95,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 5,
+      "robbery": 3,
+      "sexual": 316,
+      "theft": 2500,
+      "violence": 2238
+    }
+  },
+  {
+    "name": "성남시",
+    "province": "gyeonggi",
+    "pop": 910000,
+    "total": 28987,
+    "c5": 7263,
+    "rate": 7.98,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 9,
+      "robbery": 5,
+      "sexual": 323,
+      "theft": 3074,
+      "violence": 3743
+    }
+  },
+  {
+    "name": "가평군",
+    "province": "gyeonggi",
+    "pop": 60000,
+    "total": 2314,
+    "c5": 480,
+    "rate": 8,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 1,
+      "robbery": 0,
+      "sexual": 34,
+      "theft": 139,
+      "violence": 301
+    }
+  },
+  {
+    "name": "의정부시",
+    "province": "gyeonggi",
+    "pop": 460000,
+    "total": 13724,
+    "c5": 3795,
+    "rate": 8.25,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 5,
+      "robbery": 2,
+      "sexual": 184,
+      "theft": 1475,
+      "violence": 2071
+    }
+  },
+  {
+    "name": "안성시",
+    "province": "gyeonggi",
+    "pop": 190000,
+    "total": 6324,
+    "c5": 1577,
+    "rate": 8.3,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 3,
+      "robbery": 0,
+      "sexual": 58,
+      "theft": 680,
+      "violence": 817
+    }
+  },
+  {
+    "name": "중랑구",
+    "province": "seoul",
+    "pop": 380000,
+    "total": 10744,
+    "c5": 3167,
+    "rate": 8.33,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 5,
+      "robbery": 2,
+      "sexual": 142,
+      "theft": 1439,
+      "violence": 1519
+    }
+  },
+  {
+    "name": "광진구",
+    "province": "seoul",
+    "pop": 340000,
+    "total": 9803,
+    "c5": 2869,
+    "rate": 8.44,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 2,
+      "robbery": 6,
+      "sexual": 237,
+      "theft": 1321,
+      "violence": 1250
+    }
+  },
+  {
+    "name": "구로구",
+    "province": "seoul",
+    "pop": 400000,
+    "total": 11726,
+    "c5": 3382,
+    "rate": 8.46,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 7,
+      "robbery": 0,
+      "sexual": 187,
+      "theft": 1572,
+      "violence": 1585
+    }
+  },
+  {
+    "name": "김포시",
+    "province": "gyeonggi",
+    "pop": 490000,
+    "total": 16015,
+    "c5": 4167,
+    "rate": 8.5,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 8,
+      "robbery": 3,
+      "sexual": 135,
+      "theft": 1964,
+      "violence": 1987
+    }
+  },
+  {
+    "name": "포천시",
+    "province": "gyeonggi",
+    "pop": 140000,
+    "total": 4987,
+    "c5": 1192,
+    "rate": 8.51,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 1,
+      "robbery": 1,
+      "sexual": 64,
+      "theft": 411,
+      "violence": 687
+    }
+  },
+  {
+    "name": "시흥시",
+    "province": "gyeonggi",
+    "pop": 520000,
+    "total": 18852,
+    "c5": 4537,
+    "rate": 8.72,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 12,
+      "robbery": 4,
+      "sexual": 197,
+      "theft": 1726,
+      "violence": 2539
+    }
+  },
+  {
+    "name": "금천구",
+    "province": "seoul",
+    "pop": 230000,
+    "total": 8965,
+    "c5": 2015,
+    "rate": 8.76,
+    "grade": "B",
+    "gradeText": "수도권 평균",
+    "riskScore": 0,
+    "detail": {
+      "murder": 6,
+      "robbery": 3,
+      "sexual": 127,
+      "theft": 887,
+      "violence": 975
+    }
+  },
+  {
+    "name": "관악구",
+    "province": "seoul",
+    "pop": 490000,
+    "total": 16539,
+    "c5": 4476,
+    "rate": 9.13,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 4,
+      "robbery": 3,
+      "sexual": 335,
+      "theft": 1967,
+      "violence": 2109
+    }
+  },
+  {
+    "name": "수원시",
+    "province": "gyeonggi",
+    "pop": 1180000,
+    "total": 40371,
+    "c5": 10807,
+    "rate": 9.16,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 17,
+      "robbery": 7,
+      "sexual": 511,
+      "theft": 5042,
+      "violence": 5089
+    }
+  },
+  {
+    "name": "서초구",
+    "province": "seoul",
+    "pop": 410000,
+    "total": 17238,
+    "c5": 3775,
+    "rate": 9.21,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 10,
+      "robbery": 5,
+      "sexual": 361,
+      "theft": 1587,
+      "violence": 1735
+    }
+  },
+  {
+    "name": "동대문구",
+    "province": "seoul",
+    "pop": 340000,
+    "total": 10817,
+    "c5": 3216,
+    "rate": 9.46,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 7,
+      "robbery": 4,
+      "sexual": 125,
+      "theft": 1618,
+      "violence": 1419
+    }
+  },
+  {
+    "name": "오산시",
+    "province": "gyeonggi",
+    "pop": 240000,
+    "total": 8246,
+    "c5": 2306,
+    "rate": 9.61,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 3,
+      "robbery": 1,
+      "sexual": 92,
+      "theft": 953,
+      "violence": 1215
+    }
+  },
+  {
+    "name": "부천시",
+    "province": "gyeonggi",
+    "pop": 780000,
+    "total": 26541,
+    "c5": 7870,
+    "rate": 10.09,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 11,
+      "robbery": 3,
+      "sexual": 331,
+      "theft": 3659,
+      "violence": 3766
+    }
+  },
+  {
+    "name": "평택시",
+    "province": "gyeonggi",
+    "pop": 590000,
+    "total": 26803,
+    "c5": 6151,
+    "rate": 10.43,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 11,
+      "robbery": 6,
+      "sexual": 280,
+      "theft": 2436,
+      "violence": 3330
+    }
+  },
+  {
+    "name": "연천군",
+    "province": "gyeonggi",
+    "pop": 40000,
+    "total": 1520,
+    "c5": 423,
+    "rate": 10.57,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 1,
+      "robbery": 0,
+      "sexual": 13,
+      "theft": 131,
+      "violence": 258
+    }
+  },
+  {
+    "name": "안산시",
+    "province": "gyeonggi",
+    "pop": 630000,
+    "total": 24971,
+    "c5": 6807,
+    "rate": 10.8,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 12,
+      "robbery": 8,
+      "sexual": 328,
+      "theft": 2722,
+      "violence": 3653
+    }
+  },
+  {
+    "name": "마포구",
+    "province": "seoul",
+    "pop": 360000,
+    "total": 13488,
+    "c5": 3893,
+    "rate": 10.81,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 4,
+      "robbery": 4,
+      "sexual": 504,
+      "theft": 1469,
+      "violence": 1864
+    }
+  },
+  {
+    "name": "동두천시",
+    "province": "gyeonggi",
+    "pop": 90000,
+    "total": 3077,
+    "c5": 979,
+    "rate": 10.88,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 2,
+      "robbery": 4,
+      "sexual": 55,
+      "theft": 360,
+      "violence": 538
+    }
+  },
+  {
+    "name": "영등포구",
+    "province": "seoul",
+    "pop": 380000,
+    "total": 15467,
+    "c5": 4157,
+    "rate": 10.94,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 10,
+      "robbery": 6,
+      "sexual": 281,
+      "theft": 1790,
+      "violence": 2021
+    }
+  },
+  {
+    "name": "강남구",
+    "province": "seoul",
+    "pop": 530000,
+    "total": 31705,
+    "c5": 6097,
+    "rate": 11.5,
+    "grade": "C",
+    "gradeText": "선별 주의",
+    "riskScore": 1,
+    "detail": {
+      "murder": 16,
+      "robbery": 17,
+      "sexual": 635,
+      "theft": 2094,
+      "violence": 3181
+    }
+  },
+  {
+    "name": "양주시",
+    "province": "gyeonggi",
+    "pop": 270000,
+    "total": 17045,
+    "c5": 4022,
+    "rate": 14.9,
+    "grade": "D",
+    "gradeText": "주의 필요",
+    "riskScore": 2,
+    "detail": {
+      "murder": 7,
+      "robbery": 9,
+      "sexual": 182,
+      "theft": 1566,
+      "violence": 2190
+    }
+  },
+  {
+    "name": "용산구",
+    "province": "seoul",
+    "pop": 210000,
+    "total": 10736,
+    "c5": 3289,
+    "rate": 15.66,
+    "grade": "D",
+    "gradeText": "주의 필요",
+    "riskScore": 2,
+    "detail": {
+      "murder": 10,
+      "robbery": 4,
+      "sexual": 262,
+      "theft": 1072,
+      "violence": 1884
+    }
+  },
+  {
+    "name": "종로구",
+    "province": "seoul",
+    "pop": 140000,
+    "total": 10015,
+    "c5": 2754,
+    "rate": 19.67,
+    "grade": "D",
+    "gradeText": "주의 필요",
+    "riskScore": 2,
+    "detail": {
+      "murder": 1,
+      "robbery": 5,
+      "sexual": 208,
+      "theft": 1180,
+      "violence": 1330
+    }
+  },
+  {
+    "name": "중구",
+    "province": "seoul",
+    "pop": 120000,
+    "total": 6358,
+    "c5": 2368,
+    "rate": 19.73,
+    "grade": "D",
+    "gradeText": "주의 필요",
+    "riskScore": 2,
+    "detail": {
+      "murder": 2,
+      "robbery": 1,
+      "sexual": 183,
+      "theft": 1188,
+      "violence": 964
+    }
+  }
+]
