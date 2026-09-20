@@ -4,47 +4,109 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🏫 수도권 명문학군 & 학교정보 실시간 모니터 대시보드 (schoolinfo-mcp)</title>
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re_theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     :root {
-      --bg-page: #f8fafc;
+      --bg-page: #f4f5f7;
       --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --card-border-hover: #cbd5e1;
-      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-      --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.09), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
-      --text-main: #0f172a;
-      --text-sub: #334155;
-      --text-muted: #64748b;
-      --primary: #2563eb;
-      --primary-light: #eff6ff;
+      --card-border: #e3e6eb;
+      --card-border-hover: #cbd1da;
+      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.09);
+      --text-main: #131820;
+      --text-sub: #3d4654;
+      --text-muted: #647085;
+      --primary: #1d4ed8;
+      --primary-light: #e8eefc;
       --primary-border: #bfdbfe;
-      --accent-green: #059669;
-      --accent-green-bg: #ecfdf5;
+      --accent-green: #137a48;
+      --accent-green-bg: #e3f4eb;
       --accent-green-border: #a7f3d0;
       --purple: #7c3aed;
       --purple-light: #faf5ff;
-      --amber: #d97706;
-      --amber-light: #fef3c7;
-      --danger: #dc2626;
-      --mono: 'Fira Code', monospace;
+      --amber: #7a4f06;
+      --amber-light: #fdf0cf;
+      --danger: #b3261e;
+      --mono: ui-monospace, 'SF Mono', Consolas, monospace;
+      --line: #e3e6eb;
+      --line-strong: #cbd1da;
+      --nav-h: 56px;
+    }
+    [data-theme="dark"] {
+      --bg-page: #0d1015;
+      --card-bg: #151920;
+      --card-border: #262c36;
+      --card-border-hover: #363e4b;
+      --text-main: #e9edf3;
+      --text-sub: #c1c9d5;
+      --text-muted: #8f99a9;
+      --primary: #7aa7ff;
+      --primary-light: rgba(122, 167, 255, 0.15);
+      --primary-border: #363e4b;
+      --accent-green: #4cc38a;
+      --accent-green-bg: rgba(76, 195, 138, 0.14);
+      --purple: #a855f7;
+      --amber: #e8b64c;
+      --amber-light: rgba(232, 182, 76, 0.14);
+      --danger: #f38b83;
+      --line: #262c36;
+      --line-strong: #363e4b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-page);
       color: var(--text-main);
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
       min-height: 100vh;
-      padding: 24px;
-      line-height: 1.5;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    /* ---------- 상단 바 (index.html 표준) ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--card-bg); border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: var(--nav-h); max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+      text-decoration: none; white-space: nowrap; color: var(--text-main);
+    }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+      display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+      color: var(--text-sub); font-size: 0.95rem; font-weight: 600;
+      text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--text-main); }
+    .nav a[aria-current="page"] { color: var(--primary); border-bottom-color: var(--primary); }
+    .theme-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+      background: var(--card-bg); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-main);
+      cursor: pointer;
     }
 
     .fhd-container {
-      max-width: 1860px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 24px 60px;
       display: flex;
       flex-direction: column;
       gap: 22px;
@@ -798,18 +860,31 @@
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+          <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+          <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+          <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+        </svg>
+        부동산 신호등
+      </a>
+      <nav class="nav" aria-label="대시보드 이동">
+        <a href="index.html">메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html" aria-current="page">나이스 학군 대시보드</a>
+        <a href="crime_board.html">경찰청 범죄 대시보드</a>
+        <a href="MCP/dashboard.html">MCP 도구 대시보드</a>
+      </nav>
+      <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환">
+        <span id="themeToggleIcon" aria-hidden="true">☾</span>
+        <span id="themeToggleText">다크 모드</span>
+      </button>
+    </div>
+  </header>
 
   <div class="fhd-container">
-
-    <!-- 전역 네비게이션 헤더 -->
-    <nav class="top-nav">
-      <div class="nav-links">
-        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
-        <a href="schoolinfo_dashboard.html" class="nav-link active">🏫 나이스 학군 대시보드</a>
-        <a href="crime_board.html" class="nav-link">🛡️ 경찰청 치안 종합 게시판</a>
-      </div>
-      <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">NEIS 교육정보개방포털 실시간 연계</span>
-    </nav>
 
     <!-- Top Global Header with Prominent Timestamp in White Layout -->
     <header>
@@ -1227,8 +1302,24 @@
       document.getElementById(tabId).style.display = 'block';
     }
 
+    function applyTheme(theme, persist) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+      const btnIcon = document.getElementById('themeToggleIcon');
+      const btnText = document.getElementById('themeToggleText');
+      if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+      if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(cur === 'light' ? 'dark' : 'light', true);
+    }
+
     // 초기화
     window.addEventListener('DOMContentLoaded', () => {
+      applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
       renderTop20();
       onProvinceChange();
     });

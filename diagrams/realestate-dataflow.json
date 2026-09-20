@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Real Estate Analysis Pipeline Data Flow",
+    "output": "diagrams/realestate-dataflow.html",
+    "viewBox": [1080, 560],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "collection-path",
+        "label": "Independent Collection",
+        "focus": ["gov-source", "market-agent", "raw-store", "police-source", "safety-agent", "safety-store"],
+        "note": "Independent raw market ingestion and police crime data analysis saved separately."
+      },
+      {
+        "id": "integration-path",
+        "label": "Safety Integration & Quant Risk",
+        "focus": ["raw-store", "safety-store", "quant-agent", "scores-store"],
+        "note": "re-safety-analyst data connects into re-trend-risk to produce unified risk scores."
+      },
+      {
+        "id": "decision-path",
+        "label": "Buyer Strategy & PB Reporting",
+        "focus": ["scores-store", "strategist-agent", "reporter-agent", "final-report"],
+        "note": "Unified scores feed into re-strategist for homebuyer judgment and final report."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "External Data" },
+    { "label": "Ingestion" },
+    { "label": "Separate Store" },
+    { "label": "Quant & Strategy" },
+    { "label": "PB Delivery" }
+  ],
+  "nodes": [
+    { "id": "gov-source", "type": "external", "label": "Gov Open APIs", "sublabel": "MOLIT / BOK / NEIS", "stage": 0, "row": 0, "tag": "HTTPS / XML" },
+    { "id": "police-source", "type": "external", "label": "Police Open Data", "sublabel": "13-Yr Crime Stats", "stage": 0, "row": 2, "tag": "OpenAPI Portal" },
+    { "id": "market-agent", "type": "backend", "label": "re-market-data", "sublabel": "Raw Market Ingest", "stage": 1, "row": 0, "tag": "Data Ingestion" },
+    { "id": "safety-agent", "type": "backend", "label": "re-safety-analyst", "sublabel": "Crime Profiler", "stage": 1, "row": 2, "tag": "Safety Analyst" },
+    { "id": "raw-store", "type": "database", "label": "Raw Datasets", "sublabel": "data/re-market-data/", "stage": 2, "row": 0, "tag": "{slug}_raw.md" },
+    { "id": "safety-store", "type": "database", "label": "Safety Report", "sublabel": "data/re-safety-analyst/", "stage": 2, "row": 2, "tag": "Separate Store" },
+    { "id": "quant-agent", "type": "backend", "label": "re-trend-risk", "sublabel": "Quant Risk Engine", "stage": 3, "row": 0, "tag": "Score Engine" },
+    { "id": "scores-store", "type": "database", "label": "Unified Scores", "sublabel": "data/re-trend-risk/", "stage": 3, "row": 1, "tag": "Integrated DB" },
+    { "id": "strategist-agent", "type": "backend", "label": "re-strategist", "sublabel": "Buyer Investment Judge", "stage": 3, "row": 2, "tag": "Traffic Signal" },
+    { "id": "reporter-agent", "type": "backend", "label": "re-reporter", "sublabel": "PB Briefing Reporter", "stage": 4, "row": 0, "tag": "PB Synthesizer" },
+    { "id": "final-report", "type": "database", "label": "Final PB Report", "sublabel": "data/re-reporter/", "stage": 4, "row": 1, "tag": "{slug}_report.md" }
+  ],
+  "flows": [
+    { "id": "fetch-gov", "from": "gov-source", "to": "market-agent", "label": "MOLIT trades", "classification": "public API", "variant": "default", "route": "straight" },
+    { "id": "fetch-police", "from": "police-source", "to": "safety-agent", "label": "crime series", "classification": "police open data", "variant": "security", "route": "straight" },
+    { "id": "save-raw", "from": "market-agent", "to": "raw-store", "label": "save raw", "classification": "raw store", "variant": "emphasis", "route": "straight" },
+    { "id": "save-safety", "from": "safety-agent", "to": "safety-store", "label": "safety report", "classification": "safety data", "variant": "security", "route": "straight" },
+    { "id": "raw-to-quant", "from": "raw-store", "to": "quant-agent", "label": "market data", "classification": "quant pipeline", "variant": "emphasis", "route": "straight", "labelAt": [637, 120] },
+    { "id": "safety-to-quant", "from": "safety-store", "to": "quant-agent", "label": "safety connect", "classification": "safety input", "variant": "security", "route": "vertical-channel", "labelAt": [630, 270] },
+    { "id": "quant-to-scores", "from": "quant-agent", "to": "scores-store", "label": "save scores", "classification": "unified matrix", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "straight", "labelAt": [745, 210] },
+    { "id": "scores-to-strat", "from": "scores-store", "to": "strategist-agent", "label": "buyer input", "classification": "integrated risk", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "straight", "labelAt": [745, 330] },
+    { "id": "judge-to-reporter", "from": "strategist-agent", "to": "reporter-agent", "label": "strategy plan", "classification": "signal and plan", "variant": "emphasis", "route": "vertical-channel" },
+    { "id": "reporter-to-doc", "from": "reporter-agent", "to": "final-report", "label": "markdown doc", "classification": "final briefing", "variant": "default", "route": "vertical-channel" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Separate Data Collection",
+      "items": [
+        "re-market-data: Ingests MOLIT trades, BOK interest rates, and NEIS school data into {slug}_raw.md",
+        "re-safety-analyst: Independently analyzes 13-year police stats and saves {slug}_safety_report.md"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Integrated Risk Scoring & Strategy",
+      "items": [
+        "re-trend-risk: Connects both raw data and safety report into integrated 4-risk scores (-2 to +2)",
+        "Unified scores saved to {slug}_scores.md including crime rates and safety grades",
+        "re-strategist: Evaluates buyer feasibility (price safety margin, DSR leverage, and Zone A/B)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "PB Reporting & Delivery",
+      "items": [
+        "re-reporter: Synthesizes 3-second summary card and PB 3-stage customer briefing",
+        "Generates clean Markdown reports and synchronizes with interactive web dashboards"
+      ]
+    }
+  ]
+}

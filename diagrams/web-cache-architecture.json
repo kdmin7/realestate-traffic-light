@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Real Estate Web Request and Cache Architecture",
+    "output": "diagrams/web-cache-architecture.html",
+    "viewBox": [1280, 680],
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "web-request-path",
+        "label": "Web Request & CDN Path",
+        "focus": ["browser", "github-pages", "mcp-server", "l1-cache", "l2-cache"],
+        "note": "Client requests static dashboard and queries real estate data through MCP server."
+      },
+      {
+        "id": "cache-hierarchy",
+        "label": "Two-Tier Cache Hierarchy",
+        "focus": ["mcp-server", "l1-cache", "l2-cache", "molit-api", "ecos-api"],
+        "note": "In-memory L1 cache and persistent L2 file cache protect external government APIs."
+      },
+      {
+        "id": "sync-pipeline",
+        "label": "Pipeline Automation & Storage",
+        "focus": ["cron-scheduler", "mcp-server", "pipeline-runner", "markdown-store"],
+        "note": "Daily and quarterly automation scripts execute multi-agent analysis and persist markdown reports."
+      }
+    ]
+  },
+  "components": [
+    { "id": "browser", "type": "external", "label": "Client Browser", "sublabel": "Dashboard User", "pos": [50, 270], "size": [140, 64], "tag": "HTTPS / UI" },
+    { "id": "github-pages", "type": "cloud", "label": "GitHub Pages", "sublabel": "Static Web Host", "brand": "github", "pos": [270, 270], "size": [140, 64], "tag": "CDN / Edge" },
+    { "id": "mcp-server", "type": "backend", "label": "Seoul Realty MCP", "sublabel": "realestate-server.js", "brand": "node-js", "pos": [490, 270], "size": [150, 64], "tag": "Stdio / HTTP" },
+    { "id": "l1-cache", "type": "database", "label": "L1 Memory Cache", "sublabel": "Map & LRU Cache", "pos": [490, 110], "size": [150, 64], "tag": "Sub-millisecond" },
+    { "id": "l2-cache", "type": "database", "label": "L2 Disk Cache", "sublabel": "MCP/.cache/{type}/*.json", "pos": [720, 110], "size": [160, 64], "tag": "Filesystem" },
+    { "id": "molit-api", "type": "external", "label": "MOLIT OpenAPI", "sublabel": "Apt Trade / Rent", "pos": [720, 270], "size": [150, 64], "tag": "Public Portal" },
+    { "id": "ecos-api", "type": "external", "label": "BOK ECOS API", "sublabel": "Base & Loan Rates", "pos": [950, 270], "size": [150, 64], "tag": "Bank of Korea" },
+    { "id": "cron-scheduler", "type": "cloud", "label": "Cron & Actions", "sublabel": "Daily Sync Task", "brand": "github-actions", "pos": [270, 440], "size": [140, 64], "tag": "Automation" },
+    { "id": "pipeline-runner", "type": "backend", "label": "Pipeline Runner", "sublabel": "run_realestate_pipeline.js", "brand": "node-js", "pos": [490, 440], "size": [150, 64], "tag": "Multi-Agent" },
+    { "id": "markdown-store", "type": "database", "label": "Markdown Store", "sublabel": "data/re-*/*.md", "pos": [720, 440], "size": [160, 64], "tag": "Versioned Docs" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Local Environment: Node.js & File System", "wraps": ["mcp-server", "l1-cache", "l2-cache", "pipeline-runner", "markdown-store"] }
+  ],
+  "connections": [
+    { "id": "client-request", "from": "browser", "to": "github-pages", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "dashboard-query", "from": "github-pages", "to": "mcp-server", "label": "JSON query", "variant": "emphasis" },
+    { "id": "check-l1", "from": "mcp-server", "to": "l1-cache", "label": "L1 hit", "fromSide": "top", "toSide": "bottom", "labelDy": -48 },
+    { "id": "check-l2", "from": "l1-cache", "to": "l2-cache", "label": "L2 lookup", "variant": "dashed" },
+    { "id": "fetch-molit", "from": "mcp-server", "to": "molit-api", "label": "cache miss" },
+    { "id": "fetch-ecos", "from": "molit-api", "to": "ecos-api", "label": "macro rate" },
+    { "id": "l2-persist", "from": "molit-api", "to": "l2-cache", "label": "write cache", "variant": "emphasis", "fromSide": "top", "toSide": "bottom", "labelDy": -48 },
+    { "id": "trigger-cron", "from": "cron-scheduler", "to": "pipeline-runner", "label": "schedule", "variant": "dashed" },
+    { "id": "pipeline-mcp", "from": "pipeline-runner", "to": "mcp-server", "label": "tool call", "fromSide": "top", "toSide": "bottom", "labelDy": -48 },
+    { "id": "save-artifacts", "from": "pipeline-runner", "to": "markdown-store", "label": "write .md", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Client & Edge Delivery",
+      "items": [
+        "Interactive dashboard (index.html) hosted on GitHub Pages or local web server",
+        "Clients visualize traffic-light investment metrics across 56 Seoul & Gyeonggi districts"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Two-Tier Cache Hierarchy",
+      "items": [
+        "L1 In-Memory Cache: Serves repeated queries in sub-millisecond response times",
+        "L2 Disk Cache (.cache/): Persists monthly XML/JSON responses to prevent redundant public API quotas",
+        "Incremental update strategy: Retains finalized historical records while refreshing active months"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Pipeline Automation & Storage",
+      "items": [
+        "Scheduled runners invoke MCP tools to fetch live real estate and crime datasets",
+        "Sequential agents generate raw data, risk scores, strategist judgments, and markdown reports"
+      ]
+    }
+  ]
+}

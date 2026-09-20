@@ -6,6 +6,8 @@
   "scripts": {
     "test": "node scripts/validate-project.js",
     "check": "node scripts/validate-project.js",
+    "pipeline": "node scripts/run_realestate_pipeline.js",
+    "pipeline:verify": "node scripts/verify_pipeline.js",
     "serve": "python -m http.server 8000"
   },
   "keywords": [],

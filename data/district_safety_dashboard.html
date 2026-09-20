@@ -6,7 +6,8 @@
   <title>🛡️ 지역 치안 안전 심층 분석 대시보드 — 부동산 신호등</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -15,10 +16,16 @@
       --panel-hover: #1b2438;
       --panel-border: #1f293d;
       --border-bright: #374151;
+      --border-color: #1f293d;
+      --line-strong: #374151;
+      --bg-surface: #111827;
+      --text-primary: #f9fafb;
+      --text-secondary: #cbd5e1;
       --text: #f9fafb;
       --text-sub: #cbd5e1;
       --text-muted: #94a3b8;
       --primary: #38bdf8;
+      --accent-blue: #38bdf8;
       --primary-bg: rgba(56, 189, 248, 0.12);
       --accent-green: #22c55e;
       --accent-green-bg: rgba(34, 197, 94, 0.15);
@@ -37,10 +44,16 @@
       --panel-hover: #f1f5f9;
       --panel-border: #e2e8f0;
       --border-bright: #cbd5e1;
+      --border-color: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --bg-surface: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
       --text: #0f172a;
       --text-sub: #334155;
       --text-muted: #64748b;
       --primary: #0284c7;
+      --accent-blue: #0284c7;
       --primary-bg: rgba(2, 132, 199, 0.1);
       --accent-green: #16a34a;
       --accent-green-bg: #dcfce7;
@@ -53,13 +66,39 @@
       --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
     }
 
+    /* ---------- 상단 바 (index.html 표준) ---------- */
+    .topbar {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+        margin-bottom: 24px;
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+        text-decoration: none; white-space: nowrap; color: var(--text-primary);
+    }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+        display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+        color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;
+        text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--text-primary); }
+    .nav a[aria-current="page"] { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+    .theme-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+        background: var(--bg-surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-primary);
+        cursor: pointer;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-body);
       color: var(--text);
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
       line-height: 1.6;
-      padding: 24px;
       transition: background-color 0.25s, color 0.25s;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
@@ -72,8 +111,9 @@
     }
 
     .container {
-      max-width: 1680px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 24px 40px;
       display: flex;
       flex-direction: column;
       gap: 22px;
@@ -421,6 +461,30 @@
   </style>
 </head>
 <body>
+  <header class="topbar">
+      <div class="wrap">
+          <a class="brand" href="../index.html">
+              <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+                  <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+                  <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+                  <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+              </svg>
+              부동산 신호등
+          </a>
+          <nav class="nav" aria-label="대시보드 이동">
+              <a href="../index.html">메인 대시보드 (신호등)</a>
+              <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+              <a href="../crime_board.html" aria-current="page">경찰청 범죄 대시보드</a>
+              <a href="../MCP/dashboard.html">MCP 도구 대시보드</a>
+          </nav>
+          <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+              <span id="themeToggleIcon" aria-hidden="true">☾</span>
+              <span id="themeToggleText">다크 모드</span>
+          </button>
+      </div>
+  </header>
+
   <div class="container">
 
     <!-- Top Bar with Back Button -->
@@ -430,8 +494,8 @@
           <span>⬅️ 조금 전 페이지로 이동</span>
         </button>
         <div class="nav-breadcrumbs">
-          <a href="index.html">메인 신호등</a> &gt; 
-          <a href="crime_board.html">치안 종합 게시판</a> &gt; 
+          <a href="../index.html">메인 신호등</a> &gt; 
+          <a href="../crime_board.html">치안 종합 게시판</a> &gt; 
           <span style="color: var(--primary); font-weight: 700;" id="crumbName">지역 리포트</span>
         </div>
       </div>
@@ -779,7 +843,23 @@
       });
     }
 
+    function applyTheme(theme, persist) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+      const btnIcon = document.getElementById('themeToggleIcon');
+      const btnText = document.getElementById('themeToggleText');
+      if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+      if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(cur === 'light' ? 'dark' : 'light', true);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      var saved = 'dark';
+      try { saved = localStorage.getItem('re_theme') || 'dark'; } catch(e) {}
+      applyTheme(saved, false);
       initRegionSelect();
       const queryRegion = getParam('region') || getParam('district') || '강남구';
       changeRegion(queryRegion);

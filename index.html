@@ -1,996 +1,616 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>🚦 부동산 신호등 — 서울 25구 & 경기도 31개 시·군 실시간 대시보드</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='9' y='2' width='14' height='28' rx='7' fill='%23161b22'/%3E%3Ccircle cx='16' cy='9' r='3' fill='%23f38b83'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23e8b64c'/%3E%3Ccircle cx='16' cy='23' r='3' fill='%234cc38a'/%3E%3C/svg%3E">
+  <script>
+    /* 첫 렌더 전에 테마를 적용해 화면 깜빡임을 막습니다. 저장 키(re_theme)는 기존과 동일합니다. */
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re_theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      /* Dark Theme Tokens (Default) */
-      --bg-dark: #0b0f19;
-      --bg-surface: #0f172a;
-      --card-bg: #151c2c;
-      --card-bg-hover: #1e293b;
-      --card-border: #243048;
-      --card-border-bright: #384b6e;
-      --input-bg: #0b0f19;
-      --text-main: #f8fafc;
-      --text-sub: #cbd5e1;
-      --text-muted: #94a3b8;
-      --accent-cyan: #38bdf8;
-      --accent-cyan-bg: rgba(56, 189, 248, 0.12);
-      --accent-purple: #c084fc;
-      --meter-bg: rgba(0, 0, 0, 0.35);
-      --tag-bg: rgba(255, 255, 255, 0.08);
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-2: #f8f9fb;
+      --line: #e3e6eb;
+      --line-strong: #cbd1da;
+      --ink: #131820;
+      --ink-2: #3d4654;
+      --ink-3: #647085;
+      --accent: #1d4ed8;
+      --accent-soft: #e8eefc;
 
-      /* High-contrast WCAG-compliant Signal Colors */
-      --green: #22c55e;
-      --green-bg: rgba(34, 197, 94, 0.16);
-      --green-border: rgba(34, 197, 94, 0.45);
-      --yellow: #facc15;
-      --yellow-bg: rgba(250, 204, 21, 0.16);
-      --yellow-border: rgba(250, 204, 21, 0.45);
-      --red: #f87171;
-      --red-bg: rgba(239, 68, 68, 0.16);
-      --red-border: rgba(239, 68, 68, 0.45);
+      --buy: #137a48;   --buy-bg: #e3f4eb;
+      --warning: #7a4f06; --warning-bg: #fdf0cf;
+      --watch: #b3261e; --watch-bg: #fce8e6;
+      --pos: #137a48;
+      --neg: #b3261e;
 
-      --chart-grid: rgba(255, 255, 255, 0.06);
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+      --bar-1: #1d4ed8;
+      --bar-2: #aab4c6;
+      --nav-h: 56px;
     }
+    [data-theme="dark"] {
+      --bg: #0d1015;
+      --surface: #151920;
+      --surface-2: #1a1f27;
+      --line: #262c36;
+      --line-strong: #363e4b;
+      --ink: #e9edf3;
+      --ink-2: #c1c9d5;
+      --ink-3: #8f99a9;
+      --accent: #7aa7ff;
+      --accent-soft: rgba(122, 167, 255, 0.15);
 
-    /* Clean Crisp Light Theme */
-    [data-theme="light"] {
-      --bg-dark: #f1f5f9;
-      --bg-surface: #ffffff;
-      --card-bg: #ffffff;
-      --card-bg-hover: #f8fafc;
-      --card-border: #cbd5e1;
-      --card-border-bright: #94a3b8;
-      --input-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-sub: #334155;
-      --text-muted: #64748b;
-      --accent-cyan: #0284c7;
-      --accent-cyan-bg: rgba(2, 132, 199, 0.1);
-      --accent-purple: #7c3aed;
-      --meter-bg: #f1f5f9;
-      --tag-bg: #e2e8f0;
+      --buy: #4cc38a;   --buy-bg: rgba(76, 195, 138, 0.14);
+      --warning: #e8b64c; --warning-bg: rgba(232, 182, 76, 0.14);
+      --watch: #f38b83; --watch-bg: rgba(243, 139, 131, 0.14);
+      --pos: #4cc38a;
+      --neg: #f38b83;
 
-      /* High-contrast Light Mode Signals */
-      --green: #15803d;
-      --green-bg: #dcfce7;
-      --green-border: #86efac;
-      --yellow: #a16207;
-      --yellow-bg: #fef9c3;
-      --yellow-border: #fde047;
-      --red: #b91c1c;
-      --red-bg: #fee2e2;
-      --red-border: #fca5a5;
-
-      --chart-grid: rgba(0, 0, 0, 0.06);
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --bar-1: #7aa7ff;
+      --bar-2: #576274;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
-      padding: 32px 24px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+      font-size: 15px;
       line-height: 1.6;
-      transition: background-color 0.25s ease, color 0.25s ease;
+      letter-spacing: -0.01em;
+      word-break: keep-all;
+      overflow-wrap: break-word;
       -webkit-font-smoothing: antialiased;
     }
+    a { color: inherit; }
+    button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-    /* Tabular figures for aligned and readable numbers */
-    .num, .val, .macro-value, .meter-value, .stat-row .val {
-      font-feature-settings: "tnum" 1, "cv05" 1;
+    /* ---------- 신호 색상 변수 (행·버튼·요약이 공유) ---------- */
+    .is-buy     { --sig: var(--buy);     --sig-bg: var(--buy-bg); }
+    .is-warning { --sig: var(--warning); --sig-bg: var(--warning-bg); }
+    .is-watch   { --sig: var(--watch);   --sig-bg: var(--watch-bg); }
+    .sig {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: 999px;
+      background: var(--sig-bg); color: var(--sig);
+      font-size: 0.85rem; font-weight: 700; white-space: nowrap;
+    }
+    .sig i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    /* ---------- 상단 바 ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--surface); border-bottom: 1px solid var(--line);
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: var(--nav-h); }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+      text-decoration: none; white-space: nowrap;
+    }
+    .brand .mark rect { fill: #1b212b; stroke: var(--line-strong); }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+      display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+      color: var(--ink-2); font-size: 0.95rem; font-weight: 600;
+      text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--ink); }
+    .nav a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+    .theme-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+      background: var(--surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap;
+    }
+    .theme-btn:hover { background: var(--surface-2); }
+
+    /* ---------- 페이지 머리말 ---------- */
+    main { display: flex; flex-direction: column; gap: 20px; padding-bottom: 72px; }
+    .page-head { padding: 32px 0 4px; }
+    .page-head h1 {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+      font-size: 1.85rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3;
+    }
+    .live {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px 3px 8px; border-radius: 999px;
+      background: var(--buy-bg); color: var(--buy);
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0;
+    }
+    .live::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+      animation: blink 2.4s ease-in-out infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.3; } }
+    .meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 32px; margin-top: 16px; }
+    .meta dt { font-size: 0.82rem; font-weight: 600; color: var(--ink-3); }
+    .meta dd { font-size: 0.95rem; color: var(--ink); }
+
+    /* ---------- 공통 패널 ---------- */
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 14px;
+    }
+    .panel-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.4; }
+    .panel-sub { margin-top: 2px; font-size: 0.85rem; color: var(--ink-3); }
+
+    .seg {
+      display: inline-flex; gap: 2px; max-width: 100%; overflow-x: auto;
+      padding: 3px; background: var(--surface-2);
+      border: 1px solid var(--line); border-radius: 9px;
+    }
+    .seg button {
+      display: inline-block; text-align: center;
+      padding: 6px 12px; border: 0; border-radius: 6px; background: transparent;
+      color: var(--ink-2); font-size: 0.9rem; font-weight: 600; white-space: nowrap;
+    }
+    .seg button:hover { color: var(--ink); }
+    .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .seg .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 0.05em; border-radius: 50%; background: var(--sig); }
+
+    /* ---------- 시장 지표 ---------- */
+    .indicators {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px;
+      background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+    }
+    .ind { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; background: var(--surface); }
+    .ind-label { font-size: 0.85rem; font-weight: 600; color: var(--ink-3); }
+    .ind-value {
+      font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25;
       font-variant-numeric: tabular-nums;
     }
+    .ind-value.text { font-size: 1.3rem; }
+    .ind-value small { margin-left: 2px; font-size: 0.85rem; font-weight: 500; color: var(--ink-3); }
+    .ind-desc { font-size: 0.85rem; line-height: 1.45; color: var(--ink-2); }
 
-    .container {
-      max-width: 1680px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+    /* ---------- 차트 + 신호 현황 ---------- */
+    .overview { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr); gap: 20px; }
+    .chart-panel { padding: 20px 22px 14px; }
+    .chart-wrap { position: relative; height: 340px; }
+    .chart-fallback[hidden] { display: none; }
+    .chart-fallback {
+      display: grid; place-items: center; height: 100%;
+      color: var(--ink-3); font-size: 0.95rem; text-align: center;
     }
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 12px 24px;
-      box-shadow: var(--shadow-sm);
-      gap: 12px;
-      flex-wrap: wrap;
+    .summary-panel { display: flex; flex-direction: column; gap: 10px; padding: 20px 22px; }
+    .summary-panel .panel-head { margin-bottom: 4px; }
+    .sum-row {
+      display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left;
+      padding: 12px 14px; background: var(--surface-2);
+      border: 1px solid var(--line); border-left: 3px solid var(--sig); border-radius: 8px;
     }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .nav-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.02rem;
-      font-weight: 700;
-      text-decoration: none;
-      color: var(--text-sub);
-      padding: 9px 18px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      background: var(--input-bg);
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .nav-link:hover {
-      color: var(--text-main);
-      border-color: var(--accent-cyan);
-    }
-    .nav-link.active {
-      background: var(--accent-cyan);
-      color: #0b0f19;
-      font-weight: 800;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 14px var(--accent-cyan-bg);
-    }
-    [data-theme="light"] .nav-link.active {
-      color: #ffffff;
-    }
-    .header {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 26px 36px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 18px;
-      box-shadow: var(--shadow-md);
-      transition: all 0.25s ease;
-    }
-    .header-main {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-    .header-title h1 {
-      font-size: 2.1rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      letter-spacing: -0.025em;
-      color: var(--text-main);
-      line-height: 1.25;
-    }
-    .badge-live {
-      background: var(--green-bg);
-      border: 1px solid var(--green-border);
-      color: var(--green);
-      font-size: 0.88rem;
-      padding: 5px 14px;
-      border-radius: 9999px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      animation: pulse 2.5s infinite;
-      white-space: nowrap;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.65; }
-    }
-    .header-meta {
-      display: flex;
-      gap: 24px;
-      font-size: 1.05rem;
-      color: var(--text-sub);
-      flex-wrap: wrap;
-      line-height: 1.5;
-    }
-    .theme-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 0.98rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-      user-select: none;
-      white-space: nowrap;
-    }
-    .theme-toggle-btn:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px var(--accent-cyan-bg);
-      transform: translateY(-1px);
-    }
-    
-    .chart-section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 30px 36px;
-      box-shadow: var(--shadow-md);
-      transition: all 0.25s ease;
-    }
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 22px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .chart-section h3 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.015em;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      line-height: 1.35;
-    }
+    .sum-row:hover { border-color: var(--line-strong); border-left-color: var(--sig); }
+    .sum-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .sum-count { font-size: 0.9rem; color: var(--ink-2); }
+    .sum-count strong { font-size: 1.3rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .sum-track { display: block; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+    .sum-track > span { display: block; height: 100%; background: var(--sig); border-radius: 3px; }
+    .sum-sub { font-size: 0.82rem; color: var(--ink-3); }
 
-    .chart-wrapper {
-      position: relative;
-      height: 400px;
-      width: 100%;
+    /* ---------- 게시판 ---------- */
+    .board { scroll-margin-top: calc(var(--nav-h) + 12px); overflow: clip; }
+    .board-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      flex-wrap: wrap; gap: 8px 16px; padding: 20px 22px 12px;
     }
+    .board-status { font-size: 0.9rem; color: var(--ink-3); }
+    .board-status strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .link-btn {
+      margin-left: 8px; padding: 0; border: 0; background: none;
+      color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .board-tools {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 0 22px 16px; border-bottom: 1px solid var(--line);
+    }
+    .tools-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+    .tool-spacer { flex: 1 1 0; }
+    .search { position: relative; flex: 1 1 260px; max-width: 420px; }
+    .search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+    .search input {
+      width: 100%; padding: 8px 12px 8px 34px; background: var(--surface);
+      border: 1px solid var(--line-strong); border-radius: 8px; font-size: 0.92rem;
+    }
+    .search input::placeholder { color: var(--ink-3); }
+    .sort { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--ink-3); font-weight: 600; }
+    .sort select, .sort button {
+      padding: 7px 10px; background: var(--surface);
+      border: 1px solid var(--line-strong); border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; color: var(--ink);
+    }
+    .sort button:hover, .sort select:hover { background: var(--surface-2); }
 
-    .macro-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+    .board-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.95rem; }
+    .board-table thead th {
+      position: sticky; top: var(--nav-h); z-index: 2; padding: 0; text-align: left;
+      background: var(--surface-2); border-bottom: 1px solid var(--line);
+      font-size: 0.82rem; font-weight: 700; color: var(--ink-3);
     }
-    .macro-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.25s ease;
+    .th-btn {
+      display: flex; align-items: center; gap: 4px; width: 100%;
+      padding: 11px 12px; border: 0; background: none;
+      font-size: inherit; font-weight: inherit; color: inherit; text-align: left;
     }
-    .macro-label { font-size: 0.98rem; color: var(--text-muted); font-weight: 600; }
-    .macro-value { font-size: 2.1rem; font-weight: 900; color: var(--text-main); letter-spacing: -0.02em; line-height: 1.2; }
-    .macro-desc { font-size: 0.96rem; color: var(--text-sub); line-height: 1.45; }
+    .th-btn:hover { color: var(--ink); }
+    .board-table th[aria-sort] { color: var(--ink); }
+    .board-table th.num .th-btn { justify-content: flex-end; }
+    .caret { font-size: 0.6rem; }
+    th[aria-sort="ascending"] .caret::after { content: '▲'; }
+    th[aria-sort="descending"] .caret::after { content: '▼'; }
+    .board-table th.c-region .th-btn { padding-left: 22px; }
 
-    .pipeline-section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 26px 32px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.25s ease;
-    }
-    .pipeline-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .pipeline-header h3 { font-size: 1.35rem; font-weight: 800; }
-    .pipeline-header p { color: var(--text-sub); font-size: 1.0rem; margin-top: 5px; line-height: 1.5; }
-    .pipeline-status {
-      color: var(--green);
-      border: 1px solid var(--green);
-      background: var(--green-bg);
-      border-radius: 9999px;
-      padding: 6px 14px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .pipeline-flow {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-    }
-    .pipeline-step {
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px;
-      min-height: 116px;
-      transition: all 0.25s ease;
-    }
-    .pipeline-step strong { display: block; color: var(--accent-cyan); font-size: 0.98rem; font-weight: 800; }
-    .pipeline-step span { display: block; color: var(--text-main); font-weight: 800; font-size: 1.02rem; margin: 6px 0; }
-    .pipeline-step small { color: var(--text-muted); font-size: 0.88rem; word-break: break-word; line-height: 1.45; }
-    .pipeline-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
-    .pipeline-links a {
-      color: var(--accent-cyan);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      text-decoration: none;
-      background: var(--input-bg);
-      transition: all 0.2s ease;
-    }
-    .pipeline-links a:hover { border-color: var(--accent-cyan); background: var(--accent-cyan-bg); }
+    .board-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; line-height: 1.45; }
+    .board-table td.c-region { padding-left: 22px; box-shadow: inset 3px 0 0 var(--sig); }
+    .board-table tbody tr:last-child td { border-bottom: 0; }
+    .board-table tbody tr[data-url] { cursor: pointer; }
+    .board-table tbody tr:hover td { background: var(--surface-2); }
+    .board-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-    /* 컨트롤 바: 필터, 검색, 상태 */
-    .controls-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 22px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.25s ease;
+    .region-link { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
+    .region-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+    .sub { display: block; font-size: 0.82rem; font-weight: 500; color: var(--ink-3); line-height: 1.4; }
+    .num small { display: block; font-size: 0.78rem; font-weight: 500; color: var(--ink-3); }
+    .num strong { font-weight: 700; }
+    .u { margin-left: 1px; font-size: 0.85em; font-weight: 500; color: var(--ink-3); }
+    .v84 { font-size: 1.05rem; font-weight: 800; }
+    .meter { display: block; position: relative; width: 64px; height: 3px; margin: 5px 0 0 auto; border-radius: 2px; background: var(--line); }
+    .meter::after { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: inherit; background: var(--bar-1); }
+    .pos { color: var(--pos); font-weight: 600; }
+    .neg { color: var(--neg); font-weight: 600; }
+    .c-apt .apt-name { display: block; font-weight: 600; }
+    .c-apt .apt-price { display: block; font-size: 0.85rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .go {
+      display: inline-block; padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 8px;
+      color: var(--accent); font-size: 0.88rem; font-weight: 700; text-decoration: none; white-space: nowrap;
     }
-    .controls-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text-sub);
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 1.0rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      font-family: inherit;
-    }
-    .filter-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--text-main);
-      box-shadow: 0 0 10px var(--accent-cyan-bg);
-    }
-    .filter-btn.active {
-      background: var(--accent-cyan-bg);
-      color: var(--accent-cyan);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 14px var(--accent-cyan-bg);
-      font-weight: 800;
-    }
-    .search-box {
-      position: relative;
-      min-width: 320px;
-    }
-    .search-input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 12px 18px;
-      color: var(--text-main);
-      font-size: 1.05rem;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-    .search-input:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px var(--accent-cyan-bg);
-    }
-    .status-summary {
-      font-size: 1.02rem;
-      color: var(--text-sub);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-weight: 600;
-    }
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 700;
-    }
+    .go:hover { background: var(--accent-soft); border-color: var(--accent); }
+    .empty td { padding: 56px 20px; text-align: center; color: var(--ink-3); box-shadow: none; }
+    .empty p { margin-bottom: 10px; }
 
-    /* 지역 그리드 및 카드 */
-    .district-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 24px;
+    /* ---------- 연결 대시보드 / 파이프라인 ---------- */
+    .resources { padding: 20px 22px; }
+    .link-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .link-item {
+      display: block; padding: 12px 14px; text-decoration: none;
+      background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
     }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 26px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 20px;
-      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s, box-shadow 0.2s;
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      position: relative;
-      user-select: none;
+    .link-item:hover { border-color: var(--accent); }
+    .link-item strong { display: block; font-size: 0.95rem; font-weight: 700; }
+    .link-item span { font-size: 0.82rem; color: var(--ink-3); }
+    details.pipeline { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+    details.pipeline summary {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      list-style: none; font-weight: 700; cursor: pointer;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 24px var(--accent-cyan-bg), var(--shadow-md);
+    details.pipeline summary::-webkit-details-marker { display: none; }
+    details.pipeline summary::before {
+      content: ''; width: 7px; height: 7px; margin: 0 4px 3px 2px;
+      border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3);
+      transform: rotate(-45deg); transition: transform 0.15s;
     }
-    .card:hover .card-title {
-      color: var(--accent-cyan);
+    details.pipeline[open] summary::before { transform: rotate(45deg); margin-bottom: 5px; }
+    .chip-ok {
+      padding: 2px 10px; border-radius: 999px; background: var(--buy-bg); color: var(--buy);
+      font-size: 0.82rem; font-weight: 700;
     }
-    .card:hover .link-arrow {
-      transform: translate(3px, -3px);
-      color: var(--accent-cyan);
+    .pipeline-desc { margin-top: 10px; font-size: 0.9rem; color: var(--ink-2); }
+    .steps {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 14px;
+      list-style: none; counter-reset: step;
+      border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
     }
-    .card.neon-active {
-      transform: scale(1.03) translateY(-6px) !important;
-      border-color: var(--accent-cyan) !important;
-      box-shadow: 0 0 35px var(--accent-cyan), 0 0 60px var(--accent-cyan-bg) !important;
-      animation: neonFlash 0.35s ease-out forwards;
-      z-index: 10;
+    .steps li { padding: 14px 16px; background: var(--surface-2); border-right: 1px solid var(--line); counter-increment: step; }
+    .steps li:last-child { border-right: 0; }
+    .steps .st { font-size: 0.9rem; font-weight: 800; color: var(--accent); }
+    .steps .st::before { content: counter(step, decimal-leading-zero) '  '; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .steps code {
+      display: block; margin: 4px 0; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.82rem; font-weight: 600; word-break: break-all;
     }
-    @keyframes neonFlash {
-      0% {
-        box-shadow: 0 0 10px var(--accent-cyan);
-        border-color: var(--accent-cyan);
-      }
-      50% {
-        box-shadow: 0 0 45px var(--accent-cyan), 0 0 90px var(--accent-cyan-bg);
-        border-color: #ffffff;
-      }
-      100% {
-        box-shadow: 0 0 35px var(--accent-cyan), 0 0 60px var(--accent-cyan-bg);
-        border-color: var(--accent-cyan);
-      }
-    }
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 16px;
-      gap: 8px;
-    }
-    .card-title-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .card-title-link {
-      text-decoration: none;
-      color: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-    }
-    .card-title-link:hover .card-title {
-      color: var(--accent-cyan);
-    }
-    .card-title-link:hover .link-arrow {
-      transform: translate(2px, -2px);
-      color: var(--accent-cyan);
-    }
-    .card-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-main);
-      transition: color 0.2s;
-      line-height: 1.3;
-    }
-    .link-arrow {
-      color: var(--text-muted);
-      font-size: 1.15rem;
-      transition: all 0.2s;
-    }
-    .btn-card-detail {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent-cyan-bg);
-      border: 1px solid var(--card-border-bright);
-      color: var(--accent-cyan);
-      padding: 12px 18px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 1.02rem;
-      font-weight: 700;
-      transition: all 0.2s ease;
-      margin-top: 6px;
-      min-height: 48px;
-    }
-    .btn-card-detail:hover {
-      background: var(--accent-cyan);
-      color: #0b0f19;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 16px var(--accent-cyan-bg);
-      font-weight: 800;
-    }
-    [data-theme="light"] .btn-card-detail:hover {
-      color: #ffffff;
-    }
-    .zone-tag {
-      background: var(--tag-bg);
-      color: var(--text-sub);
-      font-size: 0.82rem;
-      padding: 4px 9px;
-      border-radius: 6px;
-      font-weight: 700;
-      border: 1px solid var(--card-border);
-      white-space: nowrap;
-    }
-    .signal-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      font-size: 0.92rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-    }
-    .signal-badge.buy { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
-    .signal-badge.warning { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-border); }
-    .signal-badge.watch { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .steps p { font-size: 0.82rem; line-height: 1.5; color: var(--ink-3); }
+    .pipeline-note { margin-top: 12px; font-size: 0.85rem; color: var(--ink-3); }
 
-    .stats-table {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: 1.04rem;
-      padding: 3px 0;
-      gap: 8px;
-    }
-    .stat-row .lbl { color: var(--text-muted); font-size: 0.98rem; font-weight: 500; }
-    .stat-row .val { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
-    .stat-row .val.highlight { color: var(--accent-cyan); font-weight: 900; font-size: 1.35rem; }
-    .stat-row .val.small { font-size: 0.96rem; color: var(--text-sub); font-weight: 600; }
+    noscript p { padding: 16px; text-align: center; color: var(--ink-2); }
 
-    .score-meter {
-      background: var(--meter-bg);
-      border: 1px solid var(--card-border);
-      padding: 14px 20px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-    .meter-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .meter-label {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-    .meter-value {
-      font-size: 1.25rem;
-      font-weight: 900;
-    }
-    .meter-value.positive { color: var(--green); }
-    .meter-value.negative { color: var(--red); }
-    
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-      font-size: 1.15rem;
-    }
+    /* ---------- 태블릿·모바일 ---------- */
+    @media (max-width: 1000px) {
+      .overview { grid-template-columns: minmax(0, 1fr); }
+      .indicators { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .ind { grid-column: span 2; }
+      .ind:nth-child(n+4) { grid-column: span 3; }
+      .steps { grid-template-columns: 1fr; }
+      .steps li { border-right: 0; border-bottom: 1px solid var(--line); }
+      .steps li:last-child { border-bottom: 0; }
 
-    /* ===================================================
-       모바일 & 태블릿 반응형 스타일 (모바일 안 깨짐 보장)
-       =================================================== */
-    @media (max-width: 1024px) {
-      .container {
-        gap: 20px;
+      /* 게시판 표 → 카드형 목록 */
+      .board { overflow: visible; }
+      .board-table, .board-table tbody { display: block; }
+      .board-table thead { display: none; }
+      .board-table tbody tr {
+        display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 14px;
+        padding: 16px 18px; border-bottom: 1px solid var(--line);
+        box-shadow: inset 3px 0 0 var(--sig);
       }
-      .chart-wrapper {
-        height: 360px;
+      .board-table tbody tr:last-child { border-bottom: 0; }
+      .board-table tbody tr:hover { background: var(--surface-2); }
+      .board-table td, .board-table td.c-region { display: block; padding: 0; border: 0; box-shadow: none; background: none !important; }
+      .board-table td[data-label]::before {
+        content: attr(data-label); display: block; margin-bottom: 1px;
+        font-size: 0.78rem; font-weight: 600; color: var(--ink-3);
       }
-      .macro-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .district-grid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 18px;
-      }
+      .board-table td.c-region::before, .board-table td.c-signal::before { display: none; }
+      .board-table td.num { text-align: left; white-space: normal; }
+      .board-table td.c-region { grid-column: span 4; }
+      .board-table td.c-signal { grid-column: span 2; justify-self: end; }
+      .board-table td.c-84, .board-table td.c-avg, .board-table td.c-trades { grid-column: span 2; }
+      .board-table td.c-trend, .board-table td.c-risk { grid-column: span 3; }
+      .board-table td.c-apt, .board-table td.c-go { grid-column: 1 / -1; }
+      .meter { margin-left: 0; width: 100%; max-width: 96px; }
+      .go { display: block; padding: 10px 14px; text-align: center; }
+      .empty { display: block !important; }
+      .empty td { padding: 48px 20px; }
     }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 16px 12px;
-      }
-      .container {
-        gap: 16px;
-      }
-      .top-nav {
-        padding: 12px 14px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .nav-links {
-        display: flex;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
-        gap: 8px;
-        flex-wrap: nowrap;
-      }
-      .nav-links::-webkit-scrollbar {
-        height: 3px;
-      }
-      .nav-link {
-        font-size: 0.94rem;
-        padding: 8px 14px;
-        flex-shrink: 0;
-      }
-      .theme-toggle-btn {
-        width: 100%;
-        justify-content: center;
-        min-height: 44px;
-        font-size: 0.95rem;
-      }
-      .header {
-        padding: 20px 16px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
-      .header-title h1 {
-        font-size: 1.65rem;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .header-meta {
-        flex-direction: column;
-        gap: 8px;
-        font-size: 0.94rem;
-      }
-      .chart-section {
-        padding: 20px 16px;
-      }
-      .chart-section h3 {
-        font-size: 1.15rem;
-      }
-      .chart-wrapper {
-        height: 300px;
-      }
-      .chart-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .chart-header .btn-group {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-      }
-      .chart-header .filter-btn {
-        padding: 9px 4px;
-        font-size: 0.85rem;
-        text-align: center;
-        white-space: nowrap;
-      }
-      .macro-bar {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
-      .macro-card {
-        padding: 16px;
-        gap: 6px;
-      }
-      .pipeline-section {
-        padding: 20px 16px;
-      }
-      .pipeline-flow {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .pipeline-step {
-        padding: 12px;
-        min-height: 100px;
-      }
-      .macro-label {
-        font-size: 0.9rem;
-      }
-      .macro-value {
-        font-size: 1.65rem;
-      }
-      .macro-desc {
-        font-size: 0.88rem;
-      }
-      .controls-panel {
-        padding: 18px 16px;
-        gap: 14px;
-      }
-      .controls-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .btn-group {
-        display: flex;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 6px;
-        gap: 8px;
-        flex-wrap: nowrap;
-      }
-      .btn-group::-webkit-scrollbar {
-        height: 4px;
-      }
-      .btn-group::-webkit-scrollbar-thumb {
-        background: var(--card-border);
-        border-radius: 4px;
-      }
-      .filter-btn {
-        padding: 9px 16px;
-        font-size: 0.94rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-        min-height: 44px;
-      }
-      .search-box {
-        min-width: 0;
-        width: 100%;
-      }
-      .search-input {
-        padding: 12px 16px;
-        font-size: 1.0rem;
-        min-height: 48px;
-      }
-      .status-summary {
-        font-size: 0.94rem;
-      }
-      .district-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      .card {
-        padding: 20px 18px;
-        gap: 16px;
-      }
-      .card-title {
-        font-size: 1.35rem;
-      }
-      .stat-row {
-        font-size: 0.98rem;
-      }
-      .stat-row .val.small {
-        font-size: 0.9rem;
-        max-width: 200px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .score-meter {
-        padding: 12px 16px;
-      }
-      .btn-card-detail {
-        padding: 12px 16px;
-        font-size: 0.98rem;
-        min-height: 48px;
-      }
+    @media (max-width: 900px) {
+      .topbar { position: static; }
+      .topbar .wrap { flex-wrap: wrap; gap: 8px 12px; height: auto; padding-top: 12px; }
+      .brand { order: 1; flex: 1; }
+      .theme-btn { order: 2; }
+      .nav { order: 3; flex-basis: 100%; overflow-x: auto; }
+      .nav a { padding: 10px 12px; }
     }
-
-    @media (max-width: 440px) {
-      .macro-bar {
-        grid-template-columns: 1fr;
-      }
-      .pipeline-flow {
-        grid-template-columns: 1fr;
-      }
-      .chart-header .btn-group {
-        grid-template-columns: 1fr;
-      }
-      .header-title h1 {
-        font-size: 1.45rem;
-      }
-      .chart-section h3 {
-        font-size: 1.05rem;
-      }
+    @media (max-width: 720px) {
+      .wrap { padding: 0 16px; }
+      .page-head { padding-top: 24px; }
+      .page-head h1 { font-size: 1.5rem; }
+      .meta { grid-template-columns: 1fr; gap: 10px; }
+      .chart-panel, .summary-panel, .resources { padding: 18px 16px; }
+      .chart-wrap { height: 300px; }
+      .board-head { padding: 18px 16px 10px; }
+      .board-tools { padding: 0 16px 14px; }
+      .tool-spacer { display: none; }
+      .search { flex: 1 1 100%; max-width: none; }
+      .seg { display: flex; width: 100%; }
+      .seg button { flex: 1; padding: 7px 6px; font-size: 0.86rem; }
+      .hide-sm { display: none; }
+      #signalFilter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sort { width: 100%; }
+      .sort select { flex: 1; }
+      .board-table tbody tr { padding: 16px; }
+    }
+    @media (max-width: 600px) {
+      .indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ind, .ind:nth-child(n+4) { grid-column: span 1; }
+      .ind:last-child { grid-column: span 2; }
+      .ind { padding: 14px 16px; }
+      .ind-value { font-size: 1.35rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- 전역 네비게이션 헤더 -->
-    <nav class="top-nav">
-      <div class="nav-links">
-        <a href="index.html" class="nav-link active">🚦 메인 대시보드 (신호등)</a>
-        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
-        <a href="crime_board.html" class="nav-link">🛡️ 경찰청 치안 종합 게시판</a>
-      </div>
-      <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="테마 전환">
-        <span id="themeToggleIcon">☀️</span>
-        <span id="themeToggleText">라이트 모드</span>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+          <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+          <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+          <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+        </svg>
+        부동산 신호등
+      </a>
+      <nav class="nav" aria-label="대시보드 이동">
+        <a href="index.html" aria-current="page">메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+        <a href="crime_board.html">경찰청 범죄 대시보드</a>
+      </nav>
+      <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환">
+        <span id="themeToggleIcon" aria-hidden="true">☾</span>
+        <span id="themeToggleText">다크 모드</span>
       </button>
-    </nav>
-
-    <header class="header">
-      <div class="header-main">
-        <div class="header-title">
-          <h1>🚦 부동산 신호등 <span class="badge-live">LIVE DATA</span></h1>
-        </div>
-      </div>
-      <div class="header-meta">
-        <div>기준일: <strong>2026년 9월 19일 (매일 실시간 증분 갱신)</strong></div>
-        <div>수집 지역: <strong>서울 25개 구 + 경기 31개 시·군 (총 56개 전 지역)</strong></div>
-        <div>데이터 출처: <strong>국토교통부·한국은행·경찰청·나이스(NEIS) 공공데이터 실시간 연동 엔진</strong></div>
-      </div>
-    </header>
-
-    <div class="chart-section">
-      <div class="chart-header">
-        <h3 id="chartHeading">📈 수도권 핵심 지역 전용 84㎡ 평균 거래가격 비교 (공공데이터 국토교통부 집계)</h3>
-        <div class="btn-group">
-          <button class="filter-btn active" onclick="updateChartScope('all')">수도권 TOP 12</button>
-          <button class="filter-btn" onclick="updateChartScope('seoul')">서울 주요 10개 구</button>
-          <button class="filter-btn" onclick="updateChartScope('gyeonggi')">경기 주요 10개 시·군</button>
-        </div>
-      </div>
-      <div class="chart-wrapper">
-        <canvas id="districtChart"></canvas>
-      </div>
     </div>
+  </header>
 
-    <div class="macro-bar">
-      <div class="macro-card">
-        <div class="macro-label">한국은행 기준금리 (ECOS)</div>
-        <div class="macro-value">3%</div>
-        <div class="macro-desc">최근 인상 (+0.25%p) 긴축 기조 유지</div>
-      </div>
-      <div class="macro-card">
-        <div class="macro-label">시중은행 주담대 평균금리</div>
-        <div class="macro-value">4.39%</div>
-        <div class="macro-desc">이자 부담 상승으로 매수 심리 양극화</div>
-      </div>
-      <div class="macro-card">
-        <div class="macro-label">수도권 전체 실거래 집계</div>
-        <div class="macro-value">13,540건</div>
-        <div class="macro-desc">최근 2개월(7~8월) 56개 전 지역 누적</div>
-      </div>
-      <div class="macro-card">
-        <div class="macro-label">경찰청 범죄·치안 지표</div>
-        <div class="macro-value" style="color: #34d399;">7.8건<span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/천명</span></div>
-        <div class="macro-desc">5대 강력범죄 기준 (3개월 주기 자동 수집)</div>
-      </div>
-      <div class="macro-card">
-        <div class="macro-label">신호등 종합 판정 현황</div>
-        <div class="macro-value" style="color: var(--yellow);">주의 (선별 접근)</div>
-        <div class="macro-desc">상급지 신고가 지속 vs 외곽 거래 정체</div>
-      </div>
-    </div>
+  <div class="wrap">
+    <main>
+      <section class="page-head">
+        <h1>서울·경기 부동산 정보 게시판 <span class="live">LIVE DATA</span></h1>
+        <dl class="meta">
+          <div><dt>기준일</dt><dd>2026년 9월 19일 (매일 실시간 증분 갱신)</dd></div>
+          <div><dt>수집 지역</dt><dd>서울 25개 구 + 경기 31개 시·군 (총 56개 전 지역)</dd></div>
+          <div><dt>데이터 출처</dt><dd>국토교통부·한국은행·경찰청·나이스(NEIS) 공공데이터 실시간 연동 엔진</dd></div>
+        </dl>
+      </section>
 
-    <section class="pipeline-section" aria-labelledby="pipeline-title">
-      <div class="pipeline-header">
-        <div>
-          <h3 id="pipeline-title">🔗 Agent · MCP · 산출물 실행 상태</h3>
-          <p>최종 점검: 2026-09-18 (KST) · 3개 독립 MCP 서버(39개 도구) 및 6개 전문 에이전트 연동 검증 완료</p>
-        </div>
-        <span class="pipeline-status">✅ 검증 완료 (39 Tools / PASS)</span>
-      </div>
-      <div class="pipeline-flow">
-        <div class="pipeline-step">
-          <strong>01 · 수집</strong>
-          <span>re-data-collector</span>
-          <small>국토부 실거래가 + 나이스 학군 + 경찰청 범죄통계 (crime-collector MCP)</small>
-        </div>
-        <div class="pipeline-step">
-          <strong>02 · 스코어링</strong>
-          <span>re-trend-risk-analyst</span>
-          <small>트렌드 모멘텀 & 4대 리스크(고점·환금성·금리·치안 리스크)</small>
-        </div>
-        <div class="pipeline-step">
-          <strong>03 · 치안 진단</strong>
-          <span>re-safety-analyst</span>
-          <small>경찰청 13개년 범죄·5대 강력범죄·자치구 안전등급(S~D)</small>
-        </div>
-        <div class="pipeline-step">
-          <strong>04 · 판정</strong>
-          <span>re-timing-judge</span>
-          <small>규칙 기반 신호등 판정 (🟢매수고려 / 🟡주의 / 🔴관망)</small>
-        </div>
-        <div class="pipeline-step">
-          <strong>05 · 브리핑</strong>
-          <span>re-briefing-reporter</span>
-          <small>투자 브리핑 리포트 및 56개 지역 대시보드 데이터 발행</small>
-        </div>
-      </div>
-      <div class="pipeline-links">
-        <a href="data/pipeline_validation_20260917.md">점검 보고서 열기</a>
-        <a href="crime_board.html" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 700;">🛡️ 경찰청 치안 종합 게시판</a>
-        <a href="schoolinfo_dashboard.html" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399; font-weight: 700;">🏫 나이스 학군 대시보드</a>
-        <a href="MCP/dashboard.html">MCP 도구 대시보드</a>
-        <a href="mcp_architecture_dashboard.html">MCP 아키텍처</a>
-        <span class="pipeline-status">MCP 3개 서버 · 39개 도구 (부동산 29 + 학군 6 + 범죄 4) · 6대 에이전트 PASS</span>
-      </div>
-    </section>
+      <noscript><div class="panel"><p>이 게시판은 JavaScript를 켜야 볼 수 있습니다.</p></div></noscript>
 
-    <!-- 인터랙티브 컨트롤 패널 -->
-    <div class="controls-panel">
-      <div class="controls-row">
-        <!-- 광역 필터 -->
-        <div class="btn-group" id="provinceFilter">
-          <button class="filter-btn active" data-province="all" onclick="setProvinceFilter('all')">전체 지역 (56)</button>
-          <button class="filter-btn" data-province="seoul" onclick="setProvinceFilter('seoul')">🏛️ 서울특별시 (25)</button>
-          <button class="filter-btn" data-province="gyeonggi" onclick="setProvinceFilter('gyeonggi')">🌲 경기도 (31)</button>
+      <!-- 시장 지표 -->
+      <section class="indicators" aria-label="시장 지표">
+        <div class="ind">
+          <div class="ind-label">한국은행 기준금리 (ECOS)</div>
+          <div class="ind-value">3%</div>
+          <div class="ind-desc">최근 인상 (+0.25%p) 긴축 기조 유지</div>
         </div>
+        <div class="ind">
+          <div class="ind-label">시중은행 주담대 평균금리</div>
+          <div class="ind-value">4.39%</div>
+          <div class="ind-desc">이자 부담 상승으로 매수 심리 양극화</div>
+        </div>
+        <div class="ind">
+          <div class="ind-label">수도권 전체 실거래 집계</div>
+          <div class="ind-value">13,540건</div>
+          <div class="ind-desc">최근 2개월(7~8월) 56개 전 지역 누적</div>
+        </div>
+        <div class="ind">
+          <div class="ind-label">경찰청 범죄·치안 지표</div>
+          <div class="ind-value" style="color: var(--pos);">7.8건<small>/천명</small></div>
+          <div class="ind-desc">5대 강력범죄 기준 (3개월 주기 자동 수집)</div>
+        </div>
+        <div class="ind">
+          <div class="ind-label">신호등 종합 판정 현황</div>
+          <div class="ind-value text" style="color: var(--warning);">주의 (선별 접근)</div>
+          <div class="ind-desc">상급지 신고가 지속 vs 외곽 거래 정체</div>
+        </div>
+      </section>
 
-        <!-- 검색창 -->
-        <div class="search-box">
-          <input type="text" id="searchInput" class="search-input" placeholder="🔍 구·시·군 이름 검색 (예: 송파, 분당, 과천...)" oninput="handleSearch()">
-        </div>
+      <!-- 차트 + 신호 현황 -->
+      <div class="overview">
+        <section class="panel chart-panel" aria-labelledby="chartHeading">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title" id="chartHeading">수도권 상위 핵심 12개 지역 전용 84㎡ 및 전체 실거래가 비교</h2>
+              <p class="panel-sub">공공데이터 국토교통부 집계 기준, 단위는 억원입니다.</p>
+            </div>
+            <div class="seg" id="chartScope" role="group" aria-label="차트 범위">
+              <button type="button" data-scope="all" aria-pressed="true">수도권 TOP 12</button>
+              <button type="button" data-scope="seoul" aria-pressed="false">서울 주요 10개 구</button>
+              <button type="button" data-scope="gyeonggi" aria-pressed="false">경기 주요 10개 시·군</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="districtChart" role="img" aria-label="지역별 전용 84㎡ 평균가와 전체 평균 실거래가 막대 차트"></canvas>
+            <div class="chart-fallback" id="chartFallback" hidden>차트 라이브러리를 불러오지 못했습니다. 네트워크 연결을 확인한 뒤 새로고침해 주세요.</div>
+          </div>
+        </section>
+
+        <section class="panel summary-panel" aria-labelledby="sumTitle">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title" id="sumTitle">신호등 현황</h2>
+              <p class="panel-sub">56개 지역의 판정 분포입니다. 항목을 누르면 아래 게시판이 해당 신호로 좁혀집니다.</p>
+            </div>
+          </div>
+          <div id="signalSummary" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </section>
       </div>
 
-      <div class="controls-row">
-        <!-- 신호등 필터 -->
-        <div class="btn-group" id="signalFilter">
-          <button class="filter-btn active" data-signal="all" onclick="setSignalFilter('all')">전체 신호</button>
-          <button class="filter-btn" data-signal="buy" onclick="setSignalFilter('buy')">🟢 매수고려 (<span id="countBuy">0</span>)</button>
-          <button class="filter-btn" data-signal="warning" onclick="setSignalFilter('warning')">🟡 주의 (<span id="countWarning">0</span>)</button>
-          <button class="filter-btn" data-signal="watch" onclick="setSignalFilter('watch')">🔴 관망 (<span id="countWatch">0</span>)</button>
+      <!-- 게시판 -->
+      <section class="panel board" id="board" aria-labelledby="boardTitle">
+        <div class="board-head">
+          <h2 class="panel-title" id="boardTitle">지역별 시세·신호 게시판</h2>
+          <div class="board-status" id="statusSummary" aria-live="polite"></div>
         </div>
 
-        <!-- 현재 필터 상태 집계 -->
-        <div class="status-summary" id="statusSummary">
-          56개 지역 표시 중
+        <div class="board-tools">
+          <div class="tools-row">
+            <div class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <label class="sr-only" for="searchInput">구·시·군 이름 검색</label>
+              <input type="search" id="searchInput" placeholder="구·시·군 검색 (예: 송파, 분당, 과천)" autocomplete="off">
+            </div>
+            <div class="tool-spacer"></div>
+            <div class="sort">
+              <label for="sortKey">정렬</label>
+              <select id="sortKey">
+                <option value="default">기본 순서</option>
+                <option value="avg84">전용 84㎡ 평균</option>
+                <option value="avgPrice">전체 평균</option>
+                <option value="trades">실거래 건수</option>
+                <option value="trend">트렌드</option>
+                <option value="risk">리스크</option>
+                <option value="topPrice">신고 최고가</option>
+                <option value="signal">신호</option>
+                <option value="name">이름</option>
+              </select>
+              <button type="button" id="sortDir" aria-label="정렬 방향 전환" hidden></button>
+            </div>
+          </div>
+          <div class="tools-row">
+            <div class="seg" id="provinceFilter" role="group" aria-label="광역 필터">
+              <button type="button" data-province="all" aria-pressed="true">전체<span class="hide-sm"> 지역</span> <span class="cnt"></span></button>
+              <button type="button" data-province="seoul" aria-pressed="false">서울<span class="hide-sm">특별시</span> <span class="cnt"></span></button>
+              <button type="button" data-province="gyeonggi" aria-pressed="false">경기<span class="hide-sm">도</span> <span class="cnt"></span></button>
+            </div>
+            <div class="seg" id="signalFilter" role="group" aria-label="신호 필터">
+              <button type="button" data-signal="all" aria-pressed="true">전체<span class="hide-sm"> 신호</span></button>
+              <button type="button" class="is-buy" data-signal="buy" aria-pressed="false"><span class="dot"></span>매수고려 (<span id="countBuy">0</span>)</button>
+              <button type="button" class="is-warning" data-signal="warning" aria-pressed="false"><span class="dot"></span>주의 (<span id="countWarning">0</span>)</button>
+              <button type="button" class="is-watch" data-signal="watch" aria-pressed="false"><span class="dot"></span>관망 (<span id="countWatch">0</span>)</button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 56개 지역 카드 그리드 -->
-    <div class="district-grid" id="districtGrid">
-      <!-- JavaScript로 동적 렌더링 -->
-    </div>
+        <table class="board-table">
+          <caption class="sr-only">서울·경기 지역별 실거래 시세와 신호등 판정 목록</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="c-region" data-key="name"><button type="button" class="th-btn">지역<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="c-signal" data-key="signal"><button type="button" class="th-btn">신호<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="num" data-key="avg84"><button type="button" class="th-btn">전용 84㎡ 평균<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="num" data-key="avgPrice"><button type="button" class="th-btn">전체 평균<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="num" data-key="trades"><button type="button" class="th-btn">실거래 건수<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="num" data-key="trend"><button type="button" class="th-btn">트렌드<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" class="num" data-key="risk"><button type="button" class="th-btn">리스크<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col" data-key="topPrice"><button type="button" class="th-btn">신고 최고가 아파트<span class="caret" aria-hidden="true"></span></button></th>
+              <th scope="col"><span class="sr-only">상세 분석</span></th>
+            </tr>
+          </thead>
+          <tbody id="districtGrid"></tbody>
+        </table>
+      </section>
+
+      <!-- 연결된 대시보드·데이터 -->
+      <section class="panel resources" aria-labelledby="resTitle">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title" id="resTitle">연결된 대시보드와 데이터</h2>
+            <p class="panel-sub">지역별 심층 분석은 게시판 각 행에서 열 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="link-grid">
+          <a class="link-item" href="data/pipeline_validation_20260917.md"><strong>점검 보고서 열기</strong><span>Agent·MCP 연동 검증 결과</span></a>
+          <a class="link-item" href="crime_board.html"><strong>경찰청 범죄통계 대시보드</strong><span>13개년 범죄·5대 강력범죄·안전등급</span></a>
+          <a class="link-item" href="schoolinfo_dashboard.html"><strong>나이스 학군 대시보드</strong><span>NEIS 학군 데이터</span></a>
+          <a class="link-item" href="MCP/dashboard.html"><strong>MCP 도구 대시보드</strong><span>MCP 3개 서버·39개 도구</span></a>
+          <a class="link-item" href="mcp_architecture_dashboard.html"><strong>MCP 아키텍처</strong><span>MCP 서버·에이전트 구성</span></a>
+        </div>
+
+        <details class="pipeline">
+          <summary>Agent · MCP · 산출물 실행 상태 <span class="chip-ok">검증 완료 (39 Tools / PASS)</span></summary>
+          <p class="pipeline-desc">최종 점검: 2026-09-18 (KST) · 3개 독립 MCP 서버(39개 도구) 및 6개 전문 에이전트 연동 검증 완료</p>
+          <ol class="steps">
+            <li><span class="st">수집</span><code>re-data-collector</code><p>국토부 실거래가 + 나이스 학군 + 경찰청 범죄통계 (crime-collector MCP)</p></li>
+            <li><span class="st">스코어링</span><code>re-trend-risk-analyst</code><p>트렌드 모멘텀 &amp; 4대 리스크(고점·환금성·금리·치안 리스크)</p></li>
+            <li><span class="st">치안 진단</span><code>re-safety-analyst</code><p>경찰청 13개년 범죄·5대 강력범죄·자치구 안전등급(S~D)</p></li>
+            <li><span class="st">판정</span><code>re-timing-judge</code><p>규칙 기반 신호등 판정 (🟢매수고려 / 🟡주의 / 🔴관망)</p></li>
+            <li><span class="st">브리핑</span><code>re-briefing-reporter</code><p>투자 브리핑 리포트 및 56개 지역 대시보드 데이터 발행</p></li>
+          </ol>
+          <p class="pipeline-note">MCP 3개 서버 · 39개 도구 (부동산 29 + 학군 6 + 범죄 4) · 6대 에이전트 PASS</p>
+        </details>
+      </section>
+    </main>
   </div>
 
   <script>
-    // 56개 전체 지역 데이터
+    // 56개 전체 지역 데이터 (기존 형식 그대로 유지)
     const REGION_DATA = [
   {
     "name": "강남구",
@@ -1722,72 +1342,26 @@
   }
 ];
 
-    let currentProvince = 'all';
-    let currentSignal = 'all';
-    let searchQuery = '';
+    /* ==================================================
+       상태 · 유틸
+       ================================================== */
+    const SIGNALS = {
+      buy:     { label: '매수고려', order: 0 },
+      warning: { label: '주의',     order: 1 },
+      watch:   { label: '관망',     order: 2 }
+    };
+    const DEFAULT_DIR = { name: 'asc', signal: 'asc' };   // 나머지 정렬 기준은 내림차순이 기본
+    const FONT = "'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif";
+
+    const state = { province: 'all', signal: 'all', query: '', sortKey: 'default', sortDir: 'desc' };
     let currentChartScope = 'all';
     let chartInstance = null;
 
-    // 테마 관리 (다크/라이트)
-    function initTheme() {
-      const savedTheme = localStorage.getItem('re_theme') || 'dark';
-      applyTheme(savedTheme);
-    }
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('re_theme', theme);
-
-      const icon = document.getElementById('themeToggleIcon');
-      const text = document.getElementById('themeToggleText');
-      if (theme === 'light') {
-        if (icon) icon.textContent = '🌙';
-        if (text) text.textContent = '다크 모드';
-      } else {
-        if (icon) icon.textContent = '☀️';
-        if (text) text.textContent = '라이트 모드';
-      }
-
-      // 차트가 이미 그려져 있으면 테마 색상에 맞게 다시 렌더링
-      if (chartInstance) {
-        initChart(currentChartScope);
-      }
-    }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      const nextTheme = current === 'light' ? 'dark' : 'light';
-      applyTheme(nextTheme);
-    }
-
-    // 초기화
-    document.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      renderCards();
-      initChart('all');
-    });
-
-    function setProvinceFilter(prov) {
-      currentProvince = prov;
-      document.querySelectorAll('#provinceFilter .filter-btn').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-province') === prov);
-      });
-      renderCards();
-    }
-
-    function setSignalFilter(sig) {
-      currentSignal = sig;
-      document.querySelectorAll('#signalFilter .filter-btn').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-signal') === sig);
-      });
-      renderCards();
-    }
-
-    function handleSearch() {
-      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
-      renderCards();
-    }
-
+    // 상세 분석 페이지 경로 (기존 규칙 그대로)
     function getDetailUrl(r) {
       if (r.name.includes('송파')) {
         return 'data/songpa_analysis_dashboard.html';
@@ -1798,198 +1372,259 @@
       }
     }
 
-    // 카드 전체 또는 버튼 클릭 시 네온 효과를 점멸하며 이동
-    function triggerNeonAndNavigate(event, cardElem, url) {
-      if (event) {
-        event.stopPropagation();
-      }
-      
-      // 이미 네온 효과 진행 중이면 중복 방지
-      if (cardElem.classList.contains('neon-active')) return;
-      cardElem.classList.add('neon-active');
-
-      // 0.28초 동안 화려한 네온 빛 플래시 후 이동
-      setTimeout(() => {
-        window.location.href = url;
-      }, 280);
+    // "240건 (7월: 163 / 8월: 77)" → 숫자 분리 (형식이 다르면 원문 그대로 표시)
+    function parseTrades(s) {
+      const m = /^(\d[\d,]*)건(?:\s*\(\s*7월:\s*(\d[\d,]*)\s*\/\s*8월:\s*(\d[\d,]*)\s*\))?/.exec(s || '');
+      if (!m) return { ok: false, total: 0, raw: s || '' };
+      const n = (v) => (v === undefined ? null : Number(v.replace(/,/g, '')));
+      return { ok: true, total: n(m[1]), jul: n(m[2]), aug: n(m[3]) };
+    }
+    // "신현대12차 (112.5억)" → 단지명 / 가격
+    function parseApt(s) {
+      const m = /^(.*?)\s*\(([\d.,]+)억\)\s*$/.exec(s || '');
+      if (!m) return { name: s || '', priceText: '', price: null };
+      return { name: m[1], priceText: m[2] + '억', price: Number(m[2].replace(/,/g, '')) };
     }
 
-    function renderCards() {
-      const grid = document.getElementById('districtGrid');
-      
-      const filtered = REGION_DATA.filter(r => {
-        const matchProv = currentProvince === 'all' || r.province === currentProvince;
-        const matchSig = currentSignal === 'all' || r.signal === currentSignal;
-        const matchSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery) || r.zone.toLowerCase().includes(searchQuery);
-        return matchProv && matchSig && matchSearch;
+    const ROWS = REGION_DATA.map((r, idx) => ({
+      ...r,
+      idx,
+      url: getDetailUrl(r),
+      t: parseTrades(r.trades),
+      apt: parseApt(r.topApt),
+      trendN: parseFloat(r.trend),
+      riskN: parseFloat(r.risk)
+    }));
+    const MAX_84 = Math.max(...ROWS.map((r) => Number(r.avg84) || 0), 1);
+    const fmt1 = (v) => (Number.isFinite(Number(v)) ? Number(v).toFixed(1) : '-');
+
+    /* ==================================================
+       테마 (다크/라이트) — 저장 키 re_theme 유지
+       ================================================== */
+    function applyTheme(theme, persist) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+      $('themeToggleIcon').textContent = theme === 'light' ? '☾' : '☀';
+      $('themeToggleText').textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+      if (chartInstance) initChart(currentChartScope);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(cur === 'light' ? 'dark' : 'light', true);
+    }
+
+    /* ==================================================
+       신호 현황 요약
+       ================================================== */
+    function renderSignalSummary() {
+      const total = ROWS.length;
+      $('signalSummary').innerHTML = ['buy', 'warning', 'watch'].map((k) => {
+        const items = ROWS.filter((r) => r.signal === k);
+        const seoul = items.filter((r) => r.province === 'seoul').length;
+        const gg = items.filter((r) => r.province === 'gyeonggi').length;
+        return `
+          <button type="button" class="sum-row is-${k}" data-signal="${k}">
+            <span class="sum-top">
+              <span class="sig"><i></i>${SIGNALS[k].label}</span>
+              <span class="sum-count"><strong>${items.length}</strong>개 지역</span>
+            </span>
+            <span class="sum-track"><span style="width:${(items.length / total * 100).toFixed(1)}%"></span></span>
+            <span class="sum-sub">서울 ${seoul}, 경기 ${gg}</span>
+          </button>`;
+      }).join('');
+    }
+
+    /* ==================================================
+       게시판
+       ================================================== */
+    const SORTERS = {
+      name:     (a, b) => a.name.localeCompare(b.name, 'ko'),
+      signal:   (a, b) => (SIGNALS[a.signal]?.order ?? 9) - (SIGNALS[b.signal]?.order ?? 9),
+      avg84:    (a, b) => (Number(a.avg84) || 0) - (Number(b.avg84) || 0),
+      avgPrice: (a, b) => (Number(a.avgPrice) || 0) - (Number(b.avgPrice) || 0),
+      trades:   (a, b) => a.t.total - b.t.total,
+      trend:    (a, b) => (a.trendN || 0) - (b.trendN || 0),
+      risk:     (a, b) => (a.riskN || 0) - (b.riskN || 0),
+      topPrice: (a, b) => (a.apt.price ?? -1) - (b.apt.price ?? -1)
+    };
+
+    function rowHtml(r) {
+      const label = SIGNALS[r.signal]?.label || r.signalText;
+      const url = esc(r.url);
+      const w = Math.max(4, Math.round((Number(r.avg84) || 0) / MAX_84 * 100));
+      const trades = r.t.ok
+        ? `<strong>${r.t.total.toLocaleString('ko-KR')}</strong><span class="u">건</span>` +
+          (r.t.jul !== null && r.t.aug !== null ? `<small>7월 ${r.t.jul} / 8월 ${r.t.aug}</small>` : '')
+        : esc(r.t.raw);
+      const apt = r.apt.price !== null
+        ? `<span class="apt-name">${esc(r.apt.name)}</span><span class="apt-price">${esc(r.apt.priceText)}</span>`
+        : `<span class="apt-name">${esc(r.apt.name)}</span>`;
+      return `
+        <tr class="is-${esc(r.signal)}" data-url="${url}" tabindex="0" role="link" aria-label="${esc(r.name)} 심층 분석 페이지">
+          <td class="c-region" data-label="지역">
+            <a class="region-link" href="${url}" title="${esc(r.name)} 심층 분석 대시보드로 이동">${esc(r.name)}</a>
+            <span class="sub">${esc(r.zone)}</span>
+          </td>
+          <td class="c-signal" data-label="신호"><span class="sig"><i></i>${esc(label)}</span></td>
+          <td class="num c-84" data-label="전용 84㎡ 평균"><span class="v84">${fmt1(r.avg84)}<span class="u">억</span></span><span class="meter" style="--w:${w}%"></span></td>
+          <td class="num c-avg" data-label="전체 평균">${fmt1(r.avgPrice)}<span class="u">억</span></td>
+          <td class="num c-trades" data-label="실거래 건수">${trades}</td>
+          <td class="num c-trend pos" data-label="트렌드">${esc(r.trend)}</td>
+          <td class="num c-risk neg" data-label="리스크">${esc(r.risk)}</td>
+          <td class="c-apt" data-label="신고 최고가 아파트">${apt}</td>
+          <td class="c-go"><a class="go" href="${url}" aria-label="${esc(r.name)} 심층 분석 대시보드">심층 분석</a></td>
+        </tr>`;
+    }
+
+    function renderBoard() {
+      const q = state.query;
+      let list = ROWS.filter((r) => {
+        const matchProv = state.province === 'all' || r.province === state.province;
+        const matchSig = state.signal === 'all' || r.signal === state.signal;
+        const matchQ = !q || r.name.toLowerCase().includes(q) || r.zone.toLowerCase().includes(q);
+        return matchProv && matchSig && matchQ;
       });
 
-      // 카운트 계산
-      const scopeData = REGION_DATA.filter(r => currentProvince === 'all' || r.province === currentProvince);
-      document.getElementById('countBuy').textContent = scopeData.filter(r => r.signal === 'buy').length;
-      document.getElementById('countWarning').textContent = scopeData.filter(r => r.signal === 'warning').length;
-      document.getElementById('countWatch').textContent = scopeData.filter(r => r.signal === 'watch').length;
-
-      document.getElementById('statusSummary').innerHTML = `총 <strong>${filtered.length}</strong>개 지역 표시 중 (선택 조건: ${currentProvince === 'all' ? '전체' : currentProvince === 'seoul' ? '서울' : '경기'})`;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = '<div class="empty-state">조건에 일치하는 자치구 또는 시·군이 없습니다.</div>';
-        return;
+      if (state.sortKey !== 'default' && SORTERS[state.sortKey]) {
+        const dir = state.sortDir === 'asc' ? 1 : -1;
+        list = list.slice().sort((a, b) => dir * SORTERS[state.sortKey](a, b) || a.idx - b.idx);
       }
 
-      grid.innerHTML = filtered.map(r => {
-        const detailUrl = getDetailUrl(r);
-        return `
-        <div class="card" onclick="triggerNeonAndNavigate(event, this, '${detailUrl}')" title="클릭 시 ${r.name} 심층 분석 대시보드로 이동합니다">
-          <div class="card-top">
-            <div class="card-title-group">
-              <span class="card-title-link">
-                <span class="card-title">${r.name}</span>
-                <span class="link-arrow">↗</span>
-              </span>
-              <span class="zone-tag">${r.zone}</span>
-            </div>
-            <div class="signal-badge ${r.signal}">${r.signalText}</div>
-          </div>
+      // 신호 버튼 카운트 (선택한 광역 기준)
+      const scope = ROWS.filter((r) => state.province === 'all' || r.province === state.province);
+      $('countBuy').textContent = scope.filter((r) => r.signal === 'buy').length;
+      $('countWarning').textContent = scope.filter((r) => r.signal === 'warning').length;
+      $('countWatch').textContent = scope.filter((r) => r.signal === 'watch').length;
 
-          <div class="stats-table">
-            <div class="stat-row">
-              <span class="lbl">최근 실거래 건수</span>
-              <span class="val">${r.trades}</span>
-            </div>
-            <div class="stat-row">
-              <span class="lbl">전체 평균 거래가</span>
-              <span class="val">${r.avgPrice}억</span>
-            </div>
-            <div class="stat-row">
-              <span class="lbl">전용 84㎡ 기준 평균</span>
-              <span class="val highlight">${r.avg84}억</span>
-            </div>
-            <div class="stat-row">
-              <span class="lbl">신고 최고가 아파트</span>
-              <span class="val small">${r.topApt}</span>
-            </div>
-          </div>
+      const filtered = state.province !== 'all' || state.signal !== 'all' || q;
+      $('statusSummary').innerHTML =
+        `총 <strong>${list.length}</strong>개 지역 표시 중` +
+        (filtered ? `<button type="button" class="link-btn" data-reset>필터 초기화</button>` : '');
 
-          <div class="score-meter">
-            <div class="meter-item">
-              <span class="meter-label">트렌드 모멘텀</span>
-              <span class="meter-value positive">${r.trend}</span>
-            </div>
-            <div class="meter-item">
-              <span class="meter-label">리스크 지수</span>
-              <span class="meter-value negative">${r.risk}</span>
-            </div>
-          </div>
+      $('districtGrid').innerHTML = list.length
+        ? list.map(rowHtml).join('')
+        : `<tr class="empty"><td colspan="9"><p>조건에 일치하는 자치구 또는 시·군이 없습니다.</p><button type="button" class="link-btn" data-reset>필터 초기화</button></td></tr>`;
+    }
 
-          <div class="btn-card-detail" onclick="triggerNeonAndNavigate(event, this.closest('.card'), '${detailUrl}')">
-            ⚡ ${r.name} 심층 분석 대시보드 ➔
-          </div>
-        </div>
-      `;
-      }).join('');
+    function syncFilterUI() {
+      document.querySelectorAll('#provinceFilter button').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.province === state.province)));
+      document.querySelectorAll('#signalFilter button').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.signal === state.signal)));
+      $('searchInput').value = state.query;
+    }
+    function syncSortUI() {
+      $('sortKey').value = state.sortKey;
+      const dirBtn = $('sortDir');
+      dirBtn.hidden = state.sortKey === 'default';
+      dirBtn.textContent = state.sortDir === 'asc' ? '↑ 오름차순' : '↓ 내림차순';
+      document.querySelectorAll('.board-table thead th[data-key]').forEach((th) => {
+        if (th.dataset.key === state.sortKey) {
+          th.setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
+        } else {
+          th.removeAttribute('aria-sort');
+        }
+      });
+    }
+
+    function setProvinceFilter(prov) { state.province = prov; syncFilterUI(); renderBoard(); }
+    function setSignalFilter(sig) { state.signal = sig; syncFilterUI(); renderBoard(); }
+    function handleSearch() { state.query = $('searchInput').value.trim().toLowerCase(); renderBoard(); }
+    function resetFilters() {
+      state.province = 'all'; state.signal = 'all'; state.query = '';
+      syncFilterUI(); renderBoard();
+    }
+    function setSort(key) {
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortKey = key;
+        state.sortDir = DEFAULT_DIR[key] || 'desc';
+      }
+      syncSortUI(); renderBoard();
+    }
+
+    /* ==================================================
+       차트 (Chart.js)
+       ================================================== */
+    const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    let narrowChart = window.innerWidth < 768;
+
+    function chartTargets(scope) {
+      if (scope === 'seoul') {
+        return {
+          rows: REGION_DATA.filter((r) => r.province === 'seoul').slice(0, 10),
+          title: '서울 핵심 10개 자치구 전용 84㎡ 및 전체 실거래가 비교'
+        };
+      }
+      if (scope === 'gyeonggi') {
+        return {
+          rows: REGION_DATA.filter((r) => r.province === 'gyeonggi').slice(0, 10),
+          title: '경기도 핵심 10개 시·군 전용 84㎡ 및 전체 실거래가 비교'
+        };
+      }
+      const names = ['강남구', '서초구', '송파구', '과천시', '용산구', '성동구', '성남시 (분당/판교)',
+                     '마포구', '하남시 (미사/위례)', '광명시 (철산/광명)', '용인시 (수지/기흥)', '수원시 (영통/광교)'];
+      return {
+        rows: names.map((n) => REGION_DATA.find((r) => r.name === n)).filter(Boolean),
+        title: '수도권 상위 핵심 12개 지역 전용 84㎡ 및 전체 실거래가 비교'
+      };
     }
 
     function initChart(scope) {
       currentChartScope = scope || currentChartScope;
-      const ctx = document.getElementById('districtChart').getContext('2d');
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const t = chartTargets(currentChartScope);
+      $('chartHeading').textContent = t.title;
 
-      let targetData = [];
-      if (currentChartScope === 'seoul') {
-        targetData = REGION_DATA.filter(r => r.province === 'seoul').slice(0, 10);
-        document.getElementById('chartHeading').textContent = '📈 서울 핵심 10개 자치구 전용 84㎡ 및 전체 실거래가 비교';
-      } else if (currentChartScope === 'gyeonggi') {
-        targetData = REGION_DATA.filter(r => r.province === 'gyeonggi').slice(0, 10);
-        document.getElementById('chartHeading').textContent = '📈 경기도 핵심 10개 시·군 전용 84㎡ 및 전체 실거래가 비교';
-      } else {
-        // 수도권 상위 12곳
-        targetData = [
-          REGION_DATA.find(r => r.name === '강남구'),
-          REGION_DATA.find(r => r.name === '서초구'),
-          REGION_DATA.find(r => r.name === '송파구'),
-          REGION_DATA.find(r => r.name === '과천시'),
-          REGION_DATA.find(r => r.name === '용산구'),
-          REGION_DATA.find(r => r.name === '성동구'),
-          REGION_DATA.find(r => r.name === '성남시 (분당/판교)'),
-          REGION_DATA.find(r => r.name === '마포구'),
-          REGION_DATA.find(r => r.name === '하남시 (미사/위례)'),
-          REGION_DATA.find(r => r.name === '광명시 (철산/광명)'),
-          REGION_DATA.find(r => r.name === '용인시 (수지/기흥)'),
-          REGION_DATA.find(r => r.name === '수원시 (영통/광교)')
-        ].filter(Boolean);
-        document.getElementById('chartHeading').textContent = '📈 수도권 상위 핵심 12개 지역 전용 84㎡ 및 전체 실거래가 비교';
+      const canvas = $('districtChart');
+      if (typeof Chart === 'undefined') {
+        canvas.hidden = true;
+        $('chartFallback').hidden = false;
+        return;
       }
+      if (chartInstance) chartInstance.destroy();
 
-      const labels = targetData.map(r => r.name.replace(/ \(.*\)/, ''));
-      const data84 = targetData.map(r => r.avg84);
-      const dataAvg = targetData.map(r => r.avgPrice);
+      const ink2 = cssVar('--ink-2');
+      const ink3 = cssVar('--ink-3');
+      const grid = cssVar('--line');
+      const fs = narrowChart ? 11 : 13;
 
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-
-      const textColor = isLight ? '#334155' : '#cbd5e1';
-      const labelColor = isLight ? '#64748b' : '#94a3b8';
-      const gridColor = isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)';
-
-      chartInstance = new Chart(ctx, {
+      chartInstance = new Chart(canvas.getContext('2d'), {
         type: 'bar',
         data: {
-          labels: labels,
+          labels: t.rows.map((r) => r.name.replace(/ \(.*\)/, '')),
           datasets: [
-            {
-              label: '전용 84㎡ 평균가 (억원)',
-              data: data84,
-              backgroundColor: isLight ? 'rgba(2, 132, 199, 0.88)' : 'rgba(56, 189, 248, 0.85)',
-              borderColor: isLight ? '#0284c7' : '#38bdf8',
-              borderWidth: 2,
-              borderRadius: 6
-            },
-            {
-              label: '전체 평균 실거래가 (억원)',
-              data: dataAvg,
-              backgroundColor: isLight ? 'rgba(124, 58, 237, 0.75)' : 'rgba(168, 85, 247, 0.65)',
-              borderColor: isLight ? '#7c3aed' : '#a855f7',
-              borderWidth: 2,
-              borderRadius: 6
-            }
+            { label: '전용 84㎡ 평균가 (억원)', data: t.rows.map((r) => r.avg84), backgroundColor: cssVar('--bar-1'), borderRadius: 4, maxBarThickness: 26 },
+            { label: '전체 평균 실거래가 (억원)', data: t.rows.map((r) => r.avgPrice), backgroundColor: cssVar('--bar-2'), borderRadius: 4, maxBarThickness: 26 }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: reduceMotion() ? false : { duration: 400 },
+          interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: {
-              labels: {
-                color: isLight ? '#1e293b' : '#f1f5f9',
-                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 12 : 14, weight: '700' },
-                padding: 16
-              }
+              position: 'top', align: 'end',
+              labels: { color: ink2, usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, boxHeight: 10, font: { family: FONT, size: 12, weight: '600' } }
             },
             tooltip: {
-              titleFont: { size: 14, weight: 'bold' },
-              bodyFont: { size: 13 },
-              padding: 12,
-              boxPadding: 6
+              padding: 10,
+              titleFont: { family: FONT, size: 13, weight: '700' },
+              bodyFont: { family: FONT, size: 12 },
+              callbacks: { label: (c) => ` ${c.dataset.label.replace(/ \(억원\)/, '')}: ${Number(c.parsed.y).toFixed(1)}억` }
             }
           },
           scales: {
             x: {
-              ticks: {
-                color: textColor,
-                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 11 : 13, weight: '600' },
-                maxRotation: window.innerWidth < 768 ? 45 : 0
-              },
-              grid: { color: gridColor }
+              grid: { display: false },
+              ticks: { color: ink2, autoSkip: false, maxRotation: narrowChart ? 50 : 0, font: { family: FONT, size: fs, weight: '600' } }
             },
             y: {
-              ticks: {
-                color: labelColor,
-                font: { family: 'Noto Sans KR', size: window.innerWidth < 768 ? 11 : 13, weight: '600' },
-                callback: (v) => v + '억'
-              },
-              grid: { color: gridColor }
+              beginAtZero: true,
+              grid: { color: grid },
+              border: { display: false },
+              ticks: { color: ink3, font: { family: FONT, size: fs }, callback: (v) => v + '억' }
             }
           }
         }
@@ -1997,15 +1632,89 @@
     }
 
     function updateChartScope(scope) {
-      const buttons = document.querySelectorAll('.chart-header .filter-btn');
-      buttons.forEach(b => {
-        b.classList.remove('active');
-        if (scope === 'all' && b.textContent.includes('수도권')) b.classList.add('active');
-        if (scope === 'seoul' && b.textContent.includes('서울')) b.classList.add('active');
-        if (scope === 'gyeonggi' && b.textContent.includes('경기')) b.classList.add('active');
-      });
+      document.querySelectorAll('#chartScope button').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.scope === scope)));
       initChart(scope);
     }
+
+    /* ==================================================
+       이벤트 연결 · 초기화
+       ================================================== */
+    function goToBoard() {
+      $('board').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 광역 버튼 라벨(개수는 데이터에서 계산)
+      const cnt = (p) => ROWS.filter((r) => r.province === p).length;
+      const setCnt = (p, n) => { document.querySelector(`#provinceFilter [data-province="${p}"] .cnt`).textContent = `(${n})`; };
+      setCnt('all', ROWS.length);
+      setCnt('seoul', cnt('seoul'));
+      setCnt('gyeonggi', cnt('gyeonggi'));
+
+      applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
+      renderSignalSummary();
+      syncFilterUI();
+      syncSortUI();
+      renderBoard();
+      initChart('all');
+
+      $('themeToggleBtn').addEventListener('click', toggleTheme);
+      $('provinceFilter').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-province]');
+        if (b) setProvinceFilter(b.dataset.province);
+      });
+      $('signalFilter').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-signal]');
+        if (b) setSignalFilter(b.dataset.signal);
+      });
+      $('signalSummary').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-signal]');
+        if (!b) return;
+        setSignalFilter(b.dataset.signal);
+        goToBoard();
+      });
+      $('chartScope').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-scope]');
+        if (b) updateChartScope(b.dataset.scope);
+      });
+      $('searchInput').addEventListener('input', handleSearch);
+      $('sortKey').addEventListener('change', (e) => {
+        state.sortKey = e.target.value;
+        state.sortDir = DEFAULT_DIR[state.sortKey] || 'desc';
+        syncSortUI(); renderBoard();
+      });
+      $('sortDir').addEventListener('click', () => {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        syncSortUI(); renderBoard();
+      });
+      document.querySelector('.board-table thead').addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-key]');
+        if (th) setSort(th.dataset.key);
+      });
+      $('board').addEventListener('click', (e) => {
+        if (e.target.closest('[data-reset]')) { resetFilters(); return; }
+        if (e.target.closest('a, button, input, select')) return;
+        const tr = e.target.closest('tr[data-url]');
+        if (!tr || String(window.getSelection()).length) return;
+        window.location.href = tr.dataset.url;
+      });
+      $('board').addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target.closest('a, button, input, select')) return;
+        const tr = e.target.closest('tr[data-url]');
+        if (tr) { e.preventDefault(); window.location.href = tr.dataset.url; }
+      });
+
+      let timer;
+      window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          const narrow = window.innerWidth < 768;
+          if (narrow !== narrowChart) { narrowChart = narrow; initChart(currentChartScope); }
+        }, 200);
+      });
+    });
   </script>
 </body>
 </html>

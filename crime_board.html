@@ -4,9 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛡️ 경찰청 범죄통계 및 수도권 치안 종합 게시판</title>
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re_theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -57,22 +68,50 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
       line-height: 1.6;
-      padding: 32px 24px;
       transition: background-color 0.25s, color 0.25s;
       -webkit-font-smoothing: antialiased;
+      word-break: keep-all;
+    }
+
+    /* ---------- 상단 바 (index.html 표준) ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--panel); border-bottom: 1px solid var(--panel-border);
+      margin-bottom: 24px;
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+      text-decoration: none; white-space: nowrap; color: var(--text);
+    }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+      display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+      color: var(--text-sub); font-size: 0.95rem; font-weight: 600;
+      text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav a[aria-current="page"] { color: var(--primary); border-bottom-color: var(--primary); }
+    .theme-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border: 1px solid var(--border-bright); border-radius: 8px;
+      background: var(--panel); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text);
+      cursor: pointer;
     }
 
     .num {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
       font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
     }
 
     .container {
-      max-width: 1680px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 24px 60px;
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -647,16 +686,31 @@
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+          <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+          <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+          <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+        </svg>
+        부동산 신호등
+      </a>
+      <nav class="nav" aria-label="대시보드 이동">
+        <a href="index.html">메인 대시보드 (신호등)</a>
+        <a href="schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+        <a href="crime_board.html" aria-current="page">경찰청 범죄 대시보드</a>
+        <a href="MCP/dashboard.html">MCP 도구 대시보드</a>
+      </nav>
+      <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+        <span id="themeToggleIcon" aria-hidden="true">☾</span>
+        <span id="themeToggleText">다크 모드</span>
+      </button>
+    </div>
+  </header>
+
   <div class="container">
-    <!-- Top Nav -->
-    <nav class="top-nav">
-      <div class="nav-links">
-        <a href="index.html" class="nav-link">🚦 메인 대시보드 (신호등)</a>
-        <a href="schoolinfo_dashboard.html" class="nav-link">🏫 나이스 학군 대시보드</a>
-        <a href="crime_board.html" class="nav-link active">🛡️ 경찰청 치안 종합 게시판</a>
-      </div>
-      <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">🌓 라이트 모드 전환</button>
-    </nav>
 
     <!-- Header Masthead -->
     <header class="header-masthead">
@@ -1111,7 +1165,21 @@
       });
     }
 
+    function applyTheme(theme, persist) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+      const btnIcon = document.getElementById('themeToggleIcon');
+      const btnText = document.getElementById('themeToggleText');
+      if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+      if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(cur === 'light' ? 'dark' : 'light', true);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      applyTheme(document.documentElement.getAttribute('data-theme') || 'dark', false);
       renderTable();
       initCharts();
     });

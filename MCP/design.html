@@ -1,33 +1,89 @@
-<title>서울 부동산 인사이트 MCP 서버 · 설계도</title>
-<style>
-  :root {
-    --plane:#eef1f5; --surface:#ffffff; --surface-2:#f5f8fc; --surface-3:#eaf0f7;
-    --ink:#10151c; --ink-2:#46515f; --muted:#7b8794;
-    --line:#dbe2ea; --border:rgba(16,21,28,.10);
-    --build:#2563d8;      /* 직접 구축 */
-    --reuse:#0d9488;      /* 재활용 */
-    --catalyst:#c98a00;   /* 호재/2단계 */
-    --warn:#b45309;
-    --good:#0a8f0a;
-    --shadow:0 1px 2px rgba(16,21,28,.05), 0 6px 20px rgba(16,21,28,.06);
-    --mono:ui-monospace,"Cascadia Code","Source Code Pro",Consolas,monospace;
-  }
-  @media (prefers-color-scheme: dark) {
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울 부동산 인사이트 MCP 서버 · 설계도</title>
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re_theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <style>
     :root {
+      --bg-surface: #ffffff;
+      --border-color: #dbe2ea;
+      --line-strong: #7b8794;
+      --text-primary: #10151c;
+      --text-secondary: #46515f;
+      --accent-blue: #2563d8;
+
+      --plane:#eef1f5; --surface:#ffffff; --surface-2:#f5f8fc; --surface-3:#eaf0f7;
+      --ink:#10151c; --ink-2:#46515f; --muted:#7b8794;
+      --line:#dbe2ea; --border:rgba(16,21,28,.10);
+      --build:#2563d8;      /* 직접 구축 */
+      --reuse:#0d9488;      /* 재활용 */
+      --catalyst:#c98a00;   /* 호재/2단계 */
+      --warn:#b45309;
+      --good:#0a8f0a;
+      --shadow:0 1px 2px rgba(16,21,28,.05), 0 6px 20px rgba(16,21,28,.06);
+      --mono:ui-monospace,"Cascadia Code","Source Code Pro",Consolas,monospace;
+    }
+    :root[data-theme="dark"] {
+      --bg-surface: #141922;
+      --border-color: #232b36;
+      --line-strong: #6f7d8c;
+      --text-primary: #eef2f7;
+      --text-secondary: #aab6c4;
+      --accent-blue: #4d84f0;
+
       --plane:#0b0e13; --surface:#141922; --surface-2:#1a2029; --surface-3:#1f2732;
       --ink:#eef2f7; --ink-2:#aab6c4; --muted:#6f7d8c;
       --line:#232b36; --border:rgba(255,255,255,.10);
       --build:#4d84f0; --reuse:#2dd4bf; --catalyst:#e0a52e; --warn:#e0a52e; --good:#38c838;
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 26px rgba(0,0,0,.45);
     }
-  }
-  :root[data-theme="light"]{--plane:#eef1f5;--surface:#ffffff;--surface-2:#f5f8fc;--surface-3:#eaf0f7;--ink:#10151c;--ink-2:#46515f;--muted:#7b8794;--line:#dbe2ea;--border:rgba(16,21,28,.10);--build:#2563d8;--reuse:#0d9488;--catalyst:#c98a00;--warn:#b45309;--good:#0a8f0a;--shadow:0 1px 2px rgba(16,21,28,.05),0 6px 20px rgba(16,21,28,.06);}
-  :root[data-theme="dark"]{--plane:#0b0e13;--surface:#141922;--surface-2:#1a2029;--surface-3:#1f2732;--ink:#eef2f7;--ink-2:#aab6c4;--muted:#6f7d8c;--line:#232b36;--border:rgba(255,255,255,.10);--build:#4d84f0;--reuse:#2dd4bf;--catalyst:#e0a52e;--warn:#e0a52e;--good:#38c838;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.45);}
 
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--plane);color:var(--ink);line-height:1.5;
-    font-family:system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:1080px;margin:0 auto;padding:30px 24px 72px;}
+    /* ---------- 상단 바 (index.html 표준) ---------- */
+    .topbar {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+        margin-bottom: 24px;
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+        text-decoration: none; white-space: nowrap; color: var(--text-primary);
+    }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+        display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+        color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;
+        text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--text-primary); }
+    .nav a[aria-current="page"] { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+    .theme-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+        background: var(--bg-surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-primary);
+        cursor: pointer;
+    }
+
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--plane);color:var(--ink);line-height:1.5;
+      font-family:'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;-webkit-font-smoothing:antialiased;}
+    .wrap{max-width:1240px;margin:0 auto;padding:0 24px 72px;}
   code,.mono{font-family:var(--mono);font-size:.92em;}
 
   /* header */
@@ -154,9 +210,33 @@
     .tiers{grid-template-columns:1fr;} .theme-btn{position:static;margin-bottom:14px;}
   }
 </style>
+</head>
+<body>
+  <header class="topbar">
+      <div class="wrap">
+          <a class="brand" href="../index.html">
+              <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+                  <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+                  <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+                  <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+              </svg>
+              부동산 신호등
+          </a>
+          <nav class="nav" aria-label="대시보드 이동">
+              <a href="../index.html">메인 대시보드 (신호등)</a>
+              <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+              <a href="../crime_board.html">경찰청 범죄 대시보드</a>
+              <a href="../MCP/dashboard.html" aria-current="page">MCP 도구 대시보드</a>
+          </nav>
+          <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+              <span id="themeToggleIcon" aria-hidden="true">☾</span>
+              <span id="themeToggleText">다크 모드</span>
+          </button>
+      </div>
+  </header>
 
 <div class="wrap">
-  <button class="theme-btn" id="themeBtn">◐ 테마</button>
   <header>
     <div class="kicker"><span class="sq"></span>MCP SERVER DESIGN · v0.1 (draft)</div>
     <h1>서울 부동산 인사이트 MCP 서버</h1>
@@ -456,10 +536,18 @@ score(구) = <span class="w">w₁</span>·실질가격상승률 + <span class="w
 </div>
 
 <script>
-  const btn=document.getElementById("themeBtn");
-  const dark=()=>{const a=document.documentElement.getAttribute("data-theme");return a?a==="dark":matchMedia("(prefers-color-scheme: dark)").matches;};
-  const label=()=>btn.textContent=(dark()?"☀ 라이트":"☾ 다크");
-  btn.addEventListener("click",()=>{document.documentElement.setAttribute("data-theme",dark()?"light":"dark");label();});
-  label();
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",label);
+  function applyTheme(theme, persist) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+      const btnIcon = document.getElementById('themeToggleIcon');
+      const btnText = document.getElementById('themeToggleText');
+      if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+      if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+  }
+  function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(cur === 'light' ? 'dark' : 'light', true);
+  }
 </script>
+</body>
+</html>

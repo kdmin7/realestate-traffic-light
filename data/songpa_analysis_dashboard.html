@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>부동산 신호등 — 송파구 심층 분석 대시보드</title>
-    <!-- Google Fonts -->
+    <script>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('re_theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+    <!-- Google Fonts & Pretendard -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -15,13 +26,15 @@
             --bg-body: #0b0f19;
             --bg-surface: #151c2c;
             --bg-surface-hover: #1e293b;
+            --bg-elevated: #1e2942;
             --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-secondary: #cbd5e1;
             --text-muted: #64748b;
             --accent-blue: #38bdf8;
             --accent-indigo: #818cf8;
             --border-color: #243048;
             --border-bright: #334155;
+            --line-strong: #334155;
             
             --signal-warning-bg: rgba(250, 204, 21, 0.15);
             --signal-warning-border: #facc15;
@@ -34,6 +47,53 @@
             --signal-watch-bg: rgba(239, 68, 68, 0.15);
             --signal-watch-border: #ef4444;
             --signal-watch-text: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f4f5f7;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f8f9fb;
+            --bg-elevated: #ffffff;
+            --text-primary: #131820;
+            --text-secondary: #3d4654;
+            --text-muted: #647085;
+            --accent-blue: #1d4ed8;
+            --border-color: #e3e6eb;
+            --border-bright: #cbd1da;
+            --line-strong: #cbd1da;
+        }
+
+        /* ---------- 상단 바 (index.html 표준) ---------- */
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+        .brand {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+            text-decoration: none; white-space: nowrap; color: var(--text-primary);
+        }
+        .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+        .nav a {
+            display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+            color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;
+            text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+        }
+        .nav a:hover { color: var(--text-primary); }
+        .nav a[aria-current="page"] { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        .theme-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+            background: var(--bg-surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px 40px;
         }
 
         .btn-back-main {
@@ -66,16 +126,16 @@
         }
 
         body {
-            font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+            font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-primary);
-            line-height: 1.5;
-            padding: 20px;
+            line-height: 1.6;
+            word-break: keep-all;
             min-height: 100vh;
         }
 
         .dashboard-wrapper {
-            max-width: 1820px;
+            max-width: 1240px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -401,7 +461,32 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-wrapper">
+    <header class="topbar">
+        <div class="wrap">
+            <a class="brand" href="../index.html">
+                <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+                    <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+                    <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+                    <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+                    <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+                </svg>
+                부동산 신호등
+            </a>
+            <nav class="nav" aria-label="대시보드 이동">
+                <a href="../index.html">메인 대시보드 (신호등)</a>
+                <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+                <a href="../crime_board.html">경찰청 범죄 대시보드</a>
+                <a href="../MCP/dashboard.html">MCP 도구 대시보드</a>
+            </nav>
+            <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+                <span id="themeToggleIcon" aria-hidden="true">☾</span>
+                <span id="themeToggleText">다크 모드</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-wrapper">
         <!-- Top Nav -->
         <div class="top-nav">
             <div class="brand-title">
@@ -557,6 +642,7 @@
             <span>생성 파일: <a href="file:///C:/practice/geminiCLI/realestate_prj/data/songpa_analysis_dashboard.html" style="color:var(--accent-blue); text-decoration:none;">data/songpa_analysis_dashboard.html</a></span>
         </footer>
     </div>
+    </div>
 
     <script>
         const ctx = document.getElementById('songpaChart').getContext('2d');
@@ -594,6 +680,19 @@
                 }
             }
         });
+
+        function applyTheme(theme, persist) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+            const btnIcon = document.getElementById('themeToggleIcon');
+            const btnText = document.getElementById('themeToggleText');
+            if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+            if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+        }
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(cur === 'light' ? 'dark' : 'light', true);
+        }
     </script>
 </body>
 </html>

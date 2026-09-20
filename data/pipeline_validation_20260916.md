@@ -7,7 +7,7 @@
 
 | 항목 | 결과 | 세부 |
 | --- | --- | --- |
-| Agent 정의 | PASS | 4개 정의의 name/description/tools 및 frontmatter 확인 |
+| Agent 정의 | PASS | 8개 정의의 name/description/tools 및 frontmatter 확인 |
 | MCP 서버 | PASS | 공식 MCP Client 핸드셰이크, tools/list 28개, 대표 tools/call 4개 통과 |
 | 산출물 체인 | PASS | 5개 지역의 raw → scores → signal → briefing 연결 확인 |
 | 통합 대시보드 데이터 | PASS | 56개 지역(25 서울 + 31 경기) 단일 REGION_DATA 확인 |

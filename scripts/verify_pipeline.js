@@ -5,6 +5,10 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const agents = [
   [".agents/agents/re-market-data/agent.md", "re-market-data"],
+  [".agents/agents/re-trend-risk/agent.md", "re-trend-risk"],
+  [".agents/agents/re-safety-analyst/agent.md", "re-safety-analyst"],
+  [".agents/agents/re-strategist/agent.md", "re-strategist"],
+  [".agents/agents/re-reporter/agent.md", "re-reporter"],
   [".agents/agents/re-market-analyst/agent.md", "re-market-analyst"],
   [".agents/agents/re-investment-strategist/agent.md", "re-investment-strategist"],
   [".agents/agents/re-briefing-reporter/agent.md", "re-briefing-reporter"],
@@ -44,7 +48,7 @@ function checkArtifactChain() {
     ];
     files.forEach(read);
     const signal = read(files[2]);
-    if (!signal.includes("본 신호는 참고용이며")) {
+    if (!signal.includes("본 신호는 참고용이며") && !signal.includes("본 신호는 구매 의사결정 참고용이며")) {
       throw new Error(`missing disclaimer: ${files[2]}`);
     }
     return { region, files };
@@ -53,7 +57,7 @@ function checkArtifactChain() {
 
 function checkUnifiedDashboardDataset() {
   const content = read("index.html");
-  const match = content.match(/const REGION_DATA = (\[[\s\S]*?\]);\s*[\r\n]+\s*let currentProvince/);
+  const match = content.match(/const REGION_DATA = (\[[\s\S]*?\]);/);
   if (!match) throw new Error("index.html REGION_DATA dataset not found");
   const regions = JSON.parse(match[1]);
   const seoul = regions.filter((region) => region.province === "seoul").length;

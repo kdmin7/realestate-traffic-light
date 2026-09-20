@@ -42,9 +42,31 @@
 
 ---
 
-## 🛠️ 최근 업데이트 내역 (2026-09-19)
+## 🛠️ 최근 업데이트 내역 (2026-09-20)
 
-오늘(2026-09-19) 진행된 자치구별 심층 치안 대시보드 신설, 치안 종합 게시판 양방향 연동, 뒤로가기 내비게이션 및 에이전트 파이프라인 고도화 내역입니다.
+오늘(2026-09-20) 진행된 **Archify 에이전트 스킬 연동**, **데이터 파이프라인 인터랙티브 다이어그램(`realestate_dataflow.html`)** 및 **웹 요청·캐시 아키텍처(`web_request_cache_architecture.html`)** 신설 내역입니다.
+
+### 1. Archify 다이어그램 생성 엔진 연동 및 검증 (`tt-a1i/archify`)
+- **개요**: 시스템 아키텍처, 데이터 플로우, 워크플로우를 독립형 인터랙티브 HTML로 시각화하는 [Archify](https://github.com/tt-a1i/archify) 스킬을 전역 및 로컬 프로젝트에 연동.
+- **설치 및 진단**: `npx skills add tt-a1i/archify -y`를 통해 `archify`, `archify-review` 스킬 등록 및 `node bin/archify.mjs doctor` 전 항목(Node.js v24, 렌더러/스키마/런타임) 정상 확인.
+
+### 2. 부동산 신호등 데이터 파이프라인 인터랙티브 다이어그램 ([`realestate_dataflow.html`](realestate_dataflow.html)) 신설
+- **개요**: 공공데이터 원천 수집부터 3종 MCP 서버, 6대 멀티 에이전트 분석 체인, 신호등 판정 및 대시보드 표출까지의 전 과정을 5단계 인터랙티브 데이터 플로우로 구축.
+- **5단계 파이프라인**:
+  1. `공공데이터 원천 (Sources)`: 국토부 실거래가(OpenAPI), 한국은행 ECOS(금리), 경찰청 공공데이터(13개년 범죄통계)
+  2. `MCP 수집 계층 (Ingest)`: `seoul-realty`(29개 도구), `crime-collector`(4개 도구)
+  3. `에이전트 분석 계층 (Process)`: `re-market-data`(원천 취합), `re-trend-risk`(모멘텀·리스크 산출), `re-safety-analyst`(자치구 치안 등급 진단)
+  4. `신호등 판정 & 저장 (Store)`: `re-strategist`(BUY/WARN/WATCH 신호등 판정), `re-reporter`(브리핑 리포트), 데이터셋 저장소(사전 컴파일 JSON)
+  5. `인터랙티브 대시보드 (Consume)`: `index.html`(56개 지역 메인 맵), `district_safety_dashboard.html`(55개 지자체 심층 치안 대시보드)
+- **품질 및 뷰포트 검증**: `showcase` 품질 프로필 9개 항목 100% 통과, 1440×900 ~ 2048×1320 전 해상도 및 다크/라이트 테마 자동 `visual-check` PASS.
+
+### 3. 웹 요청 및 캐시 조회 아키텍처 다이어그램 ([`web_request_cache_architecture.html`](web_request_cache_architecture.html)) 신설
+- **개요**: 클라이언트 웹 요청의 CDN/ALB 라우팅, Redis 인메모리 캐시 조회(Read-Through), 캐시 미스 시 메인 DB(PostgreSQL) 쿼리 및 메시지 큐 비동기 캐시 무효화 파이프라인 시각화.
+- **품질 및 뷰포트 검증**: `showcase` 품질 프로필 통과 및 데스크톱 브라우저 렌더링 검증 완료.
+
+---
+
+## 🛠️ 이전 업데이트 내역 (2026-09-19)
 
 ### 1. 자치구별 심층 치안 대시보드 (`district_safety_dashboard.html`) 신설
 - **개요**: 마크다운 텍스트 리포트(`gangnam_safety_report.md`) 수준의 치안 전문 분석가(`re-safety-analyst`) 심층 분석을 수도권 55개 전 지자체 인터랙티브 HTML 대시보드로 승격.
@@ -114,6 +136,8 @@ flowchart TD
         OUT3["schoolinfo_dashboard.html<br/>나이스 학군 심층 분석 대시보드"]
         OUT4["district_safety_dashboard.html<br/>55개 지자체 심층 치안 대시보드 (복귀 버튼 탑재)"]
         OUT5["data/re-*/*.md<br/>지역별 raw / scores / safety / signal / briefing 리포트"]
+        OUT6["realestate_dataflow.html<br/>Archify 데이터 파이프라인 인터랙티브 다이어그램"]
+        OUT7["web_request_cache_architecture.html<br/>Archify 웹 요청·캐시 아키텍처 다이어그램"]
     end
 
     D1 & D2 --> M1

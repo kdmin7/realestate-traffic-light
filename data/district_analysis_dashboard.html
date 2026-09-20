@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>부동산 신호등 — 지역 심층 분석 대시보드</title>
-    <!-- Google Fonts -->
+    <script>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('re_theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+    <!-- Google Fonts & Pretendard -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -16,12 +27,13 @@
             --bg-surface: #151c2c;
             --bg-surface-hover: #1e293b;
             --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-secondary: #cbd5e1;
             --text-muted: #64748b;
             --accent-blue: #38bdf8;
             --accent-indigo: #818cf8;
             --border-color: #243048;
             --border-bright: #334155;
+            --line-strong: #334155;
             
             --signal-warning-bg: rgba(250, 204, 21, 0.15);
             --signal-warning-border: #facc15;
@@ -36,6 +48,19 @@
             --signal-watch-text: #ef4444;
         }
 
+        [data-theme="light"] {
+            --bg-body: #f4f5f7;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f8f9fb;
+            --text-primary: #131820;
+            --text-secondary: #3d4654;
+            --text-muted: #647085;
+            --accent-blue: #1d4ed8;
+            --border-color: #e3e6eb;
+            --border-bright: #cbd1da;
+            --line-strong: #cbd1da;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -43,12 +68,44 @@
         }
 
         body {
-            font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+            font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 24px;
+            word-break: keep-all;
             min-height: 100vh;
+        }
+
+        /* ---------- 상단 바 (index.html 표준) ---------- */
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+        .brand {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+            text-decoration: none; white-space: nowrap; color: var(--text-primary);
+        }
+        .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+        .nav a {
+            display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+            color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;
+            text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+        }
+        .nav a:hover { color: var(--text-primary); }
+        .nav a[aria-current="page"] { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        .theme-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+            background: var(--bg-surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-primary);
+            cursor: pointer;
+        }
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
         }
 
         .dashboard-wrapper {
@@ -292,6 +349,14 @@
             gap: 16px;
         }
 
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
         @media (max-width: 1024px) {
             .plan-grid { grid-template-columns: 1fr; }
         }
@@ -398,206 +463,192 @@
             .chart-container {
                 height: 250px;
             }
-            .info-cards-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .info-card {
-                grid-column: auto !important;
-                padding: 14px 16px;
-            }
-            .info-card .info-main {
-                font-size: 1.15rem;
-            }
-            table {
-                font-size: 0.84rem;
-                min-width: 500px;
-            }
-            th, td {
-                padding: 10px 8px;
-            }
-            .plan-card {
-                padding: 16px;
-            }
-            footer {
-                padding: 16px;
-                flex-direction: column;
-                text-align: center;
-                gap: 12px;
-            }
-            footer .btn-back-main {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 440px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .brand-title h1 {
-                font-size: 1.25rem;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        <!-- Top Nav -->
-        <div class="top-nav">
-            <div class="brand-title">
-                <h1 id="regionTitle">🚦 부동산 신호등 — <span id="regionNameHeader">지역</span> 심층 분석 리포트</h1>
-                <p>국토교통부 실거래가·한국은행 금리·NEIS 학군·에이전트 4대 종합 지표 (1920x1080 최적화)</p>
-            </div>
-            <div class="meta-tags">
-                <a href="../index.html" class="btn-back-main">🏠 메인 대시보드로 돌아가기</a>
-                <span class="signal-pill" id="signalPill">신호 판정</span>
-                <span class="meta-badge" id="baseRateBadge">기준금리 3.00%</span>
-                <span class="meta-badge">2026.09 실시간</span>
-            </div>
+    <header class="topbar">
+        <div class="wrap">
+            <a class="brand" href="../index.html">
+                <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+                    <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+                    <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+                    <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+                    <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+                </svg>
+                부동산 신호등
+            </a>
+            <nav class="nav" aria-label="대시보드 이동">
+                <a href="../index.html">메인 대시보드 (신호등)</a>
+                <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+                <a href="../crime_board.html">경찰청 범죄 대시보드</a>
+                <a href="../MCP/dashboard.html">MCP 도구 대시보드</a>
+            </nav>
+            <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+                <span id="themeToggleIcon" aria-hidden="true">☾</span>
+                <span id="themeToggleText">다크 모드</span>
+            </button>
         </div>
+    </header>
 
-        <!-- 4 Key Stat Cards Top Row -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="label">전용 84㎡ 기준 평균 실거래가</span>
-                <span class="val" id="statAvg84" style="color:var(--accent-blue);">-억</span>
-                <span class="sub" id="stat84Sub">국토교통부 실거래가 신고 기준</span>
+    <div class="container">
+        <div class="dashboard-wrapper">
+            <!-- Top Nav -->
+            <div class="top-nav">
+                <div class="brand-title">
+                    <h1 id="regionTitle">🚦 부동산 신호등 — <span id="regionNameHeader">지역</span> 심층 분석 리포트</h1>
+                    <p>국토교통부 실거래가·한국은행 금리·NEIS 학군·에이전트 4대 종합 지표</p>
+                </div>
+                <div class="meta-tags">
+                    <a href="../index.html" class="btn-back-main">🏠 메인 대시보드로 돌아가기</a>
+                    <span class="signal-pill" id="signalPill">신호 판정</span>
+                    <span class="meta-badge" id="baseRateBadge">기준금리 3.00%</span>
+                    <span class="meta-badge">2026.09 실시간</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="label">지역 전체 평균 거래가</span>
-                <span class="val" id="statAvgPrice">-억</span>
-                <span class="sub" id="statTradesSub">최근 2개월 실거래 누적</span>
-            </div>
-            <div class="stat-card">
-                <span class="label">트렌드 모멘텀 지수</span>
-                <span class="val" id="statTrend" style="color:#38bdf8;">+0.0</span>
-                <span class="sub">수요 유입 및 시장 거래 활성도</span>
-            </div>
-            <div class="stat-card">
-                <span class="label">투자 리스크 지수</span>
-                <span class="val" id="statRisk" style="color:#f87171;">+0.0</span>
-                <span class="sub">고금리 대출 부담 및 가격 괴리도</span>
-            </div>
-        </div>
 
-        <!-- 모듈 ①: 5대 랜드마크 단지 시세 & 차트 -->
-        <div class="main-grid">
-            <!-- Left Chart -->
+            <!-- 4 Key Stat Cards Top Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="label">전용 84㎡ 기준 평균 실거래가</span>
+                    <span class="val" id="statAvg84" style="color:var(--accent-blue);">-억</span>
+                    <span class="sub" id="stat84Sub">국토교통부 실거래가 신고 기준</span>
+                </div>
+                <div class="stat-card">
+                    <span class="label">지역 전체 평균 거래가</span>
+                    <span class="val" id="statAvgPrice">-억</span>
+                    <span class="sub" id="statTradesSub">최근 2개월 실거래 누적</span>
+                </div>
+                <div class="stat-card">
+                    <span class="label">트렌드 모멘텀 지수</span>
+                    <span class="val" id="statTrend" style="color:#38bdf8;">+0.0</span>
+                    <span class="sub">수요 유입 및 시장 거래 활성도</span>
+                </div>
+                <div class="stat-card">
+                    <span class="label">투자 리스크 지수</span>
+                    <span class="val" id="statRisk" style="color:#f87171;">+0.0</span>
+                    <span class="sub">고금리 대출 부담 및 가격 괴리도</span>
+                </div>
+            </div>
+
+            <!-- 모듈 ①: 5대 랜드마크 단지 시세 & 차트 -->
+            <div class="main-grid">
+                <!-- Left Chart -->
+                <div class="panel">
+                    <h3>📊 시세 비교 & 가격 포지셔닝</h3>
+                    <div class="chart-container">
+                        <canvas id="detailChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right Table -->
+                <div class="panel">
+                    <h3>📋 모듈 ①: 대표 5대 랜드마크 단지 시세 & 전세가율 매트릭스</h3>
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>단지명</th>
+                                    <th>전용</th>
+                                    <th>매매 실거래가</th>
+                                    <th>전세가</th>
+                                    <th>전세가율</th>
+                                    <th>신호</th>
+                                </tr>
+                            </thead>
+                            <tbody id="landmarkTableBody">
+                                <!-- JS 렌더링 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 모듈 ②: 명문 학군 & 학원가 인프라 지수 -->
             <div class="panel">
-                <h3>📊 시세 비교 & 가격 포지셔닝</h3>
-                <div class="chart-container">
-                    <canvas id="detailChart"></canvas>
+                <h3>🎓 모듈 ②: 명문 학군 & 학원가 인프라 지수 (NEIS 교육정보 빅데이터)</h3>
+                <div class="info-cards-grid">
+                    <div class="info-card">
+                        <div class="info-title">학군 종합 평가 지수</div>
+                        <div class="info-main" id="schoolScoreVal" style="color:var(--accent-blue);">95.0점</div>
+                        <div class="info-sub" id="schoolRankVal">상위 우수 학군</div>
+                    </div>
+                    <div class="info-card" style="grid-column: span 2;">
+                        <div class="info-title">대표 명문 초·중·고교</div>
+                        <div class="info-main" id="topSchoolsVal" style="font-size:1.05rem;">명문 고등학교, 중학교 리스트</div>
+                        <div class="info-sub">대학 진학률 및 특목고·자사고 배출 상위권</div>
+                    </div>
+                    <div class="info-card" style="grid-column: span 1;">
+                        <div class="info-title">핵심 학원가 클러스터</div>
+                        <div class="info-main" id="academyZoneVal" style="font-size:1.0rem; color:var(--text-secondary);">밀집 에듀타운</div>
+                        <div class="info-sub">사교육 인프라 접근성 우수</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right Table -->
+            <!-- 모듈 ③: LTV 40% 대출 및 월 순현금흐름 시뮬레이션 -->
             <div class="panel">
-                <h3>📋 모듈 ①: 대표 5대 랜드마크 단지 시세 & 전세가율 매트릭스</h3>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>단지명</th>
-                                <th>전용</th>
-                                <th>매매 실거래가</th>
-                                <th>전세가</th>
-                                <th>전세가율</th>
-                                <th>신호</th>
-                            </tr>
-                        </thead>
-                        <tbody id="landmarkTableBody">
-                            <!-- JS 렌더링 -->
-                        </tbody>
-                    </table>
+                <h3>💰 모듈 ③: 전용 84㎡ 기준 LTV 40% 주담대 & 월 순현금흐름 시뮬레이션</h3>
+                <div class="info-cards-grid">
+                    <div class="info-card">
+                        <div class="info-title">주담대 한도 (LTV 40%)</div>
+                        <div class="info-main" id="cashflowLoan">-억</div>
+                        <div class="info-sub">스트레스 DSR 2단계 적용</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-title">월 대출이자 (금리 4.39%)</div>
+                        <div class="info-main" id="cashflowInterest" style="color:#f87171;">-만원</div>
+                        <div class="info-sub">원리금 균등분할상환 기준</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-title">월세/전세 기대수익</div>
+                        <div class="info-main" id="cashflowRent" style="color:var(--text-primary);">-만원</div>
+                        <div class="info-sub">주변 평균 임대수익률 기준</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-title">월 순현금흐름 (Cash Flow)</div>
+                        <div class="info-main" id="cashflowNet">-만원</div>
+                        <div class="info-sub" id="cashflowNetSub">실부담액 지표</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 모듈 ②: 명문 학군 & 학원가 인프라 지수 -->
-        <div class="panel">
-            <h3>🎓 모듈 ②: 명문 학군 & 학원가 인프라 지수 (NEIS 교육정보 빅데이터)</h3>
-            <div class="info-cards-grid">
-                <div class="info-card">
-                    <div class="info-title">학군 종합 평가 지수</div>
-                    <div class="info-main" id="schoolScoreVal" style="color:var(--accent-blue);">95.0점</div>
-                    <div class="info-sub" id="schoolRankVal">상위 우수 학군</div>
-                </div>
-                <div class="info-card" style="grid-column: span 2;">
-                    <div class="info-title">대표 명문 초·중·고교</div>
-                    <div class="info-main" id="topSchoolsVal" style="font-size:1.05rem;">명문 고등학교, 중학교 리스트</div>
-                    <div class="info-sub">대학 진학률 및 특목고·자사고 배출 상위권</div>
-                </div>
-                <div class="info-card" style="grid-column: span 1;">
-                    <div class="info-title">핵심 학원가 클러스터</div>
-                    <div class="info-main" id="academyZoneVal" style="font-size:1.0rem; color:var(--text-secondary);">밀집 에듀타운</div>
-                    <div class="info-sub">사교육 인프라 접근성 우수</div>
-                </div>
+            <!-- 모듈 ④: 에이전트 종합 진단평가 -->
+            <div class="panel" style="border-color: rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, #151c2c 0%, #172338 100%);">
+                <h3>🤖 모듈 ④: 부동산 신호등 멀티 에이전트 종합 진단 총평</h3>
+                <p id="agentVerdictText" style="font-size:1.05rem; line-height:1.75; color:var(--text-primary); font-weight:500;">
+                    분석 데이터 로딩 중...
+                </p>
             </div>
-        </div>
 
-        <!-- 모듈 ③: LTV 40% 대출 및 월 순현금흐름 시뮬레이션 -->
-        <div class="panel">
-            <h3>💰 모듈 ③: 전용 84㎡ 기준 LTV 40% 주담대 & 월 순현금흐름 시뮬레이션</h3>
-            <div class="info-cards-grid">
-                <div class="info-card">
-                    <div class="info-title">주담대 한도 (LTV 40%)</div>
-                    <div class="info-main" id="cashflowLoan">-억</div>
-                    <div class="info-sub">스트레스 DSR 2단계 적용</div>
+            <!-- 행동 지침 가이드 -->
+            <div class="plan-grid">
+                <div class="plan-card">
+                    <h4>🎯 1. 실수요자 실거주 갈아타기 전략</h4>
+                    <p id="planDesc1">역세권 대단지 위주로 전세가율 50% 이상 매물을 선별하고, 실거래가 반등 추세를 모니터링하십시오.</p>
                 </div>
-                <div class="info-card">
-                    <div class="info-title">월 대출이자 (금리 4.39%)</div>
-                    <div class="info-main" id="cashflowInterest" style="color:#f87171;">-만원</div>
-                    <div class="info-sub">원리금 균등분할상환 기준</div>
+                <div class="plan-card">
+                    <h4>💼 2. 갭투자 및 자산 포트폴리오 전략</h4>
+                    <p id="planDesc2">전세가율 흐름을 모니터링하며 역전세 리스크를 방어하고, 주담대 4%대 금리 환경에서의 현금흐름을 확보하십시오.</p>
                 </div>
-                <div class="info-card">
-                    <div class="info-title">월세/전세 기대수익</div>
-                    <div class="info-main" id="cashflowRent" style="color:var(--text-primary);">-만원</div>
-                    <div class="info-sub">주변 평균 임대수익률 기준</div>
-                </div>
-                <div class="info-card">
-                    <div class="info-title">월 순현금흐름 (Cash Flow)</div>
-                    <div class="info-main" id="cashflowNet">-만원</div>
-                    <div class="info-sub" id="cashflowNetSub">실부담액 지표</div>
+                <div class="plan-card">
+                    <h4>⚖️ 3. 세무 및 자금조달 계획 가이드</h4>
+                    <p id="planDesc3">취득세 중과 여부와 보유세(재산세·종부세) 시뮬레이션을 필수 점검하고, 무리한 영끌을 지양하십시오.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- 모듈 ④: 에이전트 종합 진단평가 -->
-        <div class="panel" style="border-color: rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, #151c2c 0%, #172338 100%);">
-            <h3>🤖 모듈 ④: 부동산 신호등 멀티 에이전트 종합 진단 총평</h3>
-            <p id="agentVerdictText" style="font-size:1.05rem; line-height:1.75; color:var(--text-primary); font-weight:500;">
-                분석 데이터 로딩 중...
-            </p>
+            <!-- Footer -->
+            <footer>
+                <div>© 2026 부동산 신호등 (seoul-realty MCP Engine). 국토교통부·한국은행·NEIS 공공데이터 연동.</div>
+                <div>
+                    <a href="../index.html" class="btn-back-main" style="padding:7px 16px; font-size:0.86rem;">🏠 메인 대시보드로 돌아가기</a>
+                </div>
+            </footer>
         </div>
-
-        <!-- 행동 지침 가이드 -->
-        <div class="plan-grid">
-            <div class="plan-card">
-                <h4>🎯 1. 실수요자 실거주 갈아타기 전략</h4>
-                <p id="planDesc1">역세권 대단지 위주로 전세가율 50% 이상 매물을 선별하고, 실거래가 반등 추세를 모니터링하십시오.</p>
-            </div>
-            <div class="plan-card">
-                <h4>💼 2. 갭투자 및 자산 포트폴리오 전략</h4>
-                <p id="planDesc2">전세가율 흐름을 모니터링하며 역전세 리스크를 방어하고, 주담대 4%대 금리 환경에서의 현금흐름을 확보하십시오.</p>
-            </div>
-            <div class="plan-card">
-                <h4>⚖️ 3. 세무 및 자금조달 계획 가이드</h4>
-                <p id="planDesc3">취득세 중과 여부와 보유세(재산세·종부세) 시뮬레이션을 필수 점검하고, 무리한 영끌을 지양하십시오.</p>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <div>© 2026 부동산 신호등 (seoul-realty MCP Engine). 국토교통부·한국은행·NEIS 공공데이터 연동.</div>
-            <div>
-                <a href="../index.html" class="btn-back-main" style="padding:7px 16px; font-size:0.86rem;">🏠 메인 대시보드로 돌아가기</a>
-            </div>
-        </footer>
     </div>
 
     <script>
         // 사전 컴파일된 정적 지역 데이터 (로컬 file:// 프로토콜 및 네트워크 오프라인 완전 대응)
-        const EMBEDDED_REGIONS_DETAIL = [
   {
     "name": "강남구",
     "province": "seoul",
@@ -2943,12 +2994,68 @@
                     plugins: {
                         legend: { display: false }
                     },
+            document.getElementById('academyZoneVal').innerHTML = `<span>${academyText}</span>`;
+
+            // 모듈 ③: 현금흐름
+            if (r.cashflow) {
+                document.getElementById('cashflowLoan').textContent = r.cashflow.ltv40_loan;
+                document.getElementById('cashflowInterest').textContent = r.cashflow.monthly_interest;
+                document.getElementById('cashflowRent').textContent = r.cashflow.rent_income;
+                const netEl = document.getElementById('cashflowNet');
+                netEl.textContent = r.cashflow.net_cashflow;
+                netEl.style.color = r.cashflow.net_cashflow.includes('적자') ? '#ef4444' : '#22c55e';
+            }
+
+            // 모듈 ④: 에이전트 종합 진단평가
+            if (r.verdict) {
+                document.getElementById('agentVerdictText').textContent = r.verdict;
+            }
+
+            // 차트 렌더링
+            const ctx = document.getElementById('detailChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [`${r.name} 전용84`, `${r.name} 전체평균`, '수도권 평균 (11.8억)', '서울 평균 (14.5억)'],
+                    datasets: [{
+                        label: '거래가 비교 (억원)',
+                        data: [r.avg84, r.avgPrice, 11.8, 14.5],
+                        backgroundColor: [
+                            'rgba(56, 189, 248, 0.85)',
+                            'rgba(168, 85, 247, 0.65)',
+                            'rgba(148, 163, 184, 0.4)',
+                            'rgba(148, 163, 184, 0.55)'
+                        ],
+                        borderColor: ['#38bdf8', '#a855f7', '#64748b', '#94a3b8'],
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
                     scales: {
                         x: { ticks: { color: '#cbd5e1', font: { family: 'Noto Sans KR' } }, grid: { color: 'rgba(255,255,255,0.05)' } },
                         y: { ticks: { color: '#94a3b8', font: { family: 'Noto Sans KR' }, callback: v => v + '억' }, grid: { color: 'rgba(255,255,255,0.05)' } }
                     }
                 }
             });
+        }
+
+        function applyTheme(theme, persist) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+            const btnIcon = document.getElementById('themeToggleIcon');
+            const btnText = document.getElementById('themeToggleText');
+            if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+            if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+        }
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(cur === 'light' ? 'dark' : 'light', true);
         }
     </script>
 </body>

@@ -4,18 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>서울 25개 자치구 매수 타이밍 신호등 & 수익성 시뮬레이션 통합 게시판</title>
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re_theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     :root {
       --bg-main: #0b0f17;
+      --bg-body: #0b0f17;
       --card-bg: #141a24;
+      --bg-surface: #141a24;
       --card-border: #212b3b;
+      --border-color: #212b3b;
       --card-hover: #1b2433;
       --text-title: #f8fafc;
+      --text-primary: #f8fafc;
       --text-sub: #94a3b8;
+      --text-secondary: #cbd5e1;
       --text-muted: #64748b;
+      --line-strong: #334155;
       
       --signal-green: #22c55e;
       --signal-green-bg: rgba(34, 197, 94, 0.12);
@@ -27,20 +44,64 @@
       --accent-purple: #a855f7;
     }
 
+    [data-theme="light"] {
+      --bg-main: #f4f5f7;
+      --bg-body: #f4f5f7;
+      --card-bg: #ffffff;
+      --bg-surface: #ffffff;
+      --card-border: #e3e6eb;
+      --border-color: #e3e6eb;
+      --card-hover: #f8f9fb;
+      --text-title: #131820;
+      --text-primary: #131820;
+      --text-sub: #3d4654;
+      --text-secondary: #3d4654;
+      --text-muted: #647085;
+      --line-strong: #cbd1da;
+      --accent-blue: #1d4ed8;
+    }
+
+    /* ---------- 상단 바 (index.html 표준) ---------- */
+    .topbar {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+        margin-bottom: 24px;
+    }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 56px; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+        text-decoration: none; white-space: nowrap; color: var(--text-primary);
+    }
+    .nav { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+    .nav a {
+        display: flex; align-items: center; padding: 0 14px; margin-bottom: -1px;
+        color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;
+        text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    }
+    .nav a:hover { color: var(--text-primary); }
+    .nav a[aria-current="page"] { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+    .theme-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 8px;
+        background: var(--bg-surface); font-size: 0.9rem; font-weight: 600; white-space: nowrap; color: var(--text-primary);
+        cursor: pointer;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--bg-main);
       color: var(--text-title);
-      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
       min-height: 100vh;
-      padding: 24px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .container {
-      max-width: 1840px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 24px 40px;
     }
 
     /* Main Header */
@@ -380,6 +441,29 @@
   </style>
 </head>
 <body>
+  <header class="topbar">
+      <div class="wrap">
+          <a class="brand" href="../index.html">
+              <svg class="mark" width="16" height="26" viewBox="0 0 18 30" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="17" height="29" rx="8.5"/>
+                  <circle cx="9" cy="8" r="3.2" fill="#e5615a"/>
+                  <circle cx="9" cy="15" r="3.2" fill="#e9b949"/>
+                  <circle cx="9" cy="22" r="3.2" fill="#3fbf82"/>
+              </svg>
+              부동산 신호등
+          </a>
+          <nav class="nav" aria-label="대시보드 이동">
+              <a href="../index.html">메인 대시보드 (신호등)</a>
+              <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
+              <a href="../crime_board.html">경찰청 범죄 대시보드</a>
+              <a href="../MCP/dashboard.html">MCP 도구 대시보드</a>
+          </nav>
+          <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
+              <span id="themeToggleIcon" aria-hidden="true">☾</span>
+              <span id="themeToggleText">다크 모드</span>
+          </button>
+      </div>
+  </header>
 
   <div class="container">
 
@@ -603,6 +687,19 @@
 
     // Initial Render
     renderCards(districtsData);
+
+    function applyTheme(theme, persist) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
+        const btnIcon = document.getElementById('themeToggleIcon');
+        const btnText = document.getElementById('themeToggleText');
+        if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
+        if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+    }
+    function toggleTheme() {
+        const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+        applyTheme(cur === 'light' ? 'dark' : 'light', true);
+    }
   </script>
 </body>
 </html>
