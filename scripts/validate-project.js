@@ -10,7 +10,7 @@ const requiredPaths = [
   'index.html',
   'README.md',
   'package.json',
-  '.mcp.json',
+  '.agents/mcp_config.json',
   'MCP/realestate-server.js',
   'MCP/daily_pipeline_sync.js',
   'MCP/update_raw_incremental.js',

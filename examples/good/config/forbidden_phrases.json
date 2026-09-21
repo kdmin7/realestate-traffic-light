@@ -1,0 +1,13 @@
+[
+  {"id": "guaranteed-rise", "pattern": "(무조건|반드시|확실히)\\s*(오릅|오를|상승)", "severity": "block", "scope": "all", "reason": "확정적 수익 표현", "replacement": "최근 실거래가 흐름과 가정 조건을 사실로 표시"},
+  {"id": "rise-region", "pattern": "오를\\s*지역|상승\\s*확정", "severity": "block", "scope": "facts", "reason": "근거 없는 단정 라벨", "replacement": "인접 지역 대비 평균 실거래가 격차(기준일)"},
+  {"id": "undervalued", "pattern": "저평가", "severity": "block", "scope": "facts", "reason": "판단을 사실처럼 표시", "replacement": "인접 지역 대비 평균 실거래가 격차 -N% (기준일)"},
+  {"id": "buy-timing", "pattern": "지금이\\s*(바닥|매수\\s*타이밍|기회)|매수\\s*적기", "severity": "block", "scope": "all", "reason": "시점 단정, 투자 권유로 읽힘", "replacement": "현재 적용 규칙(기준일) 기준 구매력 표시"},
+  {"id": "price-floor", "pattern": "(이\\s*가격|[0-9.]+억)\\s*(밑|아래|이하)(으)?로(는)?\\s*(팔지|내놓지|올리지)", "severity": "block", "scope": "all", "reason": "가격 담합 유도"},
+  {"id": "report-listing", "pattern": "허위\\s*매물\\s*신고\\s*(하|합|해|독려)", "severity": "block", "scope": "all", "reason": "집단 신고 독려"},
+  {"id": "return-guarantee", "pattern": "(수익|원금)\\s*(보장|확정)|확실한\\s*수익", "severity": "block", "scope": "all", "reason": "수익 보장 표현"},
+  {"id": "review-stat", "pattern": "후기.{0,10}[0-9]+\\s*%.{0,8}만족", "severity": "block", "scope": "all", "reason": "편향된 표본을 통계처럼 표시", "replacement": "제출된 사례 N건 (통계가 아님)"},
+  {"id": "broker-recommend", "pattern": "(공인)?중개(사무소|사)\\s*추천", "severity": "block", "scope": "all", "reason": "중개 알선으로 읽힐 수 있음"},
+  {"id": "single-rank", "pattern": "종합\\s*(점수|순위)|[0-9]+\\s*위\\s*지역", "severity": "block", "scope": "facts", "reason": "단일 종합점수·순위 금지"},
+  {"id": "probability", "pattern": "[0-9]+\\s*%\\s*(의\\s*)?(확률|가능성)", "severity": "block", "scope": "all", "reason": "근거 없는 확률 수치 표시 금지"}
+]

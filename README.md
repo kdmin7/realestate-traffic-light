@@ -1,330 +1,179 @@
-# 🚦 부동산 신호등 (Real Estate Traffic Light)
+# 근거 기반 부동산 게시판 에이전트 키트 (Antigravity CLI용)
 
-수도권(서울 25개 구 + 경기 31개 시·군 = 56개 전 지역)의 부동산 실거래가, 한국은행 거시경제, 나이스(NEIS) 학군, 경찰청 범죄·치안 통계를 실시간 수집·분석하여 **투자 신호등(매수고려·주의·관망)**과 **인터랙티브 시각화 대시보드**를 제공하는 멀티 에이전트 & MCP 시스템입니다.
-
----
-
-## 💡 게시판(대시보드) 소개
-
-**부동산 신호등**은 파편화된 공공데이터(국토교통부 실거래가, 한국은행 ECOS 금리, 교육부 나이스 학군 정보, 경찰청 13개년 범죄통계)를 단 하나의 직관적인 사용자 인터페이스로 통합한 **수도권 부동산 종합 진단 대시보드**입니다.
-
-사용자는 복잡한 공공데이터 포털을 일일이 찾아다니지 않고도, 메인 대시보드([`index.html`](index.html))에서 수도권 56개 전 지역의 **가격 흐름, 금리 부담, 치안 안전도, 학군 선호도**를 한눈에 비교 분석할 수 있습니다.
+> **최종 갱신 기준일:** 2026-09-21  
+> **운영 환경:** Google Antigravity CLI (`agy`) / Node.js / Python 3.10+  
+> **핵심 원칙:** 근거 등급제(A~E), 구매력 한도 내 추천, 개인정보 비저장(클라이언트 계산), 4중 안전 게이트 (법률 자문 아님)
 
 ---
 
-## 🌟 주요 장점 및 실무 유용성
+## 📌 2026-09-21 작업 및 업데이트 요약
 
-### 1. 4대 공공 빅데이터의 객관적 융합 (감정이 배제된 팩트 분석)
-- **국토교통부 실거래가**: 매매·전월세 전수 데이터 및 국민평형(84㎡) 실거래가 실시간 추적
-- **한국은행 ECOS**: 기준금리(3.0%) 및 시중은행 주담대 평균금리(4.39%) 금융 지표 연동
-- **교육부 나이스(NEIS)**: 특목고·자율고 배출률, 명문 초·중·고 학군 및 학원가 클러스터 분석
-- **경찰청 공공데이터**: 2012~2024년 13개년 5대 강력범죄 통계 및 인구 1천명당 치안 위험도 지수 산출
+본 저장소는 기존 Claude Code 기반 설정을 **Google Antigravity CLI(`agy`) 표준 아키텍처**로 전면 전환하고, 데이터 파이프라인 시각화 및 무결성 검증 체계를 완비했습니다.
 
-### 2. 직관적인 3단계 신호등 판정 엔진
-- **🟢 매수고려 (BUY)**: 높은 전세가율(50% 이상) + 트렌드 모멘텀 상승 + 리스크 지수 안정 구간
-- **🟡 주의 (WARNING)**: 단기 급등 피로도, 고금리 이자 부담 또는 전세가율 50% 미만으로 갭 부담이 높은 구간
-- **🔴 관망 (WATCH)**: 거래량 침체, 전세가율 저조 및 관망 필요 구간
+1. **Google Antigravity CLI 표준 규약 전면 적용**
+   - 프로젝트 공통 룰셋 정의: `.agents/rules/board-core.md` (절대 규칙 5대 원칙, 근거 등급 A~E, 문체 규약)
+   - 멀티 에이전트 구축: `board-orchestrator`를 중심으로 15개 전문 서브에이전트 구성 (`.agents/agents/`)
+   - 전문 스킬 체계화: 절차적 워크플로우를 담당하는 13개 스킬 등록 (`.agents/skills/`)
+   - 권한 및 훅 체계: `.agents/hooks.json` 및 `agy/settings.permissions.json`을 통한 발행 통제
 
-### 3. 심층 분석 대시보드 연계 (원클릭 드릴다운)
-- 메인 카드 클릭 시 해당 지역 전용 [심층 분석 리포트](data/district_analysis_dashboard.html)로 즉시 전환
-- **모듈 ①**: 5대 랜드마크 단지 시세·전세가율 매트릭스
-- **모듈 ②**: NEIS 교육 빅데이터 기반 명문 학군·학원가 인프라 지수
-- **모듈 ③**: LTV 40% 대출 시뮬레이션 및 월 순현금흐름(이자 vs 임대수익) 정밀 계산
-- **모듈 ④**: 멀티 에이전트 종합 진단 총평 및 실수요자·투자자 맞춤형 행동 지침
+2. **단일 진실 공급원(SSOT) 정책 규칙 및 자체 Python 경량 MCP 서버 구축**
+   - `rules/rules.json`: LTV, DSR, 취득세, 스트레스 금리 등 대출·세제 규정의 단일 기준점 마련 (AI 에이전트의 임의 수정 차단)
+   - `MCP/board_mcp.py`: 표준 라이브러리 기반 경량 MCP 서버 개발 (`rules`, `board-read`, `board-write` 3개 프로필로 읽기/쓰기 권한 분리)
 
-### 4. 무설치 로컬 구동 & 100% 오프라인 완결성
-- 별도의 웹서버 없이 로컬 파일(`file:///...`)로 브라우저에서 바로 열어도 데이터가 절대 끊기지 않는 **임베디드 사전 컴파일 데이터셋** 내장
-- 네트워크 에러나 CORS 정책 차단 환경에서도 0.01초 만에 즉각 로딩
+3. **엔드투엔드 Agent·MCP 데이터 파이프라인 시각화 구축 (`project_agent_mcp_dataflow.html`)**
+   - Archify 엔진 기반 5단계 데이터 흐름도(`project_agent_mcp_dataflow.json`) 작성 및 단독 실행형 HTML 다이어그램 빌드
+   - 3대 중점 경로 뷰(`facts-path`, `rules-strategy-path`, `gate-publish-path`), 다크/라이트 테마, 인라인 SVG 애니메이션, 모바일 반응형 최적화 완료
+   - Headless Chrome 기반 해상도별 렌더링 및 시각 회귀 테스트 검증 통과
 
-### 5. 대화면 고가독성 UI & 완벽한 모바일 반응형
-- **PC 모니터 환경**: 15~25% 확대된 대형 폰트, 선명한 고대비 네온 컬러, 넓은 400px 차트 캔버스 적용으로 멀리서도 한눈에 판독 가능
-- **모바일/태블릿 환경**: 터치 스크롤 칩 네비게이션, 1열 전폭 카드 자동 스택, 44px 이상 터치 타깃으로 작은 스마트폰에서도 글씨 겹침이나 화면 깨짐 제로 보장
+4. **클라이언트 사이드 구매력 게이트(`web/budget-gate.js`) 및 테스트 스위트 강화**
+   - 사용자 소득·자산 등 개인 재정 정보의 서버 전송을 원천 차단하고 브라우저에서만 실시간 대출·부대비용을 계산하는 로직 구축
+   - Python `unittest` 33개 테스트 및 `budget-gate.test.js` 전원 통과 검증
 
 ---
 
-## 🛠️ 최근 업데이트 내역 (2026-09-20)
+## 📂 전체 디렉터리 및 파일 구성
 
-오늘(2026-09-20) 진행된 **Archify 에이전트 스킬 연동**, **데이터 파이프라인 인터랙티브 다이어그램(`realestate_dataflow.html`)** 및 **웹 요청·캐시 아키텍처(`web_request_cache_architecture.html`)** 신설 내역입니다.
-
-### 1. Archify 다이어그램 생성 엔진 연동 및 검증 (`tt-a1i/archify`)
-- **개요**: 시스템 아키텍처, 데이터 플로우, 워크플로우를 독립형 인터랙티브 HTML로 시각화하는 [Archify](https://github.com/tt-a1i/archify) 스킬을 전역 및 로컬 프로젝트에 연동.
-- **설치 및 진단**: `npx skills add tt-a1i/archify -y`를 통해 `archify`, `archify-review` 스킬 등록 및 `node bin/archify.mjs doctor` 전 항목(Node.js v24, 렌더러/스키마/런타임) 정상 확인.
-
-### 2. 부동산 신호등 데이터 파이프라인 인터랙티브 다이어그램 ([`realestate_dataflow.html`](realestate_dataflow.html)) 신설
-- **개요**: 공공데이터 원천 수집부터 3종 MCP 서버, 6대 멀티 에이전트 분석 체인, 신호등 판정 및 대시보드 표출까지의 전 과정을 5단계 인터랙티브 데이터 플로우로 구축.
-- **5단계 파이프라인**:
-  1. `공공데이터 원천 (Sources)`: 국토부 실거래가(OpenAPI), 한국은행 ECOS(금리), 경찰청 공공데이터(13개년 범죄통계)
-  2. `MCP 수집 계층 (Ingest)`: `seoul-realty`(29개 도구), `crime-collector`(4개 도구)
-  3. `에이전트 분석 계층 (Process)`: `re-market-data`(원천 취합), `re-trend-risk`(모멘텀·리스크 산출), `re-safety-analyst`(자치구 치안 등급 진단)
-  4. `신호등 판정 & 저장 (Store)`: `re-strategist`(BUY/WARN/WATCH 신호등 판정), `re-reporter`(브리핑 리포트), 데이터셋 저장소(사전 컴파일 JSON)
-  5. `인터랙티브 대시보드 (Consume)`: `index.html`(56개 지역 메인 맵), `district_safety_dashboard.html`(55개 지자체 심층 치안 대시보드)
-- **품질 및 뷰포트 검증**: `showcase` 품질 프로필 9개 항목 100% 통과, 1440×900 ~ 2048×1320 전 해상도 및 다크/라이트 테마 자동 `visual-check` PASS.
-
-### 3. 웹 요청 및 캐시 조회 아키텍처 다이어그램 ([`web_request_cache_architecture.html`](web_request_cache_architecture.html)) 신설
-- **개요**: 클라이언트 웹 요청의 CDN/ALB 라우팅, Redis 인메모리 캐시 조회(Read-Through), 캐시 미스 시 메인 DB(PostgreSQL) 쿼리 및 메시지 큐 비동기 캐시 무효화 파이프라인 시각화.
-- **품질 및 뷰포트 검증**: `showcase` 품질 프로필 통과 및 데스크톱 브라우저 렌더링 검증 완료.
-
----
-
-## 🛠️ 이전 업데이트 내역 (2026-09-19)
-
-### 1. 자치구별 심층 치안 대시보드 (`district_safety_dashboard.html`) 신설
-- **개요**: 마크다운 텍스트 리포트(`gangnam_safety_report.md`) 수준의 치안 전문 분석가(`re-safety-analyst`) 심층 분석을 수도권 55개 전 지자체 인터랙티브 HTML 대시보드로 승격.
-- **핵심 모듈 구현**:
-  - **치안 KPI 매트릭스**: 인구 1천명당 5대 범죄율, 5대 강력범죄 총건수, 수도권 평균(7.80건) 대비 편차율, 치안 리스크 점수
-  - **5대 범죄 구성비 분석**: 폭행·절도·성범죄·강도·살인 상세 발생건수와 점유율 프로그레스 바 + Chart.js 도넛 차트
-  - **13개년 시계열 추이 (2012 ~ 2024)**: 경찰청 13개년 통계 기반 연도별 강력범죄 발생 추세 및 증감률 라인 차트
-  - **생활권 이원화 정밀 진단**: Zone A(대단지 아파트 안심 주거벨트) vs Zone B(역세권·유흥상업 구역) 분리 평가
-  - **수요자별 맞춤 실전 행동 가이드**: 가족 실수요자 / 1인 가구·임차인 / 투자 신호등 연계 체크리스트
-  - **동적 지역 전환 & 테마 지원**: 우측 상단 55개 지역 셀렉터 및 다크/라이트 모드 지원
-
-### 2. 상단 "조금 전 이동했던 페이지로 이동" 내비게이션 복귀 버튼 탑재
-- `district_safety_dashboard.html` 최상단 좌측에 **`⬅️ 조금 전 페이지로 이동`** 버튼을 눈에 띄게 배치하여, 게시판(`crime_board.html`)이나 메인 대시보드(`index.html`)에서 유입된 사용자가 직전 탐색 위치와 스크롤 상태로 1-클릭 즉시 복귀할 수 있도록 구현.
-- `window.history.back()` 우선 처리 및 `document.referrer`, `crime_board.html` 3단계 폴백 로직 탑재.
-
-### 3. 치안 종합 게시판 (`crime_board.html`) 양방향 연동 고도화
-- **지역명 원클릭 이동**: 테이블 내 수도권 자치구 및 시·군 이름(예: `강남구 ↗`) 클릭 시 해당 지역 심층 치안 대시보드로 즉시 전환.
-- **행별 대시보드 버튼**: 테이블 각 행에 `[대시보드 ↗]` 및 `[요약]` 버튼을 배치하여 직관적 이동 지원.
-- **요약 모달 내부 바로가기**: 팝업 모달 하단에 `[🛡️ 선택 지역 심층 치안 리포트 대시보드 열기 ➔]` 버튼 추가.
-- **에이전트 배너 링크 연계**: 상단 파이프라인 배너에서 강남구 심층 대시보드로 즉시 연결.
-- 불필요하고 중복되었던 구형 `crime_dashboard.html` 완전 정리 및 신규 게시판 체계로 일원화.
-
-### 4. 치안 전문 분석가 에이전트 (`re-safety-analyst`) 및 통합 파이프라인 검증
-- 경찰청 13개년 범죄통계(odcloud)와 5대 강력범죄 시계열 추이, 인구 천명당 범죄율을 전문 진단하는 `re-safety-analyst` 정의 등록 (`.agents/agents/re-safety-analyst/agent.md`, `.claude/agents/re-safety-analyst.md`).
-- `crime-collector` MCP(4개 도구) ➔ `re-data-collector` ➔ `re-trend-risk-analyst` ➔ `re-safety-analyst` 체인 무결성 점검 완료 (`scripts/verify_full_system.js` 전 항목 PASS).
-
-<details>
-<summary><strong>이전 업데이트 내역 접기/펼치기 (2026-09-18)</strong></summary>
-
-- **성남시(분당/판교) 심층 리포트 모듈 ② (NEIS 학군) 연동 복구 및 Blank 결함 완전 해결**: `EMBEDDED_REGIONS_DETAIL` 내장 컴파일로 `file://` 보안 차단 해결 및 `findRegionTarget` 지능형 매칭 도입.
-- **메인 대시보드 (`index.html`) 대화면 고가독성 & 모바일 반응형 전면 개편**: 메인 타이틀(2.1rem), 실거래가(1.35rem 스카이블루), Chart.js(400px 대화면), 모바일 터치 스크롤 칩 네비게이션 적용.
-</details>
-
----
-
-## 🔄 Agent · MCP · 데이터 흐름 (Data Flow Architecture)
-
-전체 시스템은 **공공데이터 원천 → 3개 MCP 서버 → 6개 전문 에이전트 체인 → 대시보드 & 산출물 계층**의 파이프라인으로 유기적으로 연결됩니다.
-
-```mermaid
-flowchart TD
-    subgraph SOURCEDATA ["🌐 공공데이터 원천 (OpenAPI & Bulk Data)"]
-        D1["국토교통부 실거래가<br/>(아파트/오피스텔/연립/단독/상업)"]
-        D2["한국은행 ECOS<br/>(기준금리, 주택담보대출금리)"]
-        D3["나이스 NEIS<br/>(전국 초·중·고 학군, 급식, 학사일정)"]
-        D4["경찰청 odcloud.kr<br/>(2012~2024 범죄발생지역별 통계)"]
-    end
-
-    subgraph MCPLAYER ["⚙️ MCP 서버 계층 (총 39개 도구)"]
-        M1["seoul-realty MCP (29 tools)<br/>realestate-server.js<br/>- 실거래가/전세가율/금리/대출/입지평가"]
-        M2["schoolinfo MCP (6 tools)<br/>check_schools.js<br/>- 학교검색/학군분류/학사일정"]
-        M3["crime-collector MCP (4 tools)<br/>crime-collector-server.js<br/>- 13개년 범죄수집/치안분석/시계열추이"]
-    end
-
-    subgraph AGENTCHAIN ["🤖 멀티 에이전트 파이프라인"]
-        A1["01. re-market-data<br/>(공공데이터 원천 수집 - 국토부/한은/나이스/경찰청)"]
-        A2["02. re-trend-risk-analyst<br/>(트렌드 모멘텀 & 4대 리스크 스코어링: 고점/환금/금리/치안)"]
-        A6["03. re-safety-analyst<br/>(경찰청 13개년 범죄통계 & 자치구 치안 안전 등급 진단)"]
-        A3["04. re-investment-strategist<br/>(규칙 기반 신호등 판정: BUY/WARN/WATCH)"]
-        A4["05. re-briefing-reporter<br/>(투자 브리핑 리포트 생성)"]
-        A5["06. re-tax-strategist<br/>(취득세·보유세·양도세 세후 수익률 시뮬레이션)"]
-    end
-
-    subgraph OUTPUTLAYER ["📊 최종 산출물 및 대시보드"]
-        OUT1["index.html<br/>56개 지역 신호등 메인 대시보드"]
-        OUT2["crime_board.html<br/>2012~2024 경찰청 범죄통계 종합 게시판"]
-        OUT3["schoolinfo_dashboard.html<br/>나이스 학군 심층 분석 대시보드"]
-        OUT4["district_safety_dashboard.html<br/>55개 지자체 심층 치안 대시보드 (복귀 버튼 탑재)"]
-        OUT5["data/re-*/*.md<br/>지역별 raw / scores / safety / signal / briefing 리포트"]
-        OUT6["realestate_dataflow.html<br/>Archify 데이터 파이프라인 인터랙티브 다이어그램"]
-        OUT7["web_request_cache_architecture.html<br/>Archify 웹 요청·캐시 아키텍처 다이어그램"]
-    end
-
-    D1 & D2 --> M1
-    D3 --> M2
-    D4 --> M3
-    M3 -.->|범죄율 연동| M1
-
-    M1 & M2 & M3 --> A1
-    A1 -->|raw.md| A2
-    M3 & A1 --> A6
-    A6 -->|치안 대시보드 연동| OUT4
-    A6 -->|safety_report.md| OUT5
-    A2 -->|scores.md| A3
-    A3 -->|signal.md| A4
-    A3 -.-> A5
-    A4 -->|briefing.md| OUT5
-
-    A3 & A4 -->|REGION_DATA 갱신| OUT1
-    M3 -->|13개년 집계| OUT2
-    OUT2 -->|지역명/버튼 클릭| OUT4
-    OUT4 -->|조금 전 페이지로 이동| OUT2
-    M2 -->|학군 데이터| OUT3
 ```
-
-### 단계별 데이터 전환 흐름
-
-1. **수집 단계 (`re-market-data` + MCP 서버 3종)**:
-   - `seoul-realty`: 국토부 API에서 실거래가(매매·전월세)를 수집하고 한국은행 ECOS에서 금리 데이터를 취합
-   - `schoolinfo`: 나이스 API에서 자치구별 초·중·고 학군 및 특목고/자율고 비율 취합
-   - `crime-collector`: 경찰청 OpenAPI에서 2012~2024년 13개 연도 범죄 데이터를 3개월(90일) 주기로 수집하여 `data/crime/{year}.csv` 및 `{year}.json`으로 보관
-   - ➡️ 산출물: `data/re-data-collector/{slug}_raw.md`
-
-2. **분석 단계 (`re-trend-risk-analyst`)**:
-   - 거래량 및 실거래가 분기 CAGR로 **트렌드 모멘텀 점수** 산출
-   - 전세가율, 인구 1천명당 범죄율(역수), 학군 선호도, 금리 부담을 결합한 **리스크 점수** 산출
-   - ➡️ 산출물: `data/re-trend-risk-analyst/{slug}_scores.md`
-
-3. **판정 단계 (`re-investment-strategist`)**:
-   - 모멘텀과 리스크 지수를 교차 평가하여 **신호등(BUY 매수고려 / WARNING 주의 / WATCH 관망)** 부여
-   - ➡️ 산출물: `data/re-timing-judge/{slug}_signal.md`
-
-4. **브리핑 단계 (`re-briefing-reporter`)**:
-   - 핵심 지표 요약, 상승/하락 요인, 단지별 최고가 현황을 담은 분석 리포트 발행
-   - ➡️ 산출물: `data/re-briefing-reporter/{slug}_briefing.md` 및 `index.html`의 56개 지역 카드 데이터 갱신
-
----
-
-## 📂 계층별 데이터 구조 (Data Structure)
-
-### 1. 원천 데이터 구조 (Raw Datasets)
-
-| 데이터군 | 저장 경로 / 엔드포인트 | 포맷 | 주요 필드 및 구조 |
-|---|---|:---:|---|
-| **아파트 실거래가** | `RTMSDataSvcAptTradeDev` (국토부) | XML/JSON | `dealAmount`(매매가), `excluUseAr`(전용면적), `dealYear/Month/Day`, `aptNm`, `floor` |
-| **아파트 전월세** | `RTMSDataSvcAptRent` (국토부) | XML/JSON | `deposit`(보증금), `monthlyRent`(월세), `excluUseAr`, `dealYear/Month` |
-| **한국은행 금리** | `ECOS` 통계 (한국은행) | JSON | `BASE_RATE`(기준금리), `MORTGAGE_RATE`(주담대 평균금리), 월별 시계열 |
-| **경찰청 범죄통계** | `MCP/data/crime/{year}.csv` & `.json` | CSV/JSON | `범죄대분류`, `범죄중분류`, `서울 강남구`, `경기도 고양시` ... 전국 249개 지자체별 발생건수 |
-| **범죄 동기화 메타** | `MCP/data/crime/manifest.json` | JSON | `updatedAt`, `syncIntervalDays: 90`, `nextSyncDueAt`, 연도별 건수/컬럼수 |
-| **나이스 학군** | NEIS API 대방 포털 | JSON | `SCHUL_NM`, `HS_PURPS_SMS_NM`(특목/자율/일반), `ORG_RDNMA` |
-
-### 2. 중간 에이전트 산출물 구조 (`data/re-*/`)
-
-- **`{slug}_raw.md`**: 수집된 최근 거래 내역, 전세가율, 학군 목록, 5대 강력범죄 건수 원본
-- **`{slug}_scores.md`**: 트렌드 지수 (1~100점), 리스크 지수 (1~100점), 지표별 가중치 breakdown
-- **`{slug}_signal.md`**: 최종 신호 (`BUY` / `WARNING` / `WATCH`), 신호 산출 사유, 모니터링 체크리스트
-- **`{slug}_briefing.md`**: 사람이 읽기 쉬운 종합 투자 요약문, 학군/치안 종합 평가, 세부 매물 추천
-
-### 3. 최종 메인 대시보드 데이터 구조 (`index.html` 내 `REGION_DATA`)
-
-```javascript
-{
-  name: "성남시 (분당/판교)",          // 지역명 (서울 25구 + 경기 31개 시·군)
-  province: "gyeonggi",              // 광역 구분 (seoul | gyeonggi)
-  zone: "경부축",                     // 세부 생활권역 (경부축, 동남권, 서북권 등)
-  signal: "warning",                 // 신호등 판정 (buy | warning | watch)
-  signalText: "🟡 주의",              // UI 표시 라벨
-  trades: "420건 (7월: 280 / 8월: 140)", // 최근 실거래량
-  avgPrice: 16.2,                    // 전체 평균 매매가 (억원)
-  avg84: 17.8,                       // 국민평형(84㎡) 기준 평균 거래가 (억원)
-  topApt: "산운마을7단지 (28.0억)",    // 신고 최고가 단지
-  trend: "+1.6",                     // 트렌드 모멘텀 점수
-  risk: "+1.0"                       // 복합 리스크 지수
-}
+realestate_prj/
+├── .agents/                               # Antigravity CLI 에이전트·스킬·규칙 설정
+│   ├── rules/
+│   │   └── board-core.md                 # 5대 절대 규칙, 근거 등급제, 발행 파이프라인 규약
+│   ├── agents/                           # 15개 전문 서브에이전트 정의 (agent.md)
+│   │   ├── board-orchestrator/           # 전체 파이프라인 조율 오케스트레이터 (메인)
+│   │   ├── re-market-data/               # 실거래·공공 데이터 수집 및 A등급 정규화
+│   │   ├── re-safety-analyst/            # 경찰청 치안/안전 데이터 분석
+│   │   ├── re-trend-risk/                # 4대 리스크 스코어링 (A·B등급 근거만 사용)
+│   │   ├── re-rules/                     # 공식 법령·보도자료 원문 대조 및 규정 제안
+│   │   ├── re-strategist/                # 구매력 한도 내 트레이드오프 및 추천 카드 도출
+│   │   ├── re-tax-strategist/            # 취득세·보유세·양도세 정밀 세무 시뮬레이션
+│   │   ├── re-reporter/                  # 사실(A/B)·의견(C/D) 패널 분리 초안 작성
+│   │   ├── legal-reviewer/               # 담합·단정적 수익 표현·법률 리스크 사전 심의
+│   │   ├── fact-checker/                 # 유튜버·보고서 등 전문가 견해 검증
+│   │   ├── community-moderator/          # 회원 거래/거주 후기 검수
+│   │   ├── publisher/                    # 품질 게이트 통과 초안 최종 게시판 발행
+│   │   └── ... (통합 에이전트 등)
+│   ├── skills/                           # 전문 작업 지침 (13개 SKILL.md)
+│   │   ├── board-workflow/               # 발행 단계 및 게이트 증적 체크리스트
+│   │   ├── budget-gate/                  # 구매력 계산 및 예산 초과 차단 로직
+│   │   ├── rules-table/                  # LTV·DSR 등 정책 테이블 관리 지침
+│   │   ├── evidence-grading/             # A~E 근거 등급 부여 및 출처 검증
+│   │   ├── claim-verification/           # 전문가 견해 검증 절차
+│   │   ├── experience-review/            # 회원 경험 사례 양식 검수
+│   │   ├── legal-gate/                   # 발행 전 법률·표현 체크리스트
+│   │   ├── location-metrics/             # 학군·상권·역세권 등 입지 지표 산출
+│   │   ├── recommend-card/               # 추천 카드 및 지표 팩 작성 규약
+│   │   ├── region-card/                  # 지역 게시 초안 포맷 규약
+│   │   ├── moderation-policy/            # 커뮤니티 운영 및 게시글 검수 정책
+│   │   └── archify / archify-review/     # 시스템 아키텍처 다이어그램 생성·리뷰
+│   ├── mcp_config.json                   # rules, board-read, board-write MCP 서버 설정
+│   └── hooks.json                        # 발행(publish_post) 전 결정적 검증 강제 훅
+│
+├── MCP/                                  # 자체 및 외부 MCP 도구 구성
+│   └── board_mcp.py                      # 표준 라이브러리 기반 통합 MCP 서버
+│       ├── --profile rules               # 정책 규칙 조회 (list_rules, get_rule 등)
+│       ├── --profile board-read          # 초안·견해·후기·게이트 조회
+│       └── --profile board-write         # 견해/후기 저장, 게이트 기록, 최종 발행
+│
+├── rules/                                # 공식 정책 규정 단일 진실 공급원 (SSOT)
+│   ├── rules.json                        # LTV, DSR, 취득세, 스트레스 가산금리 (AI 수정 불가)
+│   └── proposals/                        # 규정 개정 제안서 마크다운 저장소
+│
+├── data/                                 # 데이터 저장소
+│   ├── board/                            # 게시판 파이프라인 산출물
+│   │   ├── drafts/                       # 작성된 지역 초안 (.md)
+│   │   ├── claims/                       # 검증된 C등급 전문가 견해 (.json)
+│   │   ├── experiences/                  # 검수된 D등급 회원 경험담 (.json)
+│   │   ├── gates/                        # 초안별 법률·무결성 통과 증적 기록 (.json)
+│   │   └── published/                    # 최종 발행 완료된 게시글 및 색인
+│   ├── re-market-data/                   # 실거래가 정규화 데이터 (A등급)
+│   ├── re-safety-analyst/                # 지역별 치안 안전 지표 (A등급)
+│   └── re-trend-risk/                    # 4대 리스크 스코어 산출 데이터 (B등급)
+│
+├── scripts/                              # 자동화 및 품질 검증 스크립트
+│   ├── validate_board.py                 # 초안·근거·메타·규정·금지어 결정적 검증 도구
+│   ├── agy_install.py                    # 권한 규칙 병합 및 MCP 경로 설정 유틸리티
+│   └── validate-project.js               # 프로젝트 무결성 점검 스크립트
+│
+├── web/                                  # 브라우저 프론트엔드 연동 자산
+│   └── budget-gate.js                    # 클라이언트 전용 구매력 계산기 (개인정보 비저장)
+│
+├── config/                               # 설정 파일
+│   ├── forbidden_phrases.json            # 금지 문구(단정적 수익, 오를 지역 등) 사전
+│   └── board_policy.json                 # 데이터 및 규칙 유효 기간(Max Age) 정책
+│
+├── diagrams/ & Root Visual Dashboards    # 인터랙티브 시각화 대시보드
+│   ├── project_agent_mcp_dataflow.html   # 전사 Agent·MCP 데이터 파이프라인 흐름도 (Archify)
+│   ├── project_agent_mcp_dataflow.json   # 흐름도 모델 원본
+│   ├── index.html                        # 프로젝트 종합 허브 및 리소스 센터
+│   ├── mcp_architecture_dashboard.html  # MCP 아키텍처 대시보드
+│   ├── district_safety_dashboard.html    # 지역별 치안 대시보드
+│   ├── crime_board.html                  # 범죄 통계 분석 보드
+│   └── schoolinfo_dashboard.html         # 학군 정보 대시보드
+│
+├── tests/                                # 단위 및 회귀 테스트
+│   ├── test_board_mcp.py                 # MCP 서버 및 게이트 기능 테스트
+│   ├── budget-gate.test.js               # 구매력 게이트 계산 로직 테스트
+│   └── ... (총 33개 파이썬 테스트)
+│
+├── agy/                                  # Antigravity CLI 보조 설정
+│   └── settings.permissions.json         # 사용자 전역 설정용 권한 프리셋 템플릿
+│
+└── examples/                             # 검증 통과(good) 및 실패(bad) 예시 데이터
 ```
 
 ---
 
-## 🎯 어떻게 사용하면 좋을까? (실전 활용 가이드)
+## 🛡️ 5대 절대 규칙 및 4중 안전 게이트
 
-### 시나리오 1. 👨‍👩‍👧 실수요자 / 학부모 (안전 + 학군 중심 지역 선정)
-1. **메인 화면 탐색**: [`index.html`](index.html)에서 `🌲 경기도` 또는 `🏛️ 서울특별시` 탭을 선택하고 신호등 상태가 `🟢 매수고려` 또는 `🟡 주의`인 후보 지역을 1차 선별합니다.
-2. **치안 안전도 점검**: 상단 링크의 [`🛡️ 경찰청 치안 종합 게시판`](crime_board.html)을 열어 후보 지역의 **인구 1,000명당 5대 범죄율 랭킹**을 확인합니다.
-3. **학군 우수성 비교**: [`🏫 나이스 학군 대시보드`](schoolinfo_dashboard.html)에서 자치구별 특목고·자율고 배정 현황과 명문고 분포를 비교하여 최종 이사 후보지를 확정합니다.
+본 프로젝트의 모든 에이전트와 파이프라인은 [`.agents/rules/board-core.md`](file:///C:/practice/geminiCLI/realestate_prj/.agents/rules/board-core.md)의 절대 규칙을 따릅니다:
 
-### 시나리오 2. 💼 갭투자자 / 자산가 (저평가·고수익 매물 발굴)
-1. **전세가율 & 금리 모멘텀 확인**: [`index.html`](index.html) 상단 매크로 바에서 기준금리(3%) 및 주담대 평균금리 추이를 확인합니다.
-2. **급매물 발굴**: `전용 84㎡ 기준 평균가`와 `트렌드 모멘텀`이 높으면서 리스크 지수가 낮은 자치구를 탐색합니다.
-3. **지역별 심층 분석**: 카드를 클릭하여 [상세 분석 페이지](data/district_analysis_dashboard.html)로 이동, **모듈 ③(LTV 40% 대출 및 월 순현금흐름 시뮬레이션)**을 통해 월 이자 부담액과 전세/월세 기대수익 간의 실수익성을 검증합니다.
+1. **근거 등급 없는 정보 발행 금지**: 모든 데이터와 견해에 등급(A~E), 출처 URL, 기준일자가 필수 기재됩니다.
+2. **점수/추천은 A·B 등급만 반영**: 전문가 견해(C), 개인 후기(D), 주관적 전망(E)은 수치 스코어링에 포함되지 않고 의견 패널에만 분리 표시됩니다.
+3. **구매력 초과 지역 추천 차단**: 사용자 예산을 넘어서는 지역은 절대 메인 추천에 포함되지 않으며 참고 영역으로 격리됩니다.
+4. **금지 문구 사용 차단**: "무조건 상승", "저평가 단지", "매수 적기" 등 조급함을 유도하거나 확정적인 수익을 암시하는 표현 사용을 금지합니다 (`config/forbidden_phrases.json`).
+5. **개인 금융 정보 비저장**: 소득·자산 등 개인 재정 정보는 서버나 외부 모델에 전송되지 않으며 오직 브라우저(`web/budget-gate.js`)에서만 연산됩니다.
 
-### 시나리오 3. 📊 공공데이터 리서처 / 부동산 분석가 (시계열 심층 연구)
-1. **13개년 범죄 추이 분석**: [`crime_board.html`](crime_board.html)에서 2012년부터 2024년까지의 5대 범죄 추이를 시계열로 비교 분석하고, 자치구별 치안 등급과 리스크 스코어를 모니터링합니다.
-2. **MCP 도구 직접 호출**: Claude Code 또는 터미널 환경에서 `get_price_trend`, `get_jeonse_ratio`, `get_district_score` 도구를 직접 호출하여 논문 및 브리핑 보고서용 원자재 데이터를 즉시 추출합니다.
-
----
-
-## ⚡ 일상 운영 워크플로우 (Daily & Quarterly)
-
-```bash
-# 1. [웹 대시보드 브라우징 (PowerShell 실행)]
-Start-Process "index.html"
-Start-Process "crime_board.html"
-Start-Process "schoolinfo_dashboard.html"
-Start-Process "data\district_analysis_dashboard.html?region=성남시 (분당/판교)"
-
-# 2. [매일 아침 1회] 실거래가 증분 수집 및 index.html 최신화
-cd MCP
-npm run daily:sync
-
-# 3. [3개월 주기] 경찰청 범죄 데이터 자동 재수집 및 대시보드 동기화
-npm run sync:crime:check  # 현재 주기(90일) 및 남은 일수 확인
-npm run sync:crime        # 90일 만료 시 자동 재수집 + 대시보드 최신화
-
-# 4. [전체 시스템 정합성 원클릭 검증]
-cd ..
-node scripts\verify_full_system.js
+### 최종 발행 전 4중 방어선
+```
+[초안 작성] re-reporter
+   ↓
+[1차] legal-reviewer 심의 (담합 유도, 수익 보장 표현 점검 → record_gate legal)
+   ↓
+[2차] validate_board.py 자동 훅 검증 (규칙 최신성, 근거 등급 무결성, 금지어 검사)
+   ↓
+[3차] board_mcp.py 서버 단 검증 (초안 파일 sha256 해시 일치 및 변조 여부 재확인)
+   ↓
+[4차] Antigravity force_ask (권한 프리셋과 무관하게 사람의 최종 승인 필수)
+   ↓
+[발행 완료] publisher 에이전트가 data/board/published/ 로 배포
 ```
 
 ---
 
-## 💻 MCP 설치와 실행
+## 🚀 실행 및 검증 가이드
 
-필요 조건은 Node.js 18 이상입니다. MCP 의존성은 `MCP/package.json`에 있으며 공식 SDK, `fast-xml-parser`, `nodemailer`, `zod`를 사용합니다.
-
+### 1. 테스트 스위트 실행
 ```powershell
-cd C:\practice\geminiCLI\realestate_prj\MCP
-npm install
+# 1) Python 파이프라인, MCP, 검증기 전체 단위 테스트 (33개)
+python -m unittest discover -s tests
+
+# 2) 브라우저 예산 게이트(구매력 계산기) 테스트
+node tests/budget-gate.test.js
+
+# 3) 초안 및 규정 무결성 검증
+python scripts/validate_board.py
 ```
 
-`MCP/.env.example`을 참고해 필요한 키를 환경변수로 설정합니다.
-
-```text
-MOLIT_API_KEY=...
-ECOS_API_KEY=...
-NEIS_API_KEY=...
-SMTP_USER=...       # 선택
-SMTP_PASS=...       # 선택
-```
-
+### 2. Antigravity CLI (`agy`) 연동 설정
 ```powershell
-# MCP 폴더에서
-npm start                  # realestate-server.js (29개 도구)
-npm run start:realty       # realestate-server.js
-npm run start:school       # check_schools.js (6개 도구)
-npm run start:crime        # crime-collector-server.js (4개 도구)
-npm run fetch:crime        # 13개 연도 범죄통계 일괄 수집
-npm run dashboard:crime    # crime_dashboard.html 재생성
-npm run sync:crime         # 3개월 정기 동기화 검사
-npm run daily:sync         # 일일 증분 파이프라인
+# 권한 설정 미리보기
+python scripts/agy_install.py
+
+# 권한 설정 및 MCP 경로 실제 적용
+python scripts/agy_install.py --apply --absolute-mcp
 ```
 
-루트 `.mcp.json` 등록 현황:
-
-```json
-{
-  "mcpServers": {
-    "seoul-realty": { "command": "node", "args": ["MCP/realestate-server.js"] },
-    "schoolinfo": { "command": "node", "args": ["MCP/check_schools.js"] },
-    "crime-collector": { "command": "node", "args": ["MCP/crime-collector-server.js"] }
-  }
-}
-```
-
----
-
-## 🔍 대시보드 파일 맵
-
-- [`index.html`](index.html): **부동산 신호등 메인 대시보드** (수도권 56개 전 지역 종합 현황 및 비교 차트)
-- [`crime_board.html`](crime_board.html): **경찰청 범죄통계 종합 게시판** (2012~2024년 13개년 5대 강력범죄 추이 및 지자체 치안 안전 등급)
-- [`district_safety_dashboard.html`](district_safety_dashboard.html): **자치구별 심층 치안 대시보드** (55개 지자체 5대 범죄 구성비, 13개년 추이, 생활권 이원화 진단, 상단 뒤로가기 복귀 버튼 탑재)
-- [`schoolinfo_dashboard.html`](schoolinfo_dashboard.html): **나이스 학군 대시보드** (자치구별 초·중·고 학군 및 명문 학교 인프라)
-- [`data/district_analysis_dashboard.html`](data/district_analysis_dashboard.html): **지역 심층 분석 대시보드** (랜드마크, 학군·학원가, LTV 40% 현금흐름, 에이전트 진단)
-- [`mcp_architecture_dashboard.html`](mcp_architecture_dashboard.html): MCP 아키텍처 및 도구 파이프라인 시각화 화면
-
----
-
-## 🔒 보안 및 데이터 한계
-
-- API 키와 비밀번호는 Git 커밋에 포함되지 않으며, `.env` 로컬 환경에만 보관됩니다.
-- MCP 서버가 제공하는 계산값과 알고리즘 신호(매수고려·주의·관망)는 **참고자료**이며 법적 투자 권유가 아닙니다.
-- 공공데이터 수집 시점과 시장 호가 간에는 시차가 발생할 수 있으므로, 최종 거래 시 현장 확인 및 전문가 상담을 권고합니다.
+### 3. 인터랙티브 데이터 파이프라인 다이어그램 열기
+- 브라우저에서 [`project_agent_mcp_dataflow.html`](file:///C:/practice/geminiCLI/realestate_prj/project_agent_mcp_dataflow.html)을 열어 전체 에이전트-MCP 상호작용 및 3대 핵심 경로(`facts-path`, `rules-strategy-path`, `gate-publish-path`)를 인터랙티브하게 탐색할 수 있습니다.
+- 특정 노드(예: 규정 조회 MCP) 포커스 URL:  
+  `project_agent_mcp_dataflow.html#focus=mcp_rules`

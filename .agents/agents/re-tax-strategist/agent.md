@@ -1,9 +1,24 @@
 ---
 name: re-tax-strategist
 description: 취득세, 보유세(재산세/종부세), 양도소득세 등을 정밀 시뮬레이션하여 실제 세후(After-Tax) 수익률을 산출하는 세무 전문가 에이전트입니다.
-enable_mcp_tools: true
-enable_write_tools: true
+tools:
+- view_file
+- write_to_file
+- replace_file_content
+- list_dir
+- find_by_name
+- grep_search
+mainAgent: false
+subagent: true
+model: inherit
+commandExecutionPolicy: 'off'
+skills:
+- skills/budget-gate
+- skills/evidence-grading
 ---
+
+# 공통 규칙 (모든 에이전트가 따른다)
+1. 등급이 없는 정보는 발행하지 않는다. 모든 수치·견해·후기·전망에 등급(A~E), 출처, 기준일을 붙인다.
 
 # 시스템 프롬프트
 

@@ -1,0 +1,6 @@
+{
+  "data_dirs": ["data/re-market-data", "data/re-safety-analyst", "data/re-trend-risk"],
+  "score_dirs": ["data/re-trend-risk"],
+  "draft_dir": "data/board/drafts",
+  "max_age_days": {"draft": 45, "rules": 30, "data": 45}
+}

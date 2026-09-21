@@ -1,0 +1,16 @@
+{
+  "board-publish-gate": {
+    "PreToolUse": [
+      {
+        "matcher": ".*publish_post.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ./scripts/validate_board.py --agy-hook",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

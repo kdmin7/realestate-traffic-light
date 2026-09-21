@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "부동산 프로젝트 Agent·MCP 데이터 처리 흐름도",
+    "output": "project_agent_mcp_dataflow.html",
+    "viewBox": [1080, 520],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "facts-path",
+        "label": "A·B 사실 및 리스크 스코어 경로",
+        "focus": ["mcp_realty", "ag_market_data", "ag_trend_risk", "ag_strategist", "ag_reporter"],
+        "note": "국토부·경찰청 원천 데이터를 정규화하고 A·B등급 근거만으로 4대 리스크 스코어를 산출하는 사실 경로"
+      },
+      {
+        "id": "rules-strategy-path",
+        "label": "규정 검증 및 추천 전략 경로",
+        "focus": ["mcp_rules", "ag_rules", "ag_strategist", "ag_reporter"],
+        "note": "rules.json 공식 규정을 대조하고 구매력 예산 제약 내에서 트레이드오프 추천 카드를 작성하는 전략 경로"
+      },
+      {
+        "id": "gate-publish-path",
+        "label": "법률 심의 및 최종 발행 게이트",
+        "focus": ["ag_reporter", "ag_legal", "tool_validate", "ag_publisher", "board_published"],
+        "note": "초안 작성 후 담합·수익보장 표현 검토, 자동 훅 검증 및 사람 승인을 거치는 4중 방어선 출구"
+      }
+    ]
+  },
+  "stages": [
+    { "label": "01. 수집 & 조회 MCP" },
+    { "label": "02. 원천 분석 & 규정" },
+    { "label": "03. 스코어 & 전략" },
+    { "label": "04. 리포팅 & 심의" },
+    { "label": "05. 무결성 검증 & 발행" }
+  ],
+  "nodes": [
+    { "id": "mcp_realty", "type": "backend", "label": "수집 MCP 도구", "sublabel": "realty / crime / school", "stage": 0, "row": 0, "tag": "공공 API" },
+    { "id": "mcp_rules", "type": "backend", "label": "규정 조회 MCP", "sublabel": "rules (rules.json)", "stage": 0, "row": 1, "tag": "LTV·DSR" },
+    { "id": "mcp_nlm", "type": "backend", "label": "NotebookLM MCP", "sublabel": "gemini-notebook-mcp", "stage": 0, "row": 2, "tag": "송희구 전략" },
+    { "id": "ag_market_data", "type": "backend", "label": "실거래·치안 분석", "sublabel": "re-market / safety", "stage": 1, "row": 0, "tag": "A등급 사실" },
+    { "id": "ag_rules", "type": "backend", "label": "규칙 관리자", "sublabel": "re-rules", "stage": 1, "row": 1, "tag": "B등급 규칙" },
+    { "id": "ag_opinions", "type": "backend", "label": "견해·후기 검수", "sublabel": "fact-check / mod", "stage": 1, "row": 2, "tag": "C·D등급 의견" },
+    { "id": "ag_trend_risk", "type": "backend", "label": "리스크 산출기", "sublabel": "re-trend-risk", "stage": 2, "row": 0, "tag": "4대 스코어" },
+    { "id": "ag_strategist", "type": "backend", "label": "투자 전략가", "sublabel": "re-strategist", "stage": 2, "row": 1, "tag": "트레이드오프" },
+    { "id": "store_evidence", "type": "database", "label": "근거·의견 저장소", "sublabel": "data/re-*/", "stage": 2, "row": 2, "tag": "A~D 보관" },
+    { "id": "ag_reporter", "type": "backend", "label": "리포트 작성기", "sublabel": "re-reporter", "stage": 3, "row": 0, "tag": "초안 작성" },
+    { "id": "ag_legal", "type": "security", "label": "법률 검토관", "sublabel": "legal-reviewer", "stage": 3, "row": 1, "tag": "표현 심의" },
+    { "id": "mcp_board", "type": "backend", "label": "게시판 게이트", "sublabel": "board-write / read", "stage": 3, "row": 2, "tag": "record_gate" },
+    { "id": "tool_validate", "type": "backend", "label": "결정적 검증", "sublabel": "validate_board.py", "stage": 4, "row": 0, "tag": "자동 훅" },
+    { "id": "ag_publisher", "type": "backend", "label": "최종 발행자", "sublabel": "publisher", "stage": 4, "row": 1, "tag": "사람 승인" },
+    { "id": "board_published", "type": "frontend", "label": "공식 게시판", "sublabel": "data/board/published", "stage": 4, "row": 2, "tag": "발행 완료" }
+  ],
+  "flows": [
+    { "id": "flow-mcp-market", "from": "mcp_realty", "to": "ag_market_data", "label": "실거래 수집", "classification": "원천 수집", "variant": "emphasis", "route": "straight" },
+    { "id": "flow-rules-ag", "from": "mcp_rules", "to": "ag_rules", "label": "규정 조회", "classification": "규칙 파이프라인", "variant": "default", "route": "straight" },
+    { "id": "flow-nlm-opinions", "from": "mcp_nlm", "to": "ag_opinions", "label": "전략 대조", "classification": "견해 검증", "variant": "default", "route": "straight" },
+    { "id": "flow-market-trend", "from": "ag_market_data", "to": "ag_trend_risk", "label": "A등급 정규화", "classification": "스코어 입력", "variant": "emphasis", "route": "straight" },
+    { "id": "flow-trend-strat", "from": "ag_trend_risk", "to": "ag_strategist", "label": "리스크 스코어", "classification": "후보 필터링", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [530, 215] },
+    { "id": "flow-rules-strat", "from": "ag_rules", "to": "ag_strategist", "label": "LTV 한도", "classification": "구매력 제약", "variant": "default", "route": "straight" },
+    { "id": "flow-opinions-store", "from": "ag_opinions", "to": "store_evidence", "label": "C·D 저장", "classification": "의견 보관", "variant": "default", "route": "straight" },
+    { "id": "flow-strat-reporter", "from": "ag_strategist", "to": "ag_reporter", "label": "추천 지표팩", "classification": "전략 전달", "variant": "emphasis", "labelAt": [638, 200] },
+    { "id": "flow-store-board", "from": "store_evidence", "to": "mcp_board", "label": "근거 조회", "classification": "게이트 참조", "variant": "default", "route": "straight" },
+    { "id": "flow-reporter-legal", "from": "ag_reporter", "to": "ag_legal", "label": "초안 심의", "classification": "법률 검토", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [745, 215] },
+    { "id": "flow-legal-board", "from": "ag_legal", "to": "mcp_board", "label": "게이트 기록", "classification": "심의 저장", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [745, 330] },
+    { "id": "flow-legal-val", "from": "ag_legal", "to": "tool_validate", "label": "검토 통과", "classification": "자동 훅 호출", "variant": "security" },
+    { "id": "flow-val-pub", "from": "tool_validate", "to": "ag_publisher", "label": "검증 통과", "classification": "발행 인가", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [960, 215] },
+    { "id": "flow-pub-board", "from": "ag_publisher", "to": "board_published", "label": "publish_post", "classification": "최종 발행", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [960, 330] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "저장소 기반 MCP 수집 및 규정 연동",
+      "items": [
+        "seoul-realty, crime-collector, schoolinfo를 통한 국토부 실거래·경찰청 치안·학군 원천 데이터 수집",
+        "rules MCP를 통해 rules.json 규정(LTV/DSR/세율)을 안전하게 조회하고 gemini-notebook-mcp 전문가 지식 연계"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "A~E 근거 등급제 기반 멀티 에이전트 분석",
+      "items": [
+        "re-market-data와 re-safety-analyst가 A등급 공식 사실 데이터를 정규화",
+        "re-trend-risk는 점수 왜곡 방지를 위해 오직 A·B등급 근거만 읽어 4대 리스크 스코어 산출",
+        "re-strategist가 사용자 구매력 한도 내에서 트레이드오프 추천 카드 도출"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "4중 방어선 게이트 및 최종 게시판 발행",
+      "items": [
+        "re-reporter가 사실 패널(A/B)과 의견 패널(C/D)을 엄격히 분리한 게시 초안 작성",
+        "legal-reviewer의 담합·표현 검토 및 board-write의 record_gate 통과 기록",
+        "validate_board.py 자동 훅 통과 및 사람 최종 승인 후 publisher가 data/board/published/에 발행"
+      ]
+    }
+  ]
+}

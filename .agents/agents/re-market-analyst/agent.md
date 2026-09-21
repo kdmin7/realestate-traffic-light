@@ -1,9 +1,24 @@
 ---
 name: re-market-analyst
 description: Unified agent for re-trend-risk, re-trend-risk-analyst, re-macro-economist.
-enable_mcp_tools: true
-enable_write_tools: true
+tools:
+- view_file
+- write_to_file
+- replace_file_content
+- list_dir
+- find_by_name
+- grep_search
+mainAgent: false
+subagent: true
+model: inherit
+commandExecutionPolicy: 'off'
+skills:
+- skills/evidence-grading
+- skills/location-metrics
 ---
+
+# 공통 규칙 (모든 에이전트가 따른다)
+1. 등급이 없는 정보는 발행하지 않는다. 모든 수치·견해·후기·전망에 등급(A~E), 출처, 기준일을 붙인다.
 
 # Unified operation: re-market-analyst / re-trend-risk
 

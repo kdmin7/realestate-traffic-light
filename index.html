@@ -429,8 +429,10 @@
       </a>
       <nav class="nav" aria-label="대시보드 이동">
         <a href="index.html" aria-current="page">메인 대시보드 (신호등)</a>
+        <a href="data/district_analysis_dashboard.html">지역 심층 분석</a>
         <a href="schoolinfo_dashboard.html">나이스 학군 대시보드</a>
         <a href="crime_board.html">경찰청 범죄 대시보드</a>
+        <a href="project_agent_mcp_dataflow.html">데이터 플로우</a>
       </nav>
       <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환">
         <span id="themeToggleIcon" aria-hidden="true">☾</span>
@@ -1361,15 +1363,9 @@
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 상세 분석 페이지 경로 (기존 규칙 그대로)
+    // 상세 분석 페이지 경로 (단일 표준 대시보드로 일원화)
     function getDetailUrl(r) {
-      if (r.name.includes('송파')) {
-        return 'data/songpa_analysis_dashboard.html';
-      } else if (r.name.includes('강남') || r.name.includes('서초') || r.name.includes('용산') || r.name.includes('마포')) {
-        return 'data/seoul_top5_analysis_dashboard.html';
-      } else {
-        return `data/district_analysis_dashboard.html?region=${encodeURIComponent(r.name)}`;
-      }
+      return `data/district_analysis_dashboard.html?region=${encodeURIComponent(r.name)}`;
     }
 
     // "240건 (7월: 163 / 8월: 77)" → 숫자 분리 (형식이 다르면 원문 그대로 표시)

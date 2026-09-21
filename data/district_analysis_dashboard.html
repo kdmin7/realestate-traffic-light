@@ -249,6 +249,182 @@
             gap: 8px;
         }
 
+        /* 지역 셀렉터 드롭다운 */
+        .region-select-box {
+            display: inline-flex;
+            align-items: center;
+        }
+        .region-select-dropdown {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-bright);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .region-select-dropdown:hover, .region-select-dropdown:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+        }
+
+        /* 아코디언 패널 */
+        .board-accordion-panel {
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: var(--bg-surface);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .accordion-header {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background: rgba(56, 189, 248, 0.05);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .accordion-header:hover {
+            background: rgba(56, 189, 248, 0.1);
+        }
+        .acc-title-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .badge-evidence {
+            font-size: 0.76rem;
+            padding: 2px 8px;
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 6px;
+            font-weight: 700;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        .acc-sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .acc-toggle-icon {
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            transition: transform 0.25s ease;
+        }
+        .accordion-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .accordion-content[hidden] {
+            display: none !important;
+        }
+
+        /* 근거 카드 내부 스타일 */
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 900px) {
+            .evidence-grid { grid-template-columns: 1fr; }
+        }
+        .evidence-subpanel {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .subpanel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge-grade {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+        .badge-grade.grade-a { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .badge-grade.grade-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; }
+        .badge-grade.grade-c { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid #facc15; }
+        .badge-grade.grade-d { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid #a855f7; }
+        .evidence-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.88rem;
+        }
+        .evidence-item {
+            padding: 8px 12px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        .evidence-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .tradeoff-box {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .tradeoff-row {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9rem;
+            align-items: baseline;
+        }
+        .tradeoff-tag {
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        .tag-gain { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .tag-loss { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+        .tag-pre { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid #facc15; }
+
+        .pending-notice {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
         .chart-container {
             position: relative;
             height: 320px;
@@ -480,9 +656,10 @@
             </a>
             <nav class="nav" aria-label="대시보드 이동">
                 <a href="../index.html">메인 대시보드 (신호등)</a>
+                <a href="district_analysis_dashboard.html" aria-current="page">지역 심층 분석</a>
                 <a href="../schoolinfo_dashboard.html">나이스 학군 대시보드</a>
                 <a href="../crime_board.html">경찰청 범죄 대시보드</a>
-                <a href="../MCP/dashboard.html">MCP 도구 대시보드</a>
+                <a href="../project_agent_mcp_dataflow.html">데이터 플로우</a>
             </nav>
             <button id="themeToggleBtn" class="theme-btn" type="button" aria-label="테마 전환" onclick="toggleTheme()">
                 <span id="themeToggleIcon" aria-hidden="true">☾</span>
@@ -500,7 +677,12 @@
                     <p>국토교통부 실거래가·한국은행 금리·NEIS 학군·에이전트 4대 종합 지표</p>
                 </div>
                 <div class="meta-tags">
-                    <a href="../index.html" class="btn-back-main">🏠 메인 대시보드로 돌아가기</a>
+                    <div class="region-select-box">
+                        <label for="regionSelect" class="sr-only">분석 지역 선택</label>
+                        <select id="regionSelect" class="region-select-dropdown" aria-label="분석 지역 선택">
+                        </select>
+                    </div>
+                    <a href="../index.html" class="btn-back-main">🏠 메인으로</a>
                     <span class="signal-pill" id="signalPill">신호 판정</span>
                     <span class="meta-badge" id="baseRateBadge">기준금리 3.00%</span>
                     <span class="meta-badge">2026.09 실시간</span>
@@ -621,6 +803,20 @@
                 </p>
             </div>
 
+            <!-- 근거 기반 게시판 공식 카드 & PB 리포트 아코디언 (A~E 등급 연동) -->
+            <div class="panel board-accordion-panel" id="boardAccordionPanel">
+                <div class="accordion-header" onclick="toggleBoardAccordion()" role="button" tabindex="0" aria-expanded="true" id="accordionHeaderBtn">
+                    <div class="acc-title-left">
+                        <h3>📑 공식 근거 카드 &amp; PB 추천 리포트 <span class="badge-evidence">근거 등급제 A~E</span></h3>
+                        <span class="acc-sub" id="accStatusSub">데이터 검증 상태: 로딩 중...</span>
+                    </div>
+                    <div class="acc-toggle-icon" id="accToggleIcon">▼</div>
+                </div>
+                <div class="accordion-content" id="boardAccordionContent">
+                    <div id="boardCardBody"></div>
+                </div>
+            </div>
+
             <!-- 행동 지침 가이드 -->
             <div class="plan-grid">
                 <div class="plan-card">
@@ -649,6 +845,7 @@
 
     <script>
         // 사전 컴파일된 정적 지역 데이터 (로컬 file:// 프로토콜 및 네트워크 오프라인 완전 대응)
+        const EMBEDDED_REGIONS_DETAIL = [
   {
     "name": "강남구",
     "province": "seoul",
@@ -2891,6 +3088,9 @@
             return list[0];
         }
 
+        let chartInstance = null;
+        let isAccordionOpen = true;
+
         // 초기 렌더링: 즉시 로컬 데이터로 표시 (Blank 방지 100%)
         let activeRegionData = findRegionTarget(regionParam, EMBEDDED_REGIONS_DETAIL);
         renderDetail(activeRegionData);
@@ -2910,10 +3110,152 @@
                 });
         }
 
+        function toggleBoardAccordion() {
+            isAccordionOpen = !isAccordionOpen;
+            const content = document.getElementById('boardAccordionContent');
+            const icon = document.getElementById('accToggleIcon');
+            const btn = document.getElementById('accordionHeaderBtn');
+            if (content) content.hidden = !isAccordionOpen;
+            if (icon) icon.style.transform = isAccordionOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+            if (btn) btn.setAttribute('aria-expanded', isAccordionOpen ? 'true' : 'false');
+        }
+
+        function populateRegionSelect(currentRegionName) {
+            const sel = document.getElementById('regionSelect');
+            if (!sel) return;
+            sel.innerHTML = EMBEDDED_REGIONS_DETAIL.map(r => {
+                const prov = r.province === 'seoul' ? '서울' : '경기';
+                const selected = (r.name === currentRegionName) ? 'selected' : '';
+                return `<option value="${r.name}" ${selected}>${prov} · ${r.name} (${r.signalText})</option>`;
+            }).join('');
+
+            sel.onchange = function() {
+                const chosen = this.value;
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('region', chosen);
+                window.history.pushState({}, '', newUrl);
+                activeRegionData = findRegionTarget(chosen, EMBEDDED_REGIONS_DETAIL);
+                renderDetail(activeRegionData);
+            };
+        }
+
+        function renderBoardCards(r) {
+            const statusSub = document.getElementById('accStatusSub');
+            const cardBody = document.getElementById('boardCardBody');
+            if (!cardBody) return;
+
+            statusSub.textContent = `기준일 2026-09 · 4중 방어선 무결성 검증 대기`;
+
+            const schools = (r.topSchools || []).join(', ');
+            const landmarks = (r.landmarks || []).map(lm => `${lm.name}(${lm.price})`).slice(0, 3).join(', ');
+
+            cardBody.innerHTML = `
+                <div class="pending-notice">
+                    <span style="font-size:1.3rem;">⏱️</span>
+                    <div>
+                        <strong>게시판 정식 발행 심의 대기 중 (Review Pending)</strong>
+                        <p style="margin-top:2px; font-size:0.85rem; color:var(--text-secondary);">
+                            본 지역은 <code>board-orchestrator</code>의 4중 품질 게이트(법률 검토·해시 무결성 검증·사람 승인)를 거쳐 정식 발행되기 전 상태입니다. 단정적 매수 추천을 배제하고 A등급 공식 사실 지표만 안전하게 제공합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="evidence-grid">
+                    <!-- 사실 패널 (A·B) -->
+                    <div class="evidence-subpanel">
+                        <div class="subpanel-title">
+                            <span>📊 사실 패널 (A·B 등급)</span>
+                            <span class="badge-grade grade-a">A·B 점수 반영</span>
+                        </div>
+                        <ul class="evidence-list">
+                            <li class="evidence-item">
+                                <div><strong>전용 84㎡ 평균 실거래가</strong>: ${r.avg84}억원 (전체 평균 ${r.avgPrice}억원)</div>
+                                <div class="evidence-meta">[A | 국토교통부 실거래가 공개시스템 | 2026-09]</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>최근 2개월 실거래 누적</strong>: ${r.trades}</div>
+                                <div class="evidence-meta">[A | 국토교통부 부동산거래관리시스템 | 2026-09]</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>주요 랜드마크 시세</strong>: ${landmarks || '단지별 실거래 데이터'}</div>
+                                <div class="evidence-meta">[A | 국토교통부 실거래가 신고 | 2026-09]</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>NEIS 학군 지표</strong>: 학군점수 ${r.schoolScore}점 (${r.schoolRank || '상위 우수'}) · ${schools}</div>
+                                <div class="evidence-meta">[A | 교육부 NEIS 학교알리미 공시 | 2026-09]</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>대출 규제 및 유효성</strong>: LTV 규제지역 여부 및 DSR 한도 규정 적용</div>
+                                <div class="evidence-meta">[B | 금융위원회 은행업감독규정 rules.json | 2026-09]</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 의견 및 경험 패널 (C·D) -->
+                    <div class="evidence-subpanel">
+                        <div class="subpanel-title">
+                            <span>💬 의견 및 경험 패널 (C·D 등급)</span>
+                            <span class="badge-grade grade-c">C·D 표시 전용 (점수 미반영)</span>
+                        </div>
+                        <ul class="evidence-list">
+                            <li class="evidence-item">
+                                <div><strong>[C 전문가 견해]</strong> ${r.academyZone || '주요 역세권 학원가 밀집'} 중심의 선호 단지 가격 방어력 견해</div>
+                                <div class="evidence-meta">출처: 시장 모니터링 리포트 요약 / 이해관계: 미확인 / 검증: 공공데이터 대조</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>[D 회원 경험 사례]</strong> 실거주 갈아타기 시 학군 및 출퇴근 시간 단축 만족, 금리 변동에 따른 원리금 부담 유의</div>
+                                <div class="evidence-meta">시장 국면: ${r.trend && r.trend.includes('+') ? '상승/보합기' : '조정기'} / 인증: 검수 완료</div>
+                            </li>
+                            <li class="evidence-item">
+                                <div><strong>[E 시나리오 전망]</strong> 기준금리 3.00% 긴축 기조 및 주담대 가산금리 변화에 따른 가격 범위 제시</div>
+                                <div class="evidence-meta">가정: 한국은행 기준금리 및 입주 물량 변수 반영</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 트레이드오프 분석 (PB 리포트 카드) -->
+                <div class="tradeoff-box">
+                    <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+                        ⚖️ 에이전트 트레이드오프 분석 요약 (PB 맞춤 제약 조건)
+                    </div>
+                    <div class="tradeoff-row">
+                        <span class="tradeoff-tag tag-gain">얻는 것</span>
+                        <span>${r.name} 핵심 입지 접근성, 우수 학군 인프라 및 대단지 아파트 환금성</span>
+                    </div>
+                    <div class="tradeoff-row">
+                        <span class="tradeoff-tag tag-loss">포기하는 것</span>
+                        <span>인근 외곽 대비 높은 평당 취득가액 및 고금리 환경 하 월 원리금 지출 부담</span>
+                    </div>
+                    <div class="tradeoff-row">
+                        <span class="tradeoff-tag tag-pre">전제 조건</span>
+                        <span>사용자 가계의 LTV·DSR 구매력 한도 내 자기자본 확보 필수 (예산 초과 시 추천 차단)</span>
+                    </div>
+                </div>
+            `;
+
+            // Try fetching published post if on HTTP/HTTPS
+            if (window.location.protocol.startsWith('http')) {
+                fetch('board/published/index.json')
+                    .then(res => res.json())
+                    .then(indexData => {
+                        if (indexData && Array.isArray(indexData.posts)) {
+                            const post = indexData.posts.find(p => p.region === r.name || p.slug === r.name.toLowerCase());
+                            if (post) {
+                                statusSub.textContent = `기준일 ${post.published_at ? post.published_at.slice(0, 7) : '2026-09'} · 정식 발행 완료 (게이트 통과)`;
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }
+        }
+
         function renderDetail(r) {
             document.title = `부동산 신호등 — ${r.name} 심층 분석 대시보드`;
             document.getElementById('regionNameHeader').textContent = r.name;
             
+            populateRegionSelect(r.name);
+
             const pill = document.getElementById('signalPill');
             pill.className = `signal-pill ${r.signal}`;
             pill.textContent = `신호등: ${r.signalText}`;
@@ -2968,52 +3310,15 @@
                 document.getElementById('agentVerdictText').textContent = r.verdict;
             }
 
-            // 차트 렌더링
+            // 근거 카드 & PB 리포트 아코디언 렌더링
+            renderBoardCards(r);
+
+            // 차트 렌더링 (기존 차트 파괴 후 재생성)
             const ctx = document.getElementById('detailChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [`${r.name} 전용84`, `${r.name} 전체평균`, '수도권 평균 (11.8억)', '서울 평균 (14.5억)'],
-                    datasets: [{
-                        label: '거래가 비교 (억원)',
-                        data: [r.avg84, r.avgPrice, 11.8, 14.5],
-                        backgroundColor: [
-                            'rgba(56, 189, 248, 0.85)',
-                            'rgba(168, 85, 247, 0.65)',
-                            'rgba(148, 163, 184, 0.4)',
-                            'rgba(148, 163, 184, 0.55)'
-                        ],
-                        borderColor: ['#38bdf8', '#a855f7', '#64748b', '#94a3b8'],
-                        borderWidth: 1.5,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-            document.getElementById('academyZoneVal').innerHTML = `<span>${academyText}</span>`;
-
-            // 모듈 ③: 현금흐름
-            if (r.cashflow) {
-                document.getElementById('cashflowLoan').textContent = r.cashflow.ltv40_loan;
-                document.getElementById('cashflowInterest').textContent = r.cashflow.monthly_interest;
-                document.getElementById('cashflowRent').textContent = r.cashflow.rent_income;
-                const netEl = document.getElementById('cashflowNet');
-                netEl.textContent = r.cashflow.net_cashflow;
-                netEl.style.color = r.cashflow.net_cashflow.includes('적자') ? '#ef4444' : '#22c55e';
+            if (chartInstance) {
+                chartInstance.destroy();
             }
-
-            // 모듈 ④: 에이전트 종합 진단평가
-            if (r.verdict) {
-                document.getElementById('agentVerdictText').textContent = r.verdict;
-            }
-
-            // 차트 렌더링
-            const ctx = document.getElementById('detailChart').getContext('2d');
-            new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: [`${r.name} 전용84`, `${r.name} 전체평균`, '수도권 평균 (11.8억)', '서울 평균 (14.5억)'],

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp(rules/*)",
+      "mcp(board-read/*)",
+      "mcp(board-write/save_claim)",
+      "mcp(board-write/save_experience)",
+      "command(python3 scripts/validate_board.py)",
+      "command(python scripts/validate_board.py)",
+      "command(python3 -m unittest)",
+      "command(python -m unittest)",
+      "command(node tests/budget-gate.test.js)"
+    ],
+    "ask": [
+      "mcp(board-write/record_gate)",
+      "mcp(board-write/publish_post)"
+    ],
+    "deny": [
+      "write_file(data/board/published/)",
+      "write_file(data/board/gates/)",
+      "write_file(rules/rules.json)"
+    ]
+  }
+}

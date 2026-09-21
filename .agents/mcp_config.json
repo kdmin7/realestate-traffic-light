@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "rules": {
+      "command": "python",
+      "args": [
+        "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\board_mcp.py",
+        "--profile",
+        "rules"
+      ],
+      "env": {
+        "BOARD_ROOT": "C:\\practice\\geminiCLI\\realestate_prj"
+      }
+    },
+    "board-read": {
+      "command": "python",
+      "args": [
+        "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\board_mcp.py",
+        "--profile",
+        "board-read"
+      ],
+      "env": {
+        "BOARD_ROOT": "C:\\practice\\geminiCLI\\realestate_prj"
+      }
+    },
+    "board-write": {
+      "command": "python",
+      "args": [
+        "C:\\practice\\geminiCLI\\realestate_prj\\MCP\\board_mcp.py",
+        "--profile",
+        "board-write"
+      ],
+      "env": {
+        "BOARD_ROOT": "C:\\practice\\geminiCLI\\realestate_prj"
+      }
+    }
+  }
+}

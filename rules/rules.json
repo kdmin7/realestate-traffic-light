@@ -1,0 +1,12 @@
+{
+  "schema": "rules/v1",
+  "note": "값은 공식 공고 원문을 확인한 뒤에만 채우고 status를 verified로 바꾼다. 2차 자료(블로그, 기사)만으로 채우지 않는다. 에이전트가 직접 수정하지 못하도록 .claude/settings.json에서 막아 두었으니 사람이 편집한다.",
+  "rules": [
+    {"id": "ltv", "name": "LTV(주택담보인정비율)", "value": null, "value_shape": {"regulated": "ratio", "non_regulated": "ratio"}, "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"},
+    {"id": "loan_cap_tiers", "name": "주택 가격 구간별 주담대 상한", "value": null, "value_shape": "[{up_to: KRW|null, cap: KRW}] (up_to null은 최상위 구간)", "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"},
+    {"id": "dsr_limit", "name": "DSR 한도", "value": null, "value_shape": "ratio", "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"},
+    {"id": "stress_rate_addon", "name": "스트레스 금리 가산", "value": null, "value_shape": {"regulated": "rate", "non_regulated": "rate"}, "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"},
+    {"id": "acquisition_tax", "name": "취득세율 구간", "value": null, "value_shape": "[{up_to: KRW|null, rate: ratio}]", "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"},
+    {"id": "other_costs_rate", "name": "중개보수 등 기타 부대비용 비율", "value": null, "value_shape": "ratio", "source_url": null, "effective_from": null, "checked_at": null, "status": "unverified"}
+  ]
+}
