@@ -1,33 +1,28 @@
 # 근거 기반 부동산 게시판 에이전트 키트 (Antigravity CLI용)
 
-> **최종 갱신 기준일:** 2026-09-21  
+> **최종 갱신 기준일:** 2026-09-22  
 > **운영 환경:** Google Antigravity CLI (`agy`) / Node.js / Python 3.10+  
 > **핵심 원칙:** 근거 등급제(A~E), 구매력 한도 내 추천, 개인정보 비저장(클라이언트 계산), 4중 안전 게이트 (법률 자문 아님)
 
 ---
 
-## 📌 2026-09-21 작업 및 업데이트 요약
+## 📌 2026-09-22 작업 및 파이프라인 검증 요약
 
-본 저장소는 기존 Claude Code 기반 설정을 **Google Antigravity CLI(`agy`) 표준 아키텍처**로 전면 전환하고, 데이터 파이프라인 시각화 및 무결성 검증 체계를 완비했습니다.
+본 저장소는 **Google Antigravity CLI(`agy`) 표준 아키텍처**로의 전면 전환에 이어, **웹 대시보드 간 네비게이션·디자인 일원화**, **지역 심층 대시보드 내 근거 아코디언 컴포넌트 연동**, 그리고 **MCP-Agent 유기적 연동 무결성 검증**을 완료했습니다.
 
-1. **Google Antigravity CLI 표준 규약 전면 적용**
-   - 프로젝트 공통 룰셋 정의: `.agents/rules/board-core.md` (절대 규칙 5대 원칙, 근거 등급 A~E, 문체 규약)
-   - 멀티 에이전트 구축: `board-orchestrator`를 중심으로 15개 전문 서브에이전트 구성 (`.agents/agents/`)
-   - 전문 스킬 체계화: 절차적 워크플로우를 담당하는 13개 스킬 등록 (`.agents/skills/`)
-   - 권한 및 훅 체계: `.agents/hooks.json` 및 `agy/settings.permissions.json`을 통한 발행 통제
+1. **대시보드 상단 네비게이션 및 디자인 시스템 전면 통일**
+   - 핵심 웹 대시보드 5종(`index.html`, `district_analysis_dashboard.html`, `schoolinfo_dashboard.html`, `crime_board.html`, `project_agent_mcp_dataflow.html`, `mcp_architecture_dashboard.html`)의 상단 글로벌 바(`.topbar`)에 표준 5대 네비게이션 메뉴를 일치시키고, 다크/라이트 테마 및 폰트(Pretendard/Noto Sans KR) 시스템을 전면 통일했습니다.
+   - 메인 허브(`index.html`)의 56개 전 지역 행 클릭 시 `data/district_analysis_dashboard.html?region={지역명}` 으로 단일 라우팅되도록 일원화했습니다.
 
-2. **단일 진실 공급원(SSOT) 정책 규칙 및 자체 Python 경량 MCP 서버 구축**
-   - `rules/rules.json`: LTV, DSR, 취득세, 스트레스 금리 등 대출·세제 규정의 단일 기준점 마련 (AI 에이전트의 임의 수정 차단)
-   - `MCP/board_mcp.py`: 표준 라이브러리 기반 경량 MCP 서버 개발 (`rules`, `board-read`, `board-write` 3개 프로필로 읽기/쓰기 권한 분리)
+2. **지역 심층 분석 대시보드(`data/district_analysis_dashboard.html`) 고도화**
+   - **지역 빠른 전환 드롭다운**: 상단 헤더에 수도권 31개 주요 지역 셀렉터를 탑재하여, 페이지 새로고침 없이 URL 쿼리 파라미터(`pushState`)와 시세·랜드마크·차트·학군·현금흐름이 실시간 동기화되도록 구현했습니다.
+   - **[📑 공식 근거 카드 & PB 추천 리포트] 인라인 아코디언**: 4중 게이트 심의 상태 배너(`⏱️ 게시판 정식 발행 심의 대기 중`), A/B 사실 패널, C/D 의견 패널, PB 트레이드오프 분석(얻는 것/포기하는 것/전제조건) 카드를 구조화 렌더링하도록 연동했습니다.
 
-3. **엔드투엔드 Agent·MCP 데이터 파이프라인 시각화 구축 (`project_agent_mcp_dataflow.html`)**
-   - Archify 엔진 기반 5단계 데이터 흐름도(`project_agent_mcp_dataflow.json`) 작성 및 단독 실행형 HTML 다이어그램 빌드
-   - 3대 중점 경로 뷰(`facts-path`, `rules-strategy-path`, `gate-publish-path`), 다크/라이트 테마, 인라인 SVG 애니메이션, 모바일 반응형 최적화 완료
-   - Headless Chrome 기반 해상도별 렌더링 및 시각 회귀 테스트 검증 통과
-
-4. **클라이언트 사이드 구매력 게이트(`web/budget-gate.js`) 및 테스트 스위트 강화**
-   - 사용자 소득·자산 등 개인 재정 정보의 서버 전송을 원천 차단하고 브라우저에서만 실시간 대출·부대비용을 계산하는 로직 구축
-   - Python `unittest` 33개 테스트 및 `budget-gate.test.js` 전원 통과 검증
+3. **MCP 및 멀티 에이전트 유기적 데이터 파이프라인 검증 (PASS)**
+   - `seoul-realty`, `crime-collector`, `schoolinfo` MCP의 실거래·치안·학군 데이터 수집 및 A등급 정규화 검증 완료.
+   - `re-trend-risk`가 오직 A·B등급 근거만 읽어 4대 리스크 스코어를 산출하고 C·D등급 의견의 점수 오염을 차단함을 확인.
+   - `rules` MCP를 통한 `rules/rules.json` 단일 진실 공급원(SSOT) 안전 조회 및 에이전트 쓰기 차단 무결성 확인.
+   - 초안 작성(`re-reporter`) → 사전 심의(`legal-reviewer`) → 자동 훅 검증(`validate_board.py`) → 서버 해시 검증(`board_mcp.py`) → 사람 최종 승인(`force_ask`) → 공식 발행(`publisher`) 4중 방어선 연동 통과.
 
 ---
 
@@ -92,7 +87,8 @@ realestate_prj/
 ├── scripts/                              # 자동화 및 품질 검증 스크립트
 │   ├── validate_board.py                 # 초안·근거·메타·규정·금지어 결정적 검증 도구
 │   ├── agy_install.py                    # 권한 규칙 병합 및 MCP 경로 설정 유틸리티
-│   └── validate-project.js               # 프로젝트 무결성 점검 스크립트
+│   ├── verify_full_system.js             # Agent-MCP-데이터셋 전체 파이프라인 무결성 점검
+│   └── validate-project.js               # 프로젝트 형상 무결성 점검 스크립트
 │
 ├── web/                                  # 브라우저 프론트엔드 연동 자산
 │   └── budget-gate.js                    # 클라이언트 전용 구매력 계산기 (개인정보 비저장)
@@ -104,16 +100,16 @@ realestate_prj/
 ├── diagrams/ & Root Visual Dashboards    # 인터랙티브 시각화 대시보드
 │   ├── project_agent_mcp_dataflow.html   # 전사 Agent·MCP 데이터 파이프라인 흐름도 (Archify)
 │   ├── project_agent_mcp_dataflow.json   # 흐름도 모델 원본
-│   ├── index.html                        # 프로젝트 종합 허브 및 리소스 센터
+│   ├── index.html                        # 메인 허브 대시보드 (전체 56개 지역 신호등)
+│   ├── data/district_analysis_dashboard.html # 지역 심층 분석 대시보드 (31개 지역 드롭다운 & 근거 아코디언)
 │   ├── mcp_architecture_dashboard.html  # MCP 아키텍처 대시보드
-│   ├── district_safety_dashboard.html    # 지역별 치안 대시보드
-│   ├── crime_board.html                  # 범죄 통계 분석 보드
-│   └── schoolinfo_dashboard.html         # 학군 정보 대시보드
+│   ├── crime_board.html                  # 경찰청 범죄 통계 치안 대시보드
+│   └── schoolinfo_dashboard.html         # NEIS 학교정보 학군 대시보드
 │
 ├── tests/                                # 단위 및 회귀 테스트
 │   ├── test_board_mcp.py                 # MCP 서버 및 게이트 기능 테스트
 │   ├── budget-gate.test.js               # 구매력 게이트 계산 로직 테스트
-│   └── ... (총 33개 파이썬 테스트)
+│   └── ... (총 33개 파이썬 유닛 테스트 전원 통과)
 │
 ├── agy/                                  # Antigravity CLI 보조 설정
 │   └── settings.permissions.json         # 사용자 전역 설정용 권한 프리셋 템플릿
@@ -160,7 +156,10 @@ python -m unittest discover -s tests
 # 2) 브라우저 예산 게이트(구매력 계산기) 테스트
 node tests/budget-gate.test.js
 
-# 3) 초안 및 규정 무결성 검증
+# 3) 전체 시스템(에이전트·MCP·데이터셋) 무결성 점검
+node scripts/verify_full_system.js
+
+# 4) 초안 및 규정 무결성 검증
 python scripts/validate_board.py
 ```
 
@@ -173,7 +172,7 @@ python scripts/agy_install.py
 python scripts/agy_install.py --apply --absolute-mcp
 ```
 
-### 3. 인터랙티브 데이터 파이프라인 다이어그램 열기
-- 브라우저에서 [`project_agent_mcp_dataflow.html`](file:///C:/practice/geminiCLI/realestate_prj/project_agent_mcp_dataflow.html)을 열어 전체 에이전트-MCP 상호작용 및 3대 핵심 경로(`facts-path`, `rules-strategy-path`, `gate-publish-path`)를 인터랙티브하게 탐색할 수 있습니다.
-- 특정 노드(예: 규정 조회 MCP) 포커스 URL:  
-  `project_agent_mcp_dataflow.html#focus=mcp_rules`
+### 3. 인터랙티브 대시보드 및 데이터플로우 열기
+- **메인 신호등 대시보드**: 브라우저에서 [`index.html`](file:///C:/practice/geminiCLI/realestate_prj/index.html) 오픈
+- **지역 심층 분석 대시보드**: 브라우저에서 [`data/district_analysis_dashboard.html`](file:///C:/practice/geminiCLI/realestate_prj/data/district_analysis_dashboard.html) 오픈 (상단 드롭다운으로 31개 지역 전환 가능)
+- **전사 Agent·MCP 데이터 파이프라인 다이어그램**: [`project_agent_mcp_dataflow.html`](file:///C:/practice/geminiCLI/realestate_prj/project_agent_mcp_dataflow.html) 오픈 (특정 노드 포커스: `#focus=mcp_rules`)
