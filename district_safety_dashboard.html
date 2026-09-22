@@ -4,13 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛡️ 지역 치안 안전 심층 분석 대시보드 — 부동산 신호등</title>
+  <meta name="color-scheme" content="light dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
+      /* Semantic Backgrounds (DESIGN.md Tokens) */
+      --bg-primary: 255 255 255;
+      --bg-secondary: 248 250 252;
+      --bg-elevated: 255 255 255;
+
+      /* Text & Foreground */
+      --text-primary: 15 23 42;
+      --text-secondary: 71 85 105;
+      --text-muted: 148 163 184;
+
+      /* Borders */
+      --border-default: 226 232 240;
+      --border-subtle: 241 245 249;
+
+      /* Mapped Layout Variables (Light) */
+      --bg-body: #f8fafc;
+      --panel: #ffffff;
+      --panel-hover: #f1f5f9;
+      --panel-border: #e2e8f0;
+      --border-bright: #cbd5e1;
+      --border-color: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --bg-surface: #ffffff;
+      --text: #0f172a;
+      --text-sub: #334155;
+      --primary: #2563eb;
+      --accent-blue: #2563eb;
+      --primary-bg: rgba(37, 99, 235, 0.1);
+      --accent-green: #10b981;
+      --accent-green-bg: #dcfce7;
+      --accent-yellow: #f59e0b;
+      --accent-yellow-bg: #fef3c7;
+      --accent-red: #ef4444;
+      --accent-red-bg: #fee2e2;
+      --accent-purple: #7c3aed;
+      --input-bg: #ffffff;
+      --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+    }
+
+    [data-theme="dark"], .dark {
+      /* Dark Mode Semantic Tokens (DESIGN.md) */
+      --bg-primary: 11 15 23;
+      --bg-secondary: 17 24 39;
+      --bg-elevated: 30 41 59;
+
+      --text-primary: 248 250 252;
+      --text-secondary: 148 163 184;
+      --text-muted: 100 116 139;
+
+      --border-default: 30 41 59;
+      --border-subtle: 15 23 42;
+
+      /* Mapped Layout Variables (Dark) */
       --bg-body: #090d16;
       --panel: #111827;
       --panel-hover: #1b2438;
@@ -19,11 +73,8 @@
       --border-color: #1f293d;
       --line-strong: #374151;
       --bg-surface: #111827;
-      --text-primary: #f9fafb;
-      --text-secondary: #cbd5e1;
       --text: #f9fafb;
       --text-sub: #cbd5e1;
-      --text-muted: #94a3b8;
       --primary: #38bdf8;
       --accent-blue: #38bdf8;
       --primary-bg: rgba(56, 189, 248, 0.12);
@@ -36,34 +87,6 @@
       --accent-purple: #a855f7;
       --input-bg: #0b1120;
       --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    }
-
-    [data-theme="light"] {
-      --bg-body: #f8fafc;
-      --panel: #ffffff;
-      --panel-hover: #f1f5f9;
-      --panel-border: #e2e8f0;
-      --border-bright: #cbd5e1;
-      --border-color: #e2e8f0;
-      --line-strong: #cbd5e1;
-      --bg-surface: #ffffff;
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
-      --text: #0f172a;
-      --text-sub: #334155;
-      --text-muted: #64748b;
-      --primary: #0284c7;
-      --accent-blue: #0284c7;
-      --primary-bg: rgba(2, 132, 199, 0.1);
-      --accent-green: #16a34a;
-      --accent-green-bg: #dcfce7;
-      --accent-yellow: #d97706;
-      --accent-yellow-bg: #fef3c7;
-      --accent-red: #dc2626;
-      --accent-red-bg: #fee2e2;
-      --accent-purple: #7c3aed;
-      --input-bg: #ffffff;
-      --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
     }
 
     /* ---------- 상단 바 (index.html 표준) ---------- */
@@ -458,6 +481,26 @@
       .zone-cards { grid-template-columns: 1fr; }
       .content-panel { padding: 20px 16px; }
     }
+
+    /* Semantic Helper Classes (Replacing Inline Styles) */
+    .crumb-name-active { color: var(--primary); font-weight: 700; }
+    .text-muted-label { font-size: 0.92rem; color: var(--text-muted); }
+    .province-pill-text { font-size: 1.1rem; color: var(--primary); font-weight: 700; }
+    .kpi-val-primary { color: var(--primary); }
+    .kpi-unit { font-size: 1.05rem; font-weight: 600; color: var(--text-muted); }
+    .kpi-val-yellow { color: var(--accent-yellow); }
+    .kpi-val-infra { font-size: 1.6rem; color: var(--accent-green); }
+    .bar-fill-violence { width: 55%; background: var(--accent-red); }
+    .bar-fill-theft { width: 34%; background: var(--accent-yellow); }
+    .bar-fill-sexual { width: 11%; background: var(--accent-purple); }
+    .bar-fill-robbery { width: 3%; background: var(--primary); }
+    .bar-fill-murder { width: 1%; background: #64748b; }
+    .chart-container-220 { height: 220px; margin-top: 10px; }
+    .chart-container-240 { height: 240px; }
+    .cluster-desc-box { background: var(--input-bg); border-radius: 12px; padding: 16px; font-size: 0.92rem; color: var(--text-sub); line-height: 1.6; }
+    .cluster-title-residential { color: var(--accent-green); }
+    .cluster-title-commercial { color: var(--accent-yellow); }
+    .sub-header-muted { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -496,11 +539,11 @@
         <div class="nav-breadcrumbs">
           <a href="index.html">메인 신호등</a> &gt; 
           <a href="crime_board.html">치안 종합 게시판</a> &gt; 
-          <span style="color: var(--primary); font-weight: 700;" id="crumbName">지역 리포트</span>
+          <span class="crumb-name-active" id="crumbName">지역 리포트</span>
         </div>
       </div>
       <div class="top-right">
-        <span style="font-size: 0.92rem; color: var(--text-muted);">다른 지역 바로가기:</span>
+        <span class="text-muted-label">다른 지역 바로가기:</span>
         <select id="regionSelect" class="region-select" onchange="changeRegion(this.value)">
           <!-- Options populated dynamically -->
         </select>
@@ -515,7 +558,7 @@
         <div class="district-title">
           <h1 id="dHeaderTitle">
             <span id="dTargetName">강남구</span>
-            <span id="dProvincePill" style="font-size: 1.1rem; color: var(--primary); font-weight: 700;">(서울특별시)</span>
+            <span id="dProvincePill" class="province-pill-text">(서울특별시)</span>
           </h1>
           <p>경찰청 13개년 범죄통계(odcloud) 및 독립 MCP 연계 치안 안전 심층 진단 리포트</p>
         </div>
@@ -531,25 +574,25 @@
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-label">인구 1천명당 5대 강력범죄율</div>
-        <div class="kpi-val num" id="kpiRateVal" style="color: var(--primary);">11.50<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">건</span></div>
+        <div class="kpi-val num kpi-val-primary" id="kpiRateVal">11.50<span class="kpi-unit">건</span></div>
         <div class="kpi-sub" id="kpiRateCompare">수도권 평균(7.80건) 대비 +47.4%</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">연간 5대 강력범죄 발생건수</div>
-        <div class="kpi-val num" id="kpiC5Val">6,097<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">건</span></div>
+        <div class="kpi-val num" id="kpiC5Val">6,097<span class="kpi-unit">건</span></div>
         <div class="kpi-sub" id="kpiTotalRatio">총 범죄(31,705건) 대비 19.2%</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">치안 안전 리스크 점수 (02. Analyst)</div>
-        <div class="kpi-val num" id="kpiRiskVal" style="color: var(--accent-yellow);">+1<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">점</span></div>
+        <div class="kpi-val num kpi-val-yellow" id="kpiRiskVal">+1<span class="kpi-unit">점</span></div>
         <div class="kpi-sub">-2(매우안전) ~ 0(보통) ~ +2(고위험)</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">치안 인프라 (경찰서 및 지구대)</div>
-        <div class="kpi-val" id="kpiInfraVal" style="font-size: 1.6rem; color: var(--accent-green);">8개 지구대</div>
+        <div class="kpi-val kpi-val-infra" id="kpiInfraVal">8개 지구대</div>
         <div class="kpi-sub" id="kpiInfraSub">AI 방범 CCTV 2,400대 집중 배치</div>
       </div>
     </div>
@@ -566,41 +609,41 @@
         <div class="breakdown-table">
           <div class="b-row">
             <span class="b-label">폭행·폭력</span>
-            <div class="b-track"><div class="b-fill" id="barViolence" style="width: 55%; background: #ef4444;"></div></div>
+            <div class="b-track"><div class="b-fill bar-fill-violence" id="barViolence"></div></div>
             <span class="b-num num" id="cntViolence">1,900건</span>
             <span class="b-ratio num" id="pctViolence">53.4%</span>
           </div>
 
           <div class="b-row">
             <span class="b-label">절도 범죄</span>
-            <div class="b-track"><div class="b-fill" id="barTheft" style="width: 34%; background: #f59e0b;"></div></div>
+            <div class="b-track"><div class="b-fill bar-fill-theft" id="barTheft"></div></div>
             <span class="b-num num" id="cntTheft">2,094건</span>
             <span class="b-ratio num" id="pctTheft">34.2%</span>
           </div>
 
           <div class="b-row">
             <span class="b-label">강제추행/성</span>
-            <div class="b-track"><div class="b-fill" id="barSexual" style="width: 11%; background: #a855f7;"></div></div>
+            <div class="b-track"><div class="b-fill bar-fill-sexual" id="barSexual"></div></div>
             <span class="b-num num" id="cntSexual">635건</span>
             <span class="b-ratio num" id="pctSexual">10.4%</span>
           </div>
 
           <div class="b-row">
             <span class="b-label">강도·공갈</span>
-            <div class="b-track"><div class="b-fill" id="barRobbery" style="width: 3%; background: #38bdf8;"></div></div>
+            <div class="b-track"><div class="b-fill bar-fill-robbery" id="barRobbery"></div></div>
             <span class="b-num num" id="cntRobbery">136건</span>
             <span class="b-ratio num" id="pctRobbery">2.2%</span>
           </div>
 
           <div class="b-row">
             <span class="b-label">살인 (미수등)</span>
-            <div class="b-track"><div class="b-fill" id="barMurder" style="width: 1%; background: #64748b;"></div></div>
+            <div class="b-track"><div class="b-fill bar-fill-murder" id="barMurder"></div></div>
             <span class="b-num num" id="cntMurder">19건</span>
             <span class="b-ratio num" id="pctMurder">0.3%</span>
           </div>
         </div>
 
-        <div style="height: 220px; margin-top: 10px;">
+        <div class="chart-container-220">
           <canvas id="categoryDonutChart"></canvas>
         </div>
       </section>
@@ -612,11 +655,11 @@
           <span class="panel-badge">다년도 연동</span>
         </div>
 
-        <div style="height: 240px;">
+        <div class="chart-container-240">
           <canvas id="timeSeriesChart"></canvas>
         </div>
 
-        <div style="background: var(--input-bg); border-radius: 12px; padding: 16px; font-size: 0.92rem; color: var(--text-sub); line-height: 1.6;">
+        <div class="cluster-desc-box">
           <strong>💡 시계열 진단 요약:</strong> 최근 3개년 동안 자치구 내 강력범죄 발생 빈도는 연평균 <strong>-2.6%</strong>씩 지속적인 감소세를 보이고 있으며, 지능형 CCTV 확충 및 야간 순찰 강화로 치안 안정화 국면에 진입하고 있습니다.
         </div>
       </section>
@@ -630,14 +673,14 @@
 
         <div class="zone-cards">
           <div class="zone-card apt">
-            <h5 style="color: var(--accent-green);">🏡 순수 아파트 주거 클러스터</h5>
+            <h5 class="cluster-title-residential">🏡 순수 아파트 주거 클러스터</h5>
             <p id="zoneAptComment">
               대단지 아파트 및 명문 학군가 밀집 구역은 사설 보안, 지자체 안심귀갓길 및 학부모 순찰대가 촘촘하여 <strong>A+ 등급 수준의 극히 우수한 체감 안전도</strong>를 유지하고 있습니다.
             </p>
           </div>
 
           <div class="zone-card biz">
-            <h5 style="color: var(--accent-yellow);">🏬 지하철역 및 상업·유흥 번화가</h5>
+            <h5 class="cluster-title-commercial">🏬 지하철역 및 상업·유흥 번화가</h5>
             <p id="zoneBizComment">
               광역 상업·업무·음식점 골목은 심야 유동인구 주취 폭력 및 절도 범죄가 혼재되어 있으므로, 1인 가구 및 임차인은 대로변 보행 동선 확인이 권장됩니다.
             </p>
@@ -655,7 +698,7 @@
         <div class="agent-advice-box">
           <div class="agent-tag-row">
             <span class="agent-chip">치안 전문 분석가 (re-safety-analyst)</span>
-            <span style="color: var(--text-muted);">| 팩트 진단 총평</span>
+            <span class="sub-header-muted">| 팩트 진단 총평</span>
           </div>
           <div class="agent-opinion" id="agentOpinionText">
             로딩 중...
@@ -730,18 +773,18 @@
       gBadge.className = `grade-badge-lg ${item.grade}`;
       gBadge.innerText = `${item.grade} 등급 (${item.gradeText})`;
 
-      document.getElementById('kpiRateVal').innerHTML = `${item.rate.toFixed(2)}<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">건</span>`;
+      document.getElementById('kpiRateVal').innerHTML = `${item.rate.toFixed(2)}<span class="kpi-unit">건</span>`;
       
       const diffAvg = (((item.rate - 7.8) / 7.8) * 100).toFixed(1);
       const diffSign = diffAvg > 0 ? `+${diffAvg}%` : `${diffAvg}%`;
       document.getElementById('kpiRateCompare').innerText = `수도권 평균(7.80건) 대비 ${diffSign}`;
 
-      document.getElementById('kpiC5Val').innerHTML = `${item.c5.toLocaleString()}<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">건</span>`;
+      document.getElementById('kpiC5Val').innerHTML = `${item.c5.toLocaleString()}<span class="kpi-unit">건</span>`;
       const ratioOfTotal = ((item.c5 / item.total) * 100).toFixed(1);
       document.getElementById('kpiTotalRatio').innerText = `총 범죄(${item.total.toLocaleString()}건) 대비 ${ratioOfTotal}%`;
 
       const riskFormatted = item.riskScore > 0 ? `+${item.riskScore}` : `${item.riskScore}`;
-      document.getElementById('kpiRiskVal').innerHTML = `${riskFormatted}<span style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">점</span>`;
+      document.getElementById('kpiRiskVal').innerHTML = `${riskFormatted}<span class="kpi-unit">점</span>`;
 
       const dt = item.detail;
       const totalDet = (dt.violence + dt.theft + dt.sexual + dt.robbery + dt.murder) || 1;
@@ -845,11 +888,18 @@
 
     function applyTheme(theme, persist) {
       document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
       if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
       const btnIcon = document.getElementById('themeToggleIcon');
       const btnText = document.getElementById('themeToggleText');
       if (btnIcon) btnIcon.textContent = theme === 'light' ? '☾' : '☀';
       if (btnText) btnText.textContent = theme === 'light' ? '다크 모드' : '라이트 모드';
+      const themeBtn = document.getElementById('themeBtn');
+      if (themeBtn) themeBtn.textContent = theme === 'light' ? '🌓 다크 모드' : '🌓 라이트 모드';
     }
     function toggleTheme() {
       const cur = document.documentElement.getAttribute('data-theme') || 'dark';

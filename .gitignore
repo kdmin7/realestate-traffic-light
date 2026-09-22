@@ -10,6 +10,8 @@ node_modules/
 package-lock.json
 
 # Cache and temporary files
+dist/
+**/dist/
 .cache/
 **/.cache/
 npm-debug.log*

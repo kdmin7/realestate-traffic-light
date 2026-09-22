@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>🛡️ 경찰청 범죄통계 및 수도권 치안 종합 게시판</title>
   <script>
     (function () {
@@ -12,37 +13,32 @@
         t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', t);
+      if (t === 'dark') { document.documentElement.classList.add('dark'); }
+      else { document.documentElement.classList.remove('dark'); }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg: #090d16;
-      --panel: #111827;
-      --panel-hover: #1b2438;
-      --panel-border: #1f293d;
-      --border-bright: #2e3d5b;
-      --text: #f9fafb;
-      --text-sub: #cbd5e1;
-      --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-bg: rgba(56, 189, 248, 0.12);
-      --accent-green: #22c55e;
-      --accent-green-bg: rgba(34, 197, 94, 0.15);
-      --accent-yellow: #f59e0b;
-      --accent-yellow-bg: rgba(245, 158, 11, 0.15);
-      --accent-red: #ef4444;
-      --accent-red-bg: rgba(239, 68, 68, 0.15);
-      --accent-purple: #a855f7;
-      --input-bg: #0b1120;
-      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    }
+      /* Semantic Backgrounds (Tailwind RGB Tokens from DESIGN.md) */
+      --bg-primary: 255 255 255;
+      --bg-secondary: 248 250 252;
+      --bg-elevated: 255 255 255;
 
-    [data-theme="light"] {
+      /* Text & Foreground */
+      --text-primary: 15 23 42;
+      --text-secondary: 71 85 105;
+      --text-muted: 148 163 184;
+
+      /* Borders */
+      --border-default: 226 232 240;
+      --border-subtle: 241 245 249;
+
+      /* Mapped Layout Variables */
       --bg: #f8fafc;
       --panel: #ffffff;
       --panel-hover: #f1f5f9;
@@ -50,29 +46,82 @@
       --border-bright: #cbd5e1;
       --text: #0f172a;
       --text-sub: #334155;
-      --text-muted: #64748b;
-      --primary: #0284c7;
-      --primary-bg: rgba(2, 132, 199, 0.1);
-      --accent-green: #16a34a;
-      --accent-green-bg: #dcfce7;
-      --accent-yellow: #d97706;
-      --accent-yellow-bg: #fef3c7;
-      --accent-red: #dc2626;
-      --accent-red-bg: #fee2e2;
-      --accent-purple: #7c3aed;
+      --ink: #0f172a;
+      --ink-2: #334155;
+      --ink-3: #64748b;
+      --primary: #2563eb;
+      --primary-bg: rgba(37, 99, 235, 0.1);
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.1);
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.12);
+      --accent-yellow: #f59e0b;
+      --accent-yellow-bg: rgba(245, 158, 11, 0.12);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.12);
+      --accent-purple: #8b5cf6;
+      --buy: #10b981;
+      --warning: #f59e0b;
+      --watch: #ef4444;
       --input-bg: #ffffff;
-      --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+      --card-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+    }
+
+    [data-theme="dark"], .dark {
+      /* Dark Mode Tokens from DESIGN.md */
+      --bg-primary: 11 15 23;
+      --bg-secondary: 17 24 39;
+      --bg-elevated: 30 41 59;
+
+      --text-primary: 248 250 252;
+      --text-secondary: 148 163 184;
+      --text-muted: 100 116 139;
+
+      --border-default: 30 41 59;
+      --border-subtle: 15 23 42;
+
+      /* Mapped Layout Variables */
+      --bg: #0b0f19;
+      --panel: #111827;
+      --panel-hover: #1b2438;
+      --panel-border: #1f293d;
+      --border-bright: #2e3d5b;
+      --text: #f9fafb;
+      --text-sub: #cbd5e1;
+      --ink: #f8fafc;
+      --ink-2: #cbd5e1;
+      --ink-3: #94a3b8;
+      --primary: #38bdf8;
+      --primary-bg: rgba(56, 189, 248, 0.12);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-green: #22c55e;
+      --accent-green-bg: rgba(34, 197, 94, 0.15);
+      --accent-yellow: #f59e0b;
+      --accent-yellow-bg: rgba(245, 158, 11, 0.15);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.15);
+      --accent-purple: #a855f7;
+      --buy: #10b981;
+      --warning: #f59e0b;
+      --watch: #ef4444;
+      --input-bg: #0b1120;
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
       line-height: 1.6;
       transition: background-color 0.25s, color 0.25s;
       -webkit-font-smoothing: antialiased;
       word-break: keep-all;
+    }
+
+    h1, h2, h3, h4, .brand, .font-heading {
+      font-family: 'Space Grotesk', 'Pretendard Variable', sans-serif;
     }
 
     /* ---------- 상단 바 (index.html 표준) ---------- */
@@ -107,6 +156,40 @@
       font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
     }
+
+    /* DESIGN.md Semantic Utility Classes */
+    .text-accent { color: var(--primary); }
+    .text-buy { color: var(--accent-green); }
+    .text-warning { color: var(--accent-yellow); }
+    .text-watch { color: var(--accent-red); }
+    .text-muted { color: var(--text-muted); }
+    .pipeline-icon { font-size: 28px; line-height: 1; }
+    .pipeline-arrow { color: var(--text-muted); }
+    .step-chip-active { border-color: var(--accent-green) !important; color: var(--accent-green) !important; }
+    .kpi-unit { font-size: 1rem; color: var(--text-muted); font-weight: 500; margin-left: 2px; }
+    .dist-header-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; color: var(--text); }
+    .bar-fill-violence { background: var(--accent-red); width: 50%; }
+    .bar-fill-theft { background: var(--accent-yellow); width: 30%; }
+    .bar-fill-sexual { background: var(--accent-purple); width: 15%; }
+    .bar-fill-robbery { background: var(--primary); width: 5%; }
+    .bar-fill-murder { background: var(--text-muted); width: 2%; }
+    .btn-wrap-full { margin-top: 10px; }
+    .btn-primary-action {
+      width: 100%; padding: 12px; font-size: 1.02rem; border-radius: 10px;
+      background: var(--primary); color: #ffffff; font-weight: 800;
+      cursor: pointer; border: none; transition: opacity 0.2s;
+    }
+    [data-theme="dark"] .btn-primary-action, .dark .btn-primary-action { color: #090d16; }
+    .btn-primary-action:hover { opacity: 0.9; }
+    .badge-prov-seoul { color: var(--primary); font-weight: 700; }
+    .badge-prov-gyeonggi { color: var(--accent-green); font-weight: 700; }
+    .link-arrow { font-size: 0.82rem; color: var(--primary); }
+    .btn-group-row { display: flex; gap: 6px; align-items: center; }
+    .btn-detail-primary { background: var(--primary-bg); border-color: var(--primary); color: var(--primary); }
+    .btn-detail-secondary { opacity: 0.85; }
+    .risk-pos { color: var(--accent-red); font-weight: 800; }
+    .risk-zero { color: var(--text-muted); font-weight: 800; }
+    .risk-neg { color: var(--accent-green); font-weight: 800; }
 
     .container {
       max-width: 1240px;
@@ -732,7 +815,7 @@
     <!-- Multi-Agent Pipeline Status Banner -->
     <section class="agent-pipeline-card">
       <div class="pipeline-left">
-        <span style="font-size: 28px;">🤖</span>
+        <span class="pipeline-icon">🤖</span>
         <div class="pipeline-info">
           <h4>독립 MCP(crime-collector) &amp; 멀티 에이전트 치안 평가 파이프라인 가동 중</h4>
           <p>원천 수집부터 퀀트 스코어링 및 범죄 프로파일링까지 완결된 자율 체인</p>
@@ -740,12 +823,12 @@
       </div>
       <div class="pipeline-steps-inline">
         <div class="step-chip"><strong>MCP</strong> crime-collector</div>
-        <span style="color: var(--text-muted);">➔</span>
+        <span class="pipeline-arrow">➔</span>
         <div class="step-chip"><strong>01</strong> re-data-collector</div>
-        <span style="color: var(--text-muted);">➔</span>
+        <span class="pipeline-arrow">➔</span>
         <div class="step-chip"><strong>02</strong> re-trend-risk-analyst</div>
-        <span style="color: var(--text-muted);">➔</span>
-        <div class="step-chip" style="border-color: var(--accent-green); color: var(--accent-green);"><strong>03</strong> re-safety-analyst</div>
+        <span class="pipeline-arrow">➔</span>
+        <div class="step-chip step-chip-active"><strong>03</strong> re-safety-analyst</div>
         <a href="district_safety_dashboard.html?region=강남구" class="btn-report-link">🛡️ 강남구 상세 리포트 대시보드 열기 ➔</a>
       </div>
     </section>
@@ -754,27 +837,27 @@
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">수도권 전체 5대 범죄율</div>
-        <div class="kpi-value num" style="color: var(--primary);">7.80<span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">건/천명</span></div>
+        <div class="kpi-value num text-accent">7.80<span class="kpi-unit">건/천명</span></div>
         <div class="kpi-desc">살인·강도·성범죄·절도·폭력 기준</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">서울 최우수 안심 자치구</div>
-        <div class="kpi-value" style="color: var(--accent-green);">성북구 <span style="font-size: 1.1rem; color: var(--text-muted);">(5.2건)</span></div>
+        <div class="kpi-value text-buy">성북구 <span class="kpi-unit">(5.2건)</span></div>
         <div class="kpi-desc">도봉구(5.8건) · 노원구(6.3건) 순</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">경기 최우수 안심 시·군</div>
-        <div class="kpi-value" style="color: var(--accent-green);">의왕시 <span style="font-size: 1.1rem; color: var(--text-muted);">(4.0건)</span></div>
+        <div class="kpi-value text-buy">의왕시 <span class="kpi-unit">(4.0건)</span></div>
         <div class="kpi-desc">남양주(5.5건) · 하남(6.1건) 순</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">서울 광역 상업·유흥지</div>
-        <div class="kpi-value" style="color: #fb923c;">강남구 <span style="font-size: 1.1rem; color: var(--text-muted);">(11.5건)</span></div>
+        <div class="kpi-value text-warning">강남구 <span class="kpi-unit">(11.5건)</span></div>
         <div class="kpi-desc">유동인구 범죄 집중 (주거벨트 분리)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">13개년 장기 시계열 추이</div>
-        <div class="kpi-value num" style="color: var(--primary);">-25.3%</div>
+        <div class="kpi-value num text-accent">-25.3%</div>
         <div class="kpi-desc">10년 전 대비 지속 하향 안정세</div>
       </div>
     </div>
@@ -879,7 +962,7 @@
       <div class="modal-kpi-grid">
         <div class="modal-kpi-item">
           <span>인구 1천명당 범죄율</span>
-          <strong id="mRate" class="num" style="color: var(--primary);">-</strong>
+          <strong id="mRate" class="num text-accent">-</strong>
         </div>
         <div class="modal-kpi-item">
           <span>5대 강력범죄수</span>
@@ -892,30 +975,30 @@
       </div>
 
       <div class="modal-details-box">
-        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">5대 강력범죄 세부 발생 내역</div>
+        <div class="dist-header-title">5대 강력범죄 세부 발생 내역</div>
         <div class="crime-bar-row">
           <span class="crime-bar-label">폭력</span>
-          <div class="crime-progress-track"><div class="crime-progress-fill" id="barViolence" style="width: 50%; background: #ef4444;"></div></div>
+          <div class="crime-progress-track"><div class="crime-progress-fill bar-fill-violence" id="barViolence"></div></div>
           <span class="crime-bar-val num" id="valViolence">-</span>
         </div>
         <div class="crime-bar-row">
           <span class="crime-bar-label">절도</span>
-          <div class="crime-progress-track"><div class="crime-progress-fill" id="barTheft" style="width: 30%; background: #f59e0b;"></div></div>
+          <div class="crime-progress-track"><div class="crime-progress-fill bar-fill-theft" id="barTheft"></div></div>
           <span class="crime-bar-val num" id="valTheft">-</span>
         </div>
         <div class="crime-bar-row">
           <span class="crime-bar-label">성범죄</span>
-          <div class="crime-progress-track"><div class="crime-progress-fill" id="barSexual" style="width: 15%; background: #a855f7;"></div></div>
+          <div class="crime-progress-track"><div class="crime-progress-fill bar-fill-sexual" id="barSexual"></div></div>
           <span class="crime-bar-val num" id="valSexual">-</span>
         </div>
         <div class="crime-bar-row">
           <span class="crime-bar-label">강도</span>
-          <div class="crime-progress-track"><div class="crime-progress-fill" id="barRobbery" style="width: 5%; background: #38bdf8;"></div></div>
+          <div class="crime-progress-track"><div class="crime-progress-fill bar-fill-robbery" id="barRobbery"></div></div>
           <span class="crime-bar-val num" id="valRobbery">-</span>
         </div>
         <div class="crime-bar-row">
           <span class="crime-bar-label">살인</span>
-          <div class="crime-progress-track"><div class="crime-progress-fill" id="barMurder" style="width: 2%; background: #64748b;"></div></div>
+          <div class="crime-progress-track"><div class="crime-progress-fill bar-fill-murder" id="barMurder"></div></div>
           <span class="crime-bar-val num" id="valMurder">-</span>
         </div>
       </div>
@@ -924,8 +1007,8 @@
         생활권 진단 코멘트 로딩 중...
       </div>
 
-      <div style="margin-top: 6px;">
-        <button class="btn-detail" id="btnGoDistrictFromModal" style="width: 100%; padding: 12px; font-size: 1.02rem; border-radius: 10px; background: var(--primary); color: #090d16; font-weight: 800; cursor: pointer;" onclick="goToDistrictFromModal()">
+      <div class="btn-wrap-full">
+        <button class="btn-primary-action" id="btnGoDistrictFromModal" onclick="goToDistrictFromModal()">
           🛡️ <span id="mBtnDistrictName">선택 지역</span> 심층 치안 리포트 대시보드 열기 ➔
         </button>
       </div>
@@ -937,13 +1020,6 @@
     let currentFilter = 'all';
     let currentSort = 'rate-asc';
     let searchQuery = '';
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      document.getElementById('themeBtn').innerText = isDark ? '🌙 다크 모드 전환' : '🌓 라이트 모드 전환';
-    }
 
     function renderTable() {
       let list = RAW_DATA.filter(item => {
@@ -968,30 +1044,30 @@
 
       list.forEach((row, idx) => {
         const tr = document.createElement('tr');
-        const provBadge = row.province === 'seoul' ? '<span style="color: #38bdf8; font-weight:700;">서울</span>' : '<span style="color: #22c55e; font-weight:700;">경기</span>';
+        const provBadge = row.province === 'seoul' ? '<span class="badge-prov-seoul">서울</span>' : '<span class="badge-prov-gyeonggi">경기</span>';
         const riskFormat = row.riskScore > 0 ? `+${row.riskScore}` : `${row.riskScore}`;
-        const riskColor = row.riskScore <= -1 ? 'var(--accent-green)' : (row.riskScore === 0 ? 'var(--text-muted)' : 'var(--accent-red)');
+        const riskClass = row.riskScore <= -1 ? 'risk-neg' : (row.riskScore === 0 ? 'risk-zero' : 'risk-pos');
 
         tr.innerHTML = `
-          <td class="num" style="font-weight:700; color: var(--text-muted);">${idx + 1}</td>
+          <td class="num font-bold text-muted">${idx + 1}</td>
           <td>
             <span class="district-link-cell" onclick="goToDistrict('${row.name}')" title="클릭 시 ${row.name} 심층 치안 리포트 대시보드로 이동">
-              ${row.name} <span style="font-size: 0.82rem; color: var(--primary);">↗</span>
+              ${row.name} <span class="link-arrow">↗</span>
             </span>
           </td>
           <td>${provBadge}</td>
           <td class="num">${row.pop.toLocaleString()}명</td>
           <td class="num">${row.total.toLocaleString()}건</td>
-          <td class="num" style="font-weight: 700;">${row.c5.toLocaleString()}건</td>
-          <td class="num" style="font-weight: 800; color: var(--primary); font-size: 1.0rem;">${row.rate.toFixed(2)}</td>
+          <td class="num font-bold">${row.c5.toLocaleString()}건</td>
+          <td class="num font-extrabold text-accent text-sm">${row.rate.toFixed(2)}</td>
           <td><span class="grade-badge ${row.grade}">${row.grade}등급 (${row.gradeText})</span></td>
-          <td class="num" style="font-weight: 800; color: ${riskColor}">${riskFormat}</td>
+          <td class="num font-extrabold ${riskClass}">${riskFormat}</td>
           <td>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <button class="btn-detail" onclick="goToDistrict('${row.name}')" title="${row.name} 심층 대시보드로 이동" style="background: var(--primary-bg); border-color: var(--primary); color: var(--primary);">
+            <div class="btn-group-row">
+              <button class="btn-detail btn-detail-primary" onclick="goToDistrict('${row.name}')" title="${row.name} 심층 대시보드로 이동">
                 대시보드 ↗
               </button>
-              <button class="btn-detail" onclick="openDetail('${row.name}')" title="요약 팝업 보기" style="opacity: 0.85;">
+              <button class="btn-detail btn-detail-secondary" onclick="openDetail('${row.name}')" title="요약 팝업 보기">
                 요약
               </button>
             </div>
@@ -1168,6 +1244,11 @@
 
     function applyTheme(theme, persist) {
       document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
       if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
       const btnIcon = document.getElementById('themeToggleIcon');
       const btnText = document.getElementById('themeToggleText');

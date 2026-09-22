@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>🏫 수도권 명문학군 & 학교정보 실시간 모니터 대시보드 (schoolinfo-mcp)</title>
   <script>
     (function () {
@@ -12,59 +13,130 @@
         t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', t);
+      if (t === 'dark') { document.documentElement.classList.add('dark'); }
+      else { document.documentElement.classList.remove('dark'); }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     :root {
-      --bg-page: #f4f5f7;
+      /* Semantic Backgrounds (Tailwind RGB Tokens from DESIGN.md) */
+      --bg-primary: 255 255 255;
+      --bg-secondary: 248 250 252;
+      --bg-elevated: 255 255 255;
+
+      /* Text & Foreground */
+      --text-primary: 15 23 42;
+      --text-secondary: 71 85 105;
+      --text-muted: 148 163 184;
+
+      /* Borders */
+      --border-default: 226 232 240;
+      --border-subtle: 241 245 249;
+
+      /* Mapped Layout Variables */
+      --bg-page: #f8fafc;
       --card-bg: #ffffff;
-      --card-border: #e3e6eb;
-      --card-border-hover: #cbd1da;
+      --card-border: #e2e8f0;
+      --card-border-hover: #cbd5e1;
       --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
       --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.09);
-      --text-main: #131820;
-      --text-sub: #3d4654;
-      --text-muted: #647085;
-      --primary: #1d4ed8;
-      --primary-light: #e8eefc;
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --ink: #0f172a;
+      --ink-2: #334155;
+      --ink-3: #64748b;
+      --primary: #2563eb;
+      --primary-light: rgba(37, 99, 235, 0.1);
       --primary-border: #bfdbfe;
-      --accent-green: #137a48;
-      --accent-green-bg: #e3f4eb;
-      --accent-green-border: #a7f3d0;
-      --purple: #7c3aed;
-      --purple-light: #faf5ff;
-      --amber: #7a4f06;
-      --amber-light: #fdf0cf;
-      --danger: #b3261e;
-      --mono: ui-monospace, 'SF Mono', Consolas, monospace;
-      --line: #e3e6eb;
-      --line-strong: #cbd1da;
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.12);
+      --accent-green-border: rgba(16, 185, 129, 0.35);
+      --purple: #8b5cf6;
+      --purple-light: rgba(139, 92, 246, 0.1);
+      --amber: #f59e0b;
+      --amber-light: rgba(245, 158, 11, 0.12);
+      --danger: #ef4444;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
       --nav-h: 56px;
+
+      --buy: #10b981;
+      --warning: #f59e0b;
+      --watch: #ef4444;
+      --accent: #2563eb;
     }
-    [data-theme="dark"] {
-      --bg-page: #0d1015;
-      --card-bg: #151920;
-      --card-border: #262c36;
+
+    [data-theme="dark"], .dark {
+      /* Dark Mode Tokens from DESIGN.md */
+      --bg-primary: 11 15 23;
+      --bg-secondary: 17 24 39;
+      --bg-elevated: 30 41 59;
+
+      --text-primary: 248 250 252;
+      --text-secondary: 148 163 184;
+      --text-muted: 100 116 139;
+
+      --border-default: 30 41 59;
+      --border-subtle: 15 23 42;
+
+      /* Mapped Layout Variables */
+      --bg-page: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f293d;
       --card-border-hover: #363e4b;
-      --text-main: #e9edf3;
-      --text-sub: #c1c9d5;
-      --text-muted: #8f99a9;
-      --primary: #7aa7ff;
-      --primary-light: rgba(122, 167, 255, 0.15);
-      --primary-border: #363e4b;
-      --accent-green: #4cc38a;
-      --accent-green-bg: rgba(76, 195, 138, 0.14);
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
+      --ink: #f8fafc;
+      --ink-2: #cbd5e1;
+      --ink-3: #94a3b8;
+      --primary: #38bdf8;
+      --primary-light: rgba(56, 189, 248, 0.15);
+      --primary-border: #1f293d;
+      --accent-green: #22c55e;
+      --accent-green-bg: rgba(34, 197, 94, 0.15);
+      --accent-green-border: rgba(34, 197, 94, 0.4);
       --purple: #a855f7;
-      --amber: #e8b64c;
-      --amber-light: rgba(232, 182, 76, 0.14);
-      --danger: #f38b83;
-      --line: #262c36;
+      --amber: #f59e0b;
+      --amber-light: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --line: #1f293d;
       --line-strong: #363e4b;
+
+      --buy: #10b981;
+      --warning: #f59e0b;
+      --watch: #ef4444;
+      --accent: #38bdf8;
     }
+
+    h1, h2, h3, h4, .brand, .font-heading {
+      font-family: 'Space Grotesk', 'Pretendard Variable', sans-serif;
+    }
+    .num, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Semantic Helper Classes */
+    .text-accent { color: var(--primary) !important; }
+    .text-buy { color: var(--accent-green) !important; }
+    .text-warning { color: var(--amber) !important; }
+    .text-watch { color: var(--danger) !important; }
+    .text-main { color: var(--text-main) !important; }
+    .text-xs { font-size: 13px !important; }
+    .font-bold { font-weight: 700 !important; }
+    .no-underline { text-decoration: none !important; }
+    .hero-tag-grade1 { background: var(--accent-green-bg) !important; color: var(--accent-green) !important; border-color: var(--accent-green-border) !important; }
+    .hidden { display: none !important; }
+    .w-99 { width: 99.2%; }
+    .w-98 { width: 98.5%; }
+    .w-96 { width: 96.8%; }
+    .w-97 { width: 97.4%; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -982,7 +1054,7 @@
         <div class="view-card">
           <div class="loader" id="cardLoader">
             <div class="spin"></div>
-            <div style="font-weight:700; color:var(--text-main);">NEIS & MCP 실시간 데이터 동기화 중...</div>
+            <div class="font-bold text-main">NEIS & MCP 실시간 데이터 동기화 중...</div>
           </div>
 
           <div id="cardContent">
@@ -994,7 +1066,7 @@
                   <span class="hero-tag primary" id="heroSchoolRegion">서울 광진구</span>
                   <span class="hero-tag" id="heroSchoolKind">특수목적고 (외고)</span>
                   <span class="hero-tag">사립 · 남녀공학</span>
-                  <span class="hero-tag" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0;">학군 1등급 우수지</span>
+                  <span class="hero-tag hero-tag-grade1">학군 1등급 우수지</span>
                 </div>
               </div>
               <div class="hero-score-box">
@@ -1013,7 +1085,7 @@
                     <div class="stat-row"><span class="stat-lbl">도로명 주소</span><span class="stat-val" id="ovAddress">서울 광진구 용마산로22길 16</span></div>
                     <div class="stat-row"><span class="stat-lbl">대표 전화</span><span class="stat-val">02-2204-1300</span></div>
                     <div class="stat-row"><span class="stat-lbl">설립 구분</span><span class="stat-val">사립 (1984년 설립)</span></div>
-                    <div class="stat-row"><span class="stat-lbl">학군 분류</span><span class="stat-val" id="ovRank" style="color:var(--primary);">전국 특목고 최상위</span></div>
+                    <div class="stat-row"><span class="stat-lbl">학군 분류</span><span class="stat-val text-accent font-bold" id="ovRank">전국 특목고 최상위</span></div>
                   </div>
                 </div>
 
@@ -1021,20 +1093,20 @@
                   <div class="feed-title">📈 학군 정량 평가 4대 지표</div>
                   <div class="eval-meter">
                     <div class="meter-item">
-                      <div class="meter-head"><span>학업성취도 및 수능 역량</span><span style="color:var(--primary);">99.2점</span></div>
-                      <div class="meter-track"><div class="meter-fill" style="width: 99.2%;"></div></div>
+                      <div class="meter-head"><span>학업성취도 및 수능 역량</span><span class="text-accent font-bold">99.2점</span></div>
+                      <div class="meter-track"><div class="meter-fill w-99"></div></div>
                     </div>
                     <div class="meter-item">
-                      <div class="meter-head"><span>명문대 / 의학계열 진학률</span><span style="color:var(--primary);">98.5점</span></div>
-                      <div class="meter-track"><div class="meter-fill" style="width: 98.5%;"></div></div>
+                      <div class="meter-head"><span>명문대 / 의학계열 진학률</span><span class="text-accent font-bold">98.5점</span></div>
+                      <div class="meter-track"><div class="meter-fill w-98"></div></div>
                     </div>
                     <div class="meter-item">
-                      <div class="meter-head"><span>우수 교원 및 교육 환경</span><span style="color:var(--primary);">96.8점</span></div>
-                      <div class="meter-track"><div class="meter-fill" style="width: 96.8%;"></div></div>
+                      <div class="meter-head"><span>우수 교원 및 교육 환경</span><span class="text-accent font-bold">96.8점</span></div>
+                      <div class="meter-track"><div class="meter-fill w-96"></div></div>
                     </div>
                     <div class="meter-item">
-                      <div class="meter-head"><span>인접 학원가 및 교육 인프라</span><span style="color:var(--primary);">97.4점</span></div>
-                      <div class="meter-track"><div class="meter-fill" style="width: 97.4%;"></div></div>
+                      <div class="meter-head"><span>인접 학원가 및 교육 인프라</span><span class="text-accent font-bold">97.4점</span></div>
+                      <div class="meter-track"><div class="meter-fill w-97"></div></div>
                     </div>
                   </div>
                 </div>
@@ -1042,7 +1114,7 @@
             </div>
 
             <!-- Tab 2: Meal Feed -->
-            <div id="tab-meal" class="tab-pane" style="display: none;">
+            <div id="tab-meal" class="tab-pane hidden">
               <div class="feed-grid">
                 <div class="feed-box">
                   <div class="feed-title">🍱 오늘의 중식 식단표 (NEIS 실시간)</div>
@@ -1061,18 +1133,18 @@
                 <div class="feed-box">
                   <div class="feed-title">🔥 열량 및 3대 영양소 분석</div>
                   <div class="feed-content">
-                    <div class="stat-row"><span class="stat-lbl">총 에너지 (열량)</span><span class="stat-val" style="color:#d97706;" id="mealCal">785.4 Kcal</span></div>
+                    <div class="stat-row"><span class="stat-lbl">총 에너지 (열량)</span><span class="stat-val text-warning font-bold" id="mealCal">785.4 Kcal</span></div>
                     <div class="stat-row"><span class="stat-lbl">탄수화물 함량</span><span class="stat-val">102.4g (권장 적합)</span></div>
                     <div class="stat-row"><span class="stat-lbl">단백질 함량</span><span class="stat-val">38.6g (우수)</span></div>
                     <div class="stat-row"><span class="stat-lbl">지방 함량</span><span class="stat-val">18.2g</span></div>
-                    <div class="stat-row"><span class="stat-lbl">주요 알레르기 유발 정보</span><span class="stat-val" style="font-size:13px;">난류(1), 대두(5), 밀(6), 돼지고기(10)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">주요 알레르기 유발 정보</span><span class="stat-val text-xs">난류(1), 대두(5), 밀(6), 돼지고기(10)</span></div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Tab 3: Schedule Feed -->
-            <div id="tab-schedule" class="tab-pane" style="display: none;">
+            <div id="tab-schedule" class="tab-pane hidden">
               <div class="feed-box">
                 <div class="feed-title">📅 주요 학사일정 및 시험/방학 D-day 카운트다운</div>
                 <div class="feed-content" id="schedList">
@@ -1086,16 +1158,16 @@
             </div>
 
             <!-- Tab 4: Parent Digest -->
-            <div id="tab-parent" class="tab-pane" style="display: none;">
+            <div id="tab-parent" class="tab-pane hidden">
               <div class="feed-grid">
                 <div class="feed-box">
                   <div class="feed-title">📋 학부모 핵심 학교알리미 공시 요약</div>
                   <div class="feed-content">
                     <div class="stat-row"><span class="stat-lbl">전교생 수</span><span class="stat-val">742명 (남 340명 / 여 402명)</span></div>
-                    <div class="stat-row"><span class="stat-lbl">학급당 학생 수</span><span class="stat-val" style="color:var(--primary);">24.7명 (지역 평균 대비 쾌적)</span></div>
+                    <div class="stat-row"><span class="stat-lbl">학급당 학생 수</span><span class="stat-val text-accent font-bold">24.7명 (지역 평균 대비 쾌적)</span></div>
                     <div class="stat-row"><span class="stat-lbl">교원 1인당 학생 수</span><span class="stat-val">10.8명 (서울 평균 11.4명 대비 우수)</span></div>
                     <div class="stat-row"><span class="stat-lbl">특성화 및 방과후 강좌</span><span class="stat-val">42개 강좌 운영 중</span></div>
-                    <div class="stat-row"><span class="stat-lbl">학교 공식 웹사이트</span><span class="stat-val"><a href="#" style="color:var(--primary); text-decoration:none;">daewon.hs.kr</a></span></div>
+                    <div class="stat-row"><span class="stat-lbl">학교 공식 웹사이트</span><span class="stat-val"><a href="#" class="text-accent no-underline">daewon.hs.kr</a></span></div>
                   </div>
                 </div>
               </div>
@@ -1298,13 +1370,27 @@
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-      document.getElementById(tabId).style.display = 'block';
+      if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+      }
+      document.querySelectorAll('.tab-pane').forEach(p => {
+        p.classList.add('hidden');
+        p.style.display = 'none';
+      });
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.remove('hidden');
+        target.style.display = 'block';
+      }
     }
 
     function applyTheme(theme, persist) {
       document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
       if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
       const btnIcon = document.getElementById('themeToggleIcon');
       const btnText = document.getElementById('themeToggleText');

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>부동산 신호등 — 지역 심층 분석 대시보드</title>
     <script>
       (function () {
@@ -12,54 +13,127 @@
           t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         document.documentElement.setAttribute('data-theme', t);
+        if (t === 'dark') { document.documentElement.classList.add('dark'); }
+        else { document.documentElement.classList.remove('dark'); }
       })();
     </script>
     <!-- Google Fonts & Pretendard -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-body: #0b0f19;
-            --bg-surface: #151c2c;
-            --bg-surface-hover: #1e293b;
+            /* Semantic Backgrounds (Tailwind RGB Tokens from DESIGN.md) */
+            --bg-primary: 255 255 255;
+            --bg-secondary: 248 250 252;
+            --bg-elevated: 255 255 255;
+
+            /* Text & Foreground */
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+
+            /* Borders */
+            --border-default: #e2e8f0;
+            --border-subtle: #f1f5f9;
+
+            /* Mapped Layout Variables */
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9;
+            --accent-blue: #2563eb;
+            --accent-indigo: #4f46e5;
+            --border-color: #e2e8f0;
+            --border-bright: #cbd5e1;
+            --line-strong: #cbd5e1;
+            
+            --signal-warning-bg: rgba(245, 158, 11, 0.12);
+            --signal-warning-border: rgba(245, 158, 11, 0.35);
+            --signal-warning-text: #f59e0b;
+            
+            --signal-buy-bg: rgba(16, 185, 129, 0.12);
+            --signal-buy-border: rgba(16, 185, 129, 0.35);
+            --signal-buy-text: #10b981;
+
+            --signal-watch-bg: rgba(239, 68, 68, 0.12);
+            --signal-watch-border: rgba(239, 68, 68, 0.35);
+            --signal-watch-text: #ef4444;
+
+            --buy: #10b981;
+            --warning: #f59e0b;
+            --watch: #ef4444;
+        }
+
+        [data-theme="dark"], .dark {
+            /* Dark Mode Tokens from DESIGN.md */
+            --bg-primary: 11 15 23;
+            --bg-secondary: 17 24 39;
+            --bg-elevated: 30 41 59;
+
             --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
+            --text-muted: #94a3b8;
+
+            --border-default: #1f293d;
+            --border-subtle: #0f172a;
+
+            --bg-body: #0b0f19;
+            --bg-surface: #111827;
+            --bg-surface-hover: #1e293b;
             --accent-blue: #38bdf8;
             --accent-indigo: #818cf8;
-            --border-color: #243048;
+            --border-color: #1f293d;
             --border-bright: #334155;
-            --line-strong: #334155;
+            --line-strong: #363e4b;
+
+            --signal-warning-bg: rgba(245, 158, 11, 0.15);
+            --signal-warning-border: #f59e0b;
+            --signal-warning-text: #f59e0b;
             
-            --signal-warning-bg: rgba(250, 204, 21, 0.15);
-            --signal-warning-border: #facc15;
-            --signal-warning-text: #facc15;
-            
-            --signal-buy-bg: rgba(34, 197, 94, 0.15);
-            --signal-buy-border: #22c55e;
-            --signal-buy-text: #22c55e;
+            --signal-buy-bg: rgba(16, 185, 129, 0.15);
+            --signal-buy-border: #10b981;
+            --signal-buy-text: #10b981;
 
             --signal-watch-bg: rgba(239, 68, 68, 0.15);
             --signal-watch-border: #ef4444;
             --signal-watch-text: #ef4444;
+
+            --buy: #10b981;
+            --warning: #f59e0b;
+            --watch: #ef4444;
         }
 
-        [data-theme="light"] {
-            --bg-body: #f4f5f7;
-            --bg-surface: #ffffff;
-            --bg-surface-hover: #f8f9fb;
-            --text-primary: #131820;
-            --text-secondary: #3d4654;
-            --text-muted: #647085;
-            --accent-blue: #1d4ed8;
-            --border-color: #e3e6eb;
-            --border-bright: #cbd1da;
-            --line-strong: #cbd1da;
+        h1, h2, h3, h4, .brand, .font-heading {
+            font-family: 'Space Grotesk', 'Pretendard Variable', sans-serif;
         }
+        .num, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* DESIGN.md Semantic Utility Classes */
+        .text-accent { color: var(--accent-blue) !important; }
+        .text-danger { color: #ef4444 !important; }
+        .text-sec { color: var(--text-secondary) !important; }
+        .text-pri { color: var(--text-primary) !important; }
+        .table-responsive { overflow-x: auto; }
+        .col-span-2 { grid-column: span 2; }
+        .col-span-1 { grid-column: span 1; }
+        .text-base-lg { font-size: 1.05rem; }
+        .text-base-md { font-size: 1.0rem; }
+        .ai-card-styled {
+            border-color: rgba(56, 189, 248, 0.4);
+            background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-surface-hover) 100%);
+        }
+        .ai-text-lead { font-size: 1.05rem; line-height: 1.75; color: var(--text-primary); font-weight: 500; }
+        .btn-sm-pad { padding: 7px 16px; font-size: 0.86rem; }
+        .notice-icon { font-size: 1.3rem; }
+        .notice-p { margin-top: 2px; font-size: 0.85rem; color: var(--text-secondary); }
+        .tradeoff-heading { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .signal-pill-sm { font-size: 0.78rem; padding: 3px 10px; }
 
         * {
             margin: 0;
@@ -693,7 +767,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="label">전용 84㎡ 기준 평균 실거래가</span>
-                    <span class="val" id="statAvg84" style="color:var(--accent-blue);">-억</span>
+                    <span class="val text-accent" id="statAvg84">-억</span>
                     <span class="sub" id="stat84Sub">국토교통부 실거래가 신고 기준</span>
                 </div>
                 <div class="stat-card">
@@ -703,12 +777,12 @@
                 </div>
                 <div class="stat-card">
                     <span class="label">트렌드 모멘텀 지수</span>
-                    <span class="val" id="statTrend" style="color:#38bdf8;">+0.0</span>
+                    <span class="val text-accent" id="statTrend">+0.0</span>
                     <span class="sub">수요 유입 및 시장 거래 활성도</span>
                 </div>
                 <div class="stat-card">
                     <span class="label">투자 리스크 지수</span>
-                    <span class="val" id="statRisk" style="color:#f87171;">+0.0</span>
+                    <span class="val text-danger" id="statRisk">+0.0</span>
                     <span class="sub">고금리 대출 부담 및 가격 괴리도</span>
                 </div>
             </div>
@@ -726,7 +800,7 @@
                 <!-- Right Table -->
                 <div class="panel">
                     <h3>📋 모듈 ①: 대표 5대 랜드마크 단지 시세 & 전세가율 매트릭스</h3>
-                    <div style="overflow-x:auto;">
+                    <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
@@ -752,17 +826,17 @@
                 <div class="info-cards-grid">
                     <div class="info-card">
                         <div class="info-title">학군 종합 평가 지수</div>
-                        <div class="info-main" id="schoolScoreVal" style="color:var(--accent-blue);">95.0점</div>
+                        <div class="info-main text-accent" id="schoolScoreVal">95.0점</div>
                         <div class="info-sub" id="schoolRankVal">상위 우수 학군</div>
                     </div>
-                    <div class="info-card" style="grid-column: span 2;">
+                    <div class="info-card col-span-2">
                         <div class="info-title">대표 명문 초·중·고교</div>
-                        <div class="info-main" id="topSchoolsVal" style="font-size:1.05rem;">명문 고등학교, 중학교 리스트</div>
+                        <div class="info-main text-base-lg" id="topSchoolsVal">명문 고등학교, 중학교 리스트</div>
                         <div class="info-sub">대학 진학률 및 특목고·자사고 배출 상위권</div>
                     </div>
-                    <div class="info-card" style="grid-column: span 1;">
+                    <div class="info-card col-span-1">
                         <div class="info-title">핵심 학원가 클러스터</div>
-                        <div class="info-main" id="academyZoneVal" style="font-size:1.0rem; color:var(--text-secondary);">밀집 에듀타운</div>
+                        <div class="info-main text-sec text-base-md" id="academyZoneVal">밀집 에듀타운</div>
                         <div class="info-sub">사교육 인프라 접근성 우수</div>
                     </div>
                 </div>
@@ -779,12 +853,12 @@
                     </div>
                     <div class="info-card">
                         <div class="info-title">월 대출이자 (금리 4.39%)</div>
-                        <div class="info-main" id="cashflowInterest" style="color:#f87171;">-만원</div>
+                        <div class="info-main text-danger" id="cashflowInterest">-만원</div>
                         <div class="info-sub">원리금 균등분할상환 기준</div>
                     </div>
                     <div class="info-card">
                         <div class="info-title">월세/전세 기대수익</div>
-                        <div class="info-main" id="cashflowRent" style="color:var(--text-primary);">-만원</div>
+                        <div class="info-main text-pri" id="cashflowRent">-만원</div>
                         <div class="info-sub">주변 평균 임대수익률 기준</div>
                     </div>
                     <div class="info-card">
@@ -796,9 +870,9 @@
             </div>
 
             <!-- 모듈 ④: 에이전트 종합 진단평가 -->
-            <div class="panel" style="border-color: rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, #151c2c 0%, #172338 100%);">
+            <div class="panel ai-card-styled">
                 <h3>🤖 모듈 ④: 부동산 신호등 멀티 에이전트 종합 진단 총평</h3>
-                <p id="agentVerdictText" style="font-size:1.05rem; line-height:1.75; color:var(--text-primary); font-weight:500;">
+                <p id="agentVerdictText" class="ai-text-lead">
                     분석 데이터 로딩 중...
                 </p>
             </div>
@@ -837,7 +911,7 @@
             <footer>
                 <div>© 2026 부동산 신호등 (seoul-realty MCP Engine). 국토교통부·한국은행·NEIS 공공데이터 연동.</div>
                 <div>
-                    <a href="../index.html" class="btn-back-main" style="padding:7px 16px; font-size:0.86rem;">🏠 메인 대시보드로 돌아가기</a>
+                    <a href="../index.html" class="btn-back-main btn-sm-pad">🏠 메인 대시보드로 돌아가기</a>
                 </div>
             </footer>
         </div>
@@ -3151,10 +3225,10 @@
 
             cardBody.innerHTML = `
                 <div class="pending-notice">
-                    <span style="font-size:1.3rem;">⏱️</span>
+                    <span class="notice-icon">⏱️</span>
                     <div>
                         <strong>게시판 정식 발행 심의 대기 중 (Review Pending)</strong>
-                        <p style="margin-top:2px; font-size:0.85rem; color:var(--text-secondary);">
+                        <p class="notice-p">
                             본 지역은 <code>board-orchestrator</code>의 4중 품질 게이트(법률 검토·해시 무결성 검증·사람 승인)를 거쳐 정식 발행되기 전 상태입니다. 단정적 매수 추천을 배제하고 A등급 공식 사실 지표만 안전하게 제공합니다.
                         </p>
                     </div>
@@ -3216,7 +3290,7 @@
 
                 <!-- 트레이드오프 분석 (PB 리포트 카드) -->
                 <div class="tradeoff-box">
-                    <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+                    <div class="tradeoff-heading">
                         ⚖️ 에이전트 트레이드오프 분석 요약 (PB 맞춤 제약 조건)
                     </div>
                     <div class="tradeoff-row">
@@ -3273,10 +3347,10 @@
                     <tr>
                         <td><strong>${lm.name}</strong></td>
                         <td>${lm.area}</td>
-                        <td><strong style="color:var(--accent-blue);">${lm.price}</strong></td>
+                        <td><strong class="text-accent">${lm.price}</strong></td>
                         <td>${lm.jeonse}</td>
                         <td>${lm.jeonseRate}</td>
-                        <td><span class="signal-pill ${lm.signal === '주의' ? 'warning' : 'buy'}" style="font-size:0.78rem; padding:3px 10px;">${lm.signal}</span></td>
+                        <td><span class="signal-pill ${lm.signal === '주의' ? 'warning' : 'buy'} signal-pill-sm">${lm.signal}</span></td>
                     </tr>
                 `).join('');
             }
@@ -3302,7 +3376,7 @@
                 document.getElementById('cashflowRent').textContent = r.cashflow.rent_income;
                 const netEl = document.getElementById('cashflowNet');
                 netEl.textContent = r.cashflow.net_cashflow;
-                netEl.style.color = r.cashflow.net_cashflow.includes('적자') ? '#ef4444' : '#22c55e';
+                netEl.className = r.cashflow.net_cashflow.includes('적자') ? 'info-main text-danger' : 'info-main text-buy';
             }
 
             // 모듈 ④: 에이전트 종합 진단평가
@@ -3352,6 +3426,11 @@
 
         function applyTheme(theme, persist) {
             document.documentElement.setAttribute('data-theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
             if (persist) { try { localStorage.setItem('re_theme', theme); } catch (e) {} }
             const btnIcon = document.getElementById('themeToggleIcon');
             const btnText = document.getElementById('themeToggleText');

@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>METRO SIGNAL LAB - 수도권 부동산 투자 신호등 터미널 (v4.2 Alpha)</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-surface-variant": "#aaa8c4", "on-tertiary": "#675800", "on-secondary-container": "#dffff1", "primary-fixed-dim": "#ff5486", "tertiary-fixed-dim": "#efd13b", "tertiary-container": "#fedf49", "on-secondary-fixed-variant": "#006650", "tertiary-fixed": "#fedf49", "on-tertiary-container": "#5e4f00", "on-surface": "#e5e3ff", "on-tertiary-fixed-variant": "#695900", "on-background": "#e5e3ff", "surface-container-highest": "#232341", error: "#ff716c", "error-container": "#9f0519", "on-error-container": "#ffa8a3", "surface-tint": "#ff8aa5", "on-primary": "#620027", "secondary-fixed": "#00fcca", "outline-variant": "#46465d", secondary: "#00fcca", "surface-container-low": "#111128", "on-primary-fixed-variant": "#5e0025", primary: "#ff8aa5", "primary-fixed": "#ff7195", "on-primary-container": "#4d001d", tertiary: "#ffeeab", "on-error": "#490006", background: "#0c0c21", surface: "#0c0c21", "on-secondary-fixed": "#004737", "secondary-container": "#006b54", outline: "#74738d", "inverse-surface": "#fcf8ff", "inverse-primary": "#bd0052", "surface-container": "#171730", "primary-container": "#ff7195", "on-tertiary-fixed": "#483d00", "surface-container-lowest": "#000000", "surface-variant": "#232341", "surface-container-high": "#1d1d38", "inverse-on-surface": "#53536b", "surface-bright": "#292949", "on-secondary": "#005b47", "secondary-fixed-dim": "#00edbd", "surface-dim": "#0c0c21", "on-primary-fixed": "#000000", "secondary-dim": "#00edbd", "primary-dim": "#e40a65", "tertiary-dim": "#efd13b", "error-dim": "#d7383b"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {"space-lg": "1.5rem", "gutter-mobile": "0.75rem", "space-md": "1rem", margin: "2rem", "space-sm": "0.5rem", "space-xl": "2.5rem", "margin-mobile": "1rem", "space-xs": "0.25rem", gutter: "1rem"}, fontFamily: {headline: ["Sora"], display: ["Sora"], body: ["Inter"], label: ["Space Grotesk"], mono: ["JetBrains Mono", "monospace"]}, fontSize: {"display-hero": ["44px", {lineHeight: "52px", letterSpacing: "-0.03em", fontWeight: "700"}], "display-hero-mobile": ["30px", {lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700"}], "badge-signal": ["10px", {lineHeight: "12px", letterSpacing: "0.05em", fontWeight: "700"}], "numeric-metric-md": ["20px", {lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "400"}], "numeric-metric-sm": ["14px", {lineHeight: "18px", letterSpacing: "0em", fontWeight: "500"}], "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.025em", fontWeight: "700"}], "headline-sm": ["18px", {lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "21px", letterSpacing: "0em", fontWeight: "400"}], "label-caps": ["11px", {lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "600"}], "headline-lg-mobile": ["24px", {lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "600"}], "numeric-metric-lg": ["28px", {lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700"}], "headline-md": ["22px", {lineHeight: "30px", letterSpacing: "-0.015em", fontWeight: "600"}], "body-sm": ["12px", {lineHeight: "18px", letterSpacing: "0.005em", fontWeight: "400"}]}}}};</script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+    
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.15); }
+    }
+    .signal-pulse {
+      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Neon Tokyo Emissive Glows */
+    .glow-pink {
+      box-shadow: 0 0 16px rgba(255, 45, 120, 0.45);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 16px rgba(0, 255, 204, 0.42);
+    }
+    .glow-yellow {
+      box-shadow: 0 0 14px rgba(255, 224, 74, 0.38);
+    }
+    .glow-red {
+      box-shadow: 0 0 18px rgba(255, 68, 68, 0.5);
+    }
+    .neon-border-pink {
+      border-color: rgba(255, 45, 120, 0.55);
+      box-shadow: inset 0 0 12px rgba(255, 45, 120, 0.08), 0 0 10px rgba(255, 45, 120, 0.2);
+    }
+    .neon-border-cyan {
+      border-color: rgba(0, 255, 204, 0.5);
+      box-shadow: inset 0 0 12px rgba(0, 255, 204, 0.08), 0 0 10px rgba(0, 255, 204, 0.2);
+    }
+
+    /* Custom analytical scrollbars - Neon Tokyo dark track */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #302840;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff2d78;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body text-body-md antialiased selection:bg-primary selection:text-on-primary">
+<!-- ================= TOP APP BAR ================= -->
+<header class="flex justify-between items-center w-full px-space-lg h-14 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant sticky top-0 z-50 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+<!-- Brand / Title Cluster -->
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs cursor-pointer active:scale-95 transition-transform duration-100">
+<span class="w-3 h-3 rounded-full bg-primary glow-pink inline-block animate-pulse"></span>
+<span class="font-headline text-headline-sm font-extrabold tracking-wider text-primary">METRO SIGNAL LAB</span>
+<span class="font-mono text-[10px] uppercase bg-surface-container-highest text-secondary px-space-xs py-0.5 rounded border border-secondary/40 ml-space-xs tracking-wider shadow-[0_0_8px_rgba(0,255,204,0.25)]">v4.2 Alpha</span>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden xl:flex items-center gap-space-md ml-space-lg font-label">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 shadow-[0_2px_10px_rgba(255,45,120,0.3)]" href="#">Macro Telemetry</a>
+<a class="text-on-surface-variant font-normal hover:text-secondary hover:border-b-2 hover:border-secondary pb-1 transition-colors duration-150" href="#">District Screener</a>
+<a class="text-on-surface-variant font-normal hover:text-secondary hover:border-b-2 hover:border-secondary pb-1 transition-colors duration-150" href="#">Gap Intelligence</a>
+<a class="text-on-surface-variant font-normal hover:text-secondary hover:border-b-2 hover:border-secondary pb-1 transition-colors duration-150" href="#">Yield Analytics</a>
+</nav>
+</div>
+<!-- Search & Trailing Controls -->
+<div class="flex items-center gap-space-sm font-label">
+<!-- Search Input on right -->
+<div class="relative hidden lg:block w-72">
+<span class="material-symbols-outlined absolute left-space-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-9 pr-space-sm py-1.5 font-body text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_10px_rgba(255,45,120,0.35)] transition-all" placeholder="단지명, 법정동, 역세권(GTX) 검색..." type="text"/>
+</div>
+<!-- Trailing Icon Actions -->
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-150 active:scale-95 transition-transform duration-100" title="Notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-high transition-colors duration-150 active:scale-95 transition-transform duration-100" title="Tune Screener">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-tertiary hover:bg-surface-container-high transition-colors duration-150 active:scale-95 transition-transform duration-100" title="Analytics View">
+<span class="material-symbols-outlined">analytics</span>
+</button>
+<div class="h-5 w-px bg-outline-variant mx-space-xs hidden sm:block"></div>
+<!-- Secondary & Primary Actions -->
+<button class="hidden sm:inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container border border-outline-variant font-mono text-[11px] text-on-surface hover:border-secondary hover:text-secondary active:scale-95 transition-all">
+<span class="w-2 h-2 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+        Alert Feed
+      </button>
+<button class="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline text-xs font-bold shadow-[0_0_15px_rgba(255,45,120,0.4)] transition-all active:scale-95 uppercase tracking-wider">
+<span class="material-symbols-outlined" style="font-size:16px;">file_download</span>
+        Export Alpha Report
+      </button>
+<!-- Profile Avatar -->
+<div class="relative ml-space-xs pl-space-xs border-l border-outline-variant hidden sm:flex items-center gap-2">
+<img class="w-7 h-7 rounded-full object-cover border border-primary glow-pink" data-alt="Close up analytical portrait avatar of an institutional quantitative real estate investment strategist wearing minimal sleek glasses in a dark fintech data terminal lab with ambient glowing blue and cyan screens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-WE1sjnduHnzl61tQqeWpPoI6pXDa48vjCLrlodl6pVTtYVhjoP1piu3X8_JVb0fo7TtTbKvCcNLhvWA8YWl--HLpkzCnYiwmuPk-ShUI-0JJ39jZ0PwFw6xBkG9Yn-w18zvkbBo3Bz0Asu9U3VgzseG9XIDixmfEwROUySVPQRhquUgJrHAHKx_UrGezFQar1RNcgKrzpcnpiNrgfbywxyrJgAyuuG-2X78MVuZRLc-3WIPOCXCmvCp9SyPURGKN4hoX4yqpDYA"/>
+</div>
+</div>
+</header>
+<!-- ================= 1. LIVE MACRO TICKER STRIP ================= -->
+<aside aria-label="Real-time macro stream" class="w-full bg-surface-container-lowest border-b border-outline-variant px-space-md py-2 overflow-x-auto text-nowrap flex items-center gap-space-lg text-body-sm font-mono z-30 shadow-inner">
+<div class="flex items-center gap-space-xs text-[11px] text-primary font-bold shrink-0 tracking-wider">
+<span class="material-symbols-outlined text-primary" style="font-size: 15px;">candlestick_chart</span>
+<span class="glow-pink">CAPITAL MACRO STREAM</span>
+<span class="text-outline">|</span>
+</div>
+<!-- Ticker Metric 1 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">한국은행 기준금리</span>
+<span class="text-on-surface font-semibold">3.25%</span>
+<span class="text-[10px] px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant font-mono">동결/안정세</span>
+</div>
+<span class="text-outline-variant shrink-0">•</span>
+<!-- Ticker Metric 2 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">주담대 최저금리</span>
+<span class="text-secondary font-semibold">3.84%</span>
+<span class="text-secondary text-[11px] inline-flex items-center font-mono font-bold">
+<span class="material-symbols-outlined" style="font-size: 14px;">arrow_drop_down</span>-12bp
+      </span>
+</div>
+<span class="text-outline-variant shrink-0">•</span>
+<!-- Ticker Metric 3 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">수도권 평균 전세가율</span>
+<span class="text-primary font-semibold">61.8%</span>
+<span class="text-primary text-[11px] inline-flex items-center font-mono font-bold">
+<span class="material-symbols-outlined" style="font-size: 14px;">arrow_drop_up</span>+1.4%p QoQ
+      </span>
+</div>
+<span class="text-outline-variant shrink-0">•</span>
+<!-- Ticker Metric 4 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">서울 주간 아파트 거래량</span>
+<span class="text-on-surface font-semibold">2,410건</span>
+<span class="text-secondary text-[11px] font-mono font-bold">+18.4% WoW</span>
+</div>
+<span class="text-outline-variant shrink-0">•</span>
+<!-- Ticker Metric 5 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">부동산 매수우위지수</span>
+<span class="text-tertiary font-semibold">78.6pt</span>
+<span class="text-[10px] text-tertiary bg-tertiary/10 border border-tertiary/30 px-1 rounded font-mono">중립 진입</span>
+</div>
+<span class="text-outline-variant shrink-0">•</span>
+<!-- Ticker Metric 6 -->
+<div class="inline-flex items-center gap-space-xs shrink-0">
+<span class="text-on-surface-variant font-body text-xs">DSR/스트레스</span>
+<span class="text-error font-semibold font-mono">2단계 적용 중</span>
+<span class="w-1.5 h-1.5 rounded-full bg-error inline-block glow-red"></span>
+</div>
+<!-- Feed Status Node -->
+<div class="ml-auto pl-space-md hidden md:flex items-center gap-1.5 shrink-0 text-[10px] font-mono text-outline">
+<span class="w-2 h-2 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+<span>FEED LATENCY: 24ms</span>
+</div>
+</aside>
+<!-- ================= MAIN WORKSPACE (SIDEBAR + ANALYTICAL CANVAS) ================= -->
+<div class="flex-1 flex overflow-hidden">
+<!-- SIDE NAVIGATION BAR -->
+<aside class="hidden md:flex flex-col justify-between h-[calc(100vh-5.5rem)] w-64 bg-surface-container-lowest border-r border-outline-variant p-space-sm z-40 shrink-0 sticky top-14">
+<div>
+<!-- Terminal Node Title -->
+<div class="p-space-sm mb-space-sm border-b border-outline-variant">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary glow-pink" style="font-size: 22px;">terminal</span>
+<div>
+<h2 class="font-headline text-headline-sm font-bold text-on-surface">Capital Terminal</h2>
+<p class="font-mono text-[10px] text-primary tracking-wider uppercase">Neon Tokyo Alpha v4.2</p>
+</div>
+</div>
+<div class="mt-space-sm inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded bg-secondary/10 text-secondary font-mono text-[11px] border border-secondary/40 shadow-[0_0_8px_rgba(0,255,204,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary signal-pulse"></span>
+            Real-Time Feed: ONLINE
+          </div>
+</div>
+<!-- Tab Items -->
+<nav class="space-y-1 font-label">
+<!-- Active Tab: Overview Terminal -->
+<a class="flex items-center gap-space-sm bg-surface-container-high text-primary rounded-lg px-space-sm py-space-xs font-semibold border-l-2 border-primary shadow-[inset_0_0_12px_rgba(255,45,120,0.1)]" href="#">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span class="text-body-sm font-semibold">Overview Terminal</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">location_city</span>
+<span class="text-body-sm">Seoul Core (서울 도심)</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">apartment</span>
+<span class="text-body-sm">East Gyeonggi (분당·판교)</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-body-sm">South Gyeonggi (동탄·광교)</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">candlestick_chart</span>
+<span class="text-body-sm">Gap Tracker (갭투자 장부)</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="text-body-sm">Risk &amp; Regulations</span>
+</a>
+</nav>
+</div>
+<!-- Footer Tab Items -->
+<div class="border-t border-outline-variant pt-space-sm space-y-1 font-label">
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-sm">Terminal Settings</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant rounded-lg px-space-sm py-space-xs font-normal hover:bg-surface-container hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="text-body-sm">API Documentation</span>
+</a>
+</div>
+</aside>
+<!-- ================= SCROLLABLE DASHBOARD VIEWPORT ================= -->
+<main class="flex-1 overflow-y-auto px-space-md lg:px-space-lg py-space-md space-y-space-md bg-background">
+<!-- ================= 2. DISTRICT QUICK SELECTOR & OVERALL SIGNAL SUMMARY ================= -->
+<section class="space-y-space-md">
+<!-- Segmented District Filter Chips Bar -->
+<div class="flex items-center justify-between flex-wrap gap-space-sm pb-space-xs border-b border-outline-variant font-label">
+<div class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full">
+<button class="px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-mono text-[11px] font-bold shadow-[0_0_12px_rgba(255,45,120,0.5)] transition-all">전체 (Metropolitan All)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">강남3구 (Gangnam·Seocho·Songpa)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">마용성 (Mapo·Yongsan·Seongdong)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">분당·판교 (Bundang·Pangyo)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">동탄·광교 (Dongtan·Gwanggyo)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">과천·평촌 (Gwacheon·Pyeongchon)</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-secondary hover:border-secondary font-mono text-[11px] border border-outline-variant transition-all">송도·청라 (Songdo)</button>
+</div>
+<div class="flex items-center gap-space-xs font-mono text-[11px] text-outline">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">update</span>
+<span>최근 동기화: 오늘 09:30 KST 기준</span>
+</div>
+</div>
+<!-- Master Signal Hero Banner (Bento 3-Card Header) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Master Timing Gauge (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low border border-outline-variant hover:border-primary/50 rounded-xl p-space-md relative overflow-hidden backdrop-blur-xl shadow-[0_0_25px_rgba(255,45,120,0.06)] transition-all">
+<div class="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="flex items-start justify-between relative z-10">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] text-outline uppercase tracking-wider">Macro Investment Timing Model</span>
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-secondary/10 text-secondary font-mono text-[10px] font-bold border border-secondary/40 shadow-[0_0_8px_rgba(0,255,204,0.25)]">
+                    CONFIDENCE 89.4%
+                  </span>
+</div>
+<div class="flex items-center gap-3 mt-1.5">
+<div class="w-4 h-4 rounded-full bg-secondary signal-pulse glow-cyan"></div>
+<h1 class="font-headline text-headline-lg font-bold text-on-surface tracking-tight">
+                    GREEN LIGHT <span class="text-secondary">— 적극 매수 / 선별 진입 구간</span>
+</h1>
+</div>
+</div>
+<!-- Recommendation tag -->
+<div class="hidden sm:block text-right relative z-10">
+<span class="font-mono text-[11px] text-outline block">포트폴리오 스탠스</span>
+<p class="font-headline text-headline-sm text-primary font-bold tracking-tight">Selective Accumulate</p>
+</div>
+</div>
+<!-- Strategy Executive Summary -->
+<p class="mt-space-sm font-body text-body-md text-on-surface-variant bg-surface-container-lowest/80 p-space-sm rounded-lg border border-outline-variant relative z-10">
+<span class="font-semibold text-secondary">핵심 투자 전략:</span> "전세가율 회복세와 신축 분양가 상승 압력에 따른 갭 메우기 장세. 명문 학군지 및 GTX 직결 역세권 급매물 중심 선별 매수 유효."
+            </p>
+<!-- Traffic Light Nodes Breakdown Mini-Strip -->
+<div class="grid grid-cols-3 gap-space-sm mt-space-sm relative z-10 font-label">
+<div class="bg-surface-container p-space-xs rounded-lg border border-secondary/40 flex items-center justify-between px-space-sm shadow-[0_0_10px_rgba(0,255,204,0.1)]">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary glow-cyan"></span>
+<span class="text-body-sm text-on-surface">Buy Signal</span>
+</div>
+<span class="font-mono text-numeric-metric-md text-secondary font-bold">42<span class="text-xs text-outline ml-0.5">개 동</span></span>
+</div>
+<div class="bg-surface-container p-space-xs rounded-lg border border-tertiary/40 flex items-center justify-between px-space-sm shadow-[0_0_10px_rgba(255,224,74,0.1)]">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary glow-yellow"></span>
+<span class="text-body-sm text-on-surface">Watch / Hold</span>
+</div>
+<span class="font-mono text-numeric-metric-md text-tertiary font-bold">28<span class="text-xs text-outline ml-0.5">개 동</span></span>
+</div>
+<div class="bg-surface-container p-space-xs rounded-lg border border-error/50 flex items-center justify-between px-space-sm shadow-[0_0_10px_rgba(255,68,68,0.15)]">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error glow-red"></span>
+<span class="text-body-sm text-on-surface">Risk / Overheat</span>
+</div>
+<span class="font-mono text-numeric-metric-md text-error font-bold">11<span class="text-xs text-outline ml-0.5">개 동</span></span>
+</div>
+</div>
+</div>
+<!-- Macro Risk Diagnostic Module (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-low border border-outline-variant hover:border-secondary/50 rounded-xl p-space-md flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs font-mono">
+<span class="text-[11px] text-outline uppercase tracking-wider">RISK &amp; VALUATION SPREAD</span>
+<span class="text-[11px] text-secondary font-bold">STRESS TEST: STABLE</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm my-space-xs">
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant/60">
+<span class="font-mono text-[11px] text-outline">전세가 하방 경직성</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-mono text-numeric-metric-lg text-on-surface font-bold">88.2<span class="text-xs font-normal text-outline">/100</span></span>
+<span class="font-mono text-[10px] text-secondary font-bold px-1.5 py-0.5 rounded bg-secondary/10 border border-secondary/30">견고</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary h-full rounded-full glow-cyan" style="width: 88%"></div>
+</div>
+</div>
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant/60">
+<span class="font-mono text-[11px] text-outline">역전세 발생 확률 (LTV 70% 초과)</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-mono text-numeric-metric-lg text-primary font-bold">4.2<span class="text-xs font-normal text-outline">%</span></span>
+<span class="font-mono text-[10px] text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30">극히 낮음</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full glow-pink" style="width: 12%"></div>
+</div>
+</div>
+</div>
+<!-- Regulatory Flag Pill Strip -->
+<div class="flex items-center justify-between text-body-sm bg-surface-container-lowest p-space-xs rounded-lg border border-outline-variant font-mono text-[11px]">
+<span class="text-on-surface-variant font-label">강남3구/용산 규제지역:</span>
+<span class="text-error font-semibold">투기과열지구·조정대상지역 유지</span>
+<span class="text-secondary font-semibold">기타 경기 수도권: 비규제 프리</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 3. MULTI-METRIC DISTRICT MATRIX & INTERACTIVE TABLE ================= -->
+<section class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary glow-pink">traffic</span>
+<h2 class="font-headline text-headline-md font-bold text-on-surface">수도권 핵심 권역별 실시간 신호등 매트릭스</h2>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="text-xs text-outline font-mono">SIGNAL WEIGHT: 안전도 40% + 학군 30% + 갭메리트 30%</span>
+</div>
+</div>
+<!-- 6 Regional Signal Cards Matrix Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-md">
+<!-- Card 1: 분당구 백현/정자동 (GREEN / BUY) -->
+<div class="bg-surface-container-low border border-outline-variant hover:border-secondary rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,255,204,0.15)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-mono text-[10px] font-bold">BUY SIGNAL</span>
+<span class="text-xs font-mono text-outline">분당·판교</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-secondary transition-colors">분당구 백현/정자동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-secondary font-bold">91<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">종합 투자지수</div>
+</div>
+</div>
+<!-- Metric Row -->
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">안전도</span>
+<span class="text-on-surface font-semibold">94점</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-primary font-semibold">1등급 (S)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-on-surface font-semibold">64.5%</span>
+</div>
+</div>
+<!-- Qualitative Factor -->
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">school</span>
+<span>특목고·자사고 14.2%, 정자동 메디컬/대치분원 학원가</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">verified</span>
+<span class="text-on-surface">추천 스탠스: <strong class="text-secondary">전세 갭투자 및 실거주 갈아타기 유효</strong></span>
+</div>
+</div>
+</div>
+<!-- Card 2: 마포구 아현/공덕 (GREEN / BUY) -->
+<div class="bg-surface-container-low border border-outline-variant hover:border-secondary rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,255,204,0.15)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-mono text-[10px] font-bold">BUY SIGNAL</span>
+<span class="text-xs font-mono text-outline">마용성</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-secondary transition-colors">마포구 아현/공덕동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-secondary font-bold">88<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">종합 투자지수</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">안전도</span>
+<span class="text-on-surface font-semibold">89점</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-on-surface font-semibold">2등급 (A+)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-on-surface font-semibold">61.2%</span>
+</div>
+</div>
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">train</span>
+<span>직주근접 CBD/YBD 15분 도달권, 염리동 신흥학원가 확장</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">verified</span>
+<span class="text-on-surface">현장 동향: <strong class="text-secondary">급매 소진 속도 최상, 매도호가 상향 중</strong></span>
+</div>
+</div>
+</div>
+<!-- Card 3: 동탄2신도시 청계/영천 (GREEN / BUY) -->
+<div class="bg-surface-container-low border border-outline-variant hover:border-secondary rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,255,204,0.15)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-mono text-[10px] font-bold">BUY SIGNAL</span>
+<span class="text-xs font-mono text-outline">동탄·광교</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-secondary transition-colors">동탄2신도시 청계/영천동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-secondary font-bold">85<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">종합 투자지수</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">안전도</span>
+<span class="text-on-surface font-semibold">86점</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-on-surface font-semibold">2등급 (A)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-on-surface font-semibold">66.8%</span>
+</div>
+</div>
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">speed</span>
+<span>GTX-A 수서 직결 가동 중, 삼성·용인 반도체 클러스터 배후</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">verified</span>
+<span class="text-on-surface">매물 분석: <strong class="text-secondary">전세 대기 수요 견고하여 실투자 갭 4억대 유효</strong></span>
+</div>
+</div>
+</div>
+<!-- Card 4: 송파구 잠실/가락 (YELLOW / HOLD) -->
+<div class="bg-surface-container-low border border-outline-variant hover:border-tertiary/70 rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(255,224,74,0.15)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary glow-yellow"></span>
+<span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary border border-tertiary/40 font-mono text-[10px] font-bold">WATCH / HOLD</span>
+<span class="text-xs font-mono text-outline">강남3구</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-tertiary transition-colors">송파구 잠실/가락동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-tertiary font-bold">76<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">종합 투자지수</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">안전도</span>
+<span class="text-on-surface font-semibold">82점</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-primary font-semibold">1등급 (S)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-on-surface font-semibold">51.4%</span>
+</div>
+</div>
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-tertiary" style="font-size: 15px;">gavel</span>
+<span>토지거래허가구역 묶임(실거주 2년 필수), 갭투자 원천 차단</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-tertiary" style="font-size: 15px;">info</span>
+<span class="text-on-surface">경고: <strong class="text-tertiary">단기 호가 급등 피로도 및 거래량 주춤, 관망 권장</strong></span>
+</div>
+</div>
+</div>
+<!-- Card 5: 노원구 상계/중계 (YELLOW / HOLD) -->
+<div class="bg-surface-container-low border border-outline-variant hover:border-tertiary/70 rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(255,224,74,0.15)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary glow-yellow"></span>
+<span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary border border-tertiary/40 font-mono text-[10px] font-bold">WATCH / HOLD</span>
+<span class="text-xs font-mono text-outline">동북권</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-tertiary transition-colors">노원구 상계/중계동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-tertiary font-bold">69<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">종합 투자지수</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">안전도</span>
+<span class="text-on-surface font-semibold">71점</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-primary font-semibold">1등급 (은행사거리)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-on-surface font-semibold">58.9%</span>
+</div>
+</div>
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 15px;">school</span>
+<span>중계동 은행사거리 학원가 견고하나 공사비 인상으로 재건축 지연</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">hourglass_top</span>
+<span class="text-on-surface">전략: <strong class="text-on-surface-variant">추가 분담금 리스크 감안하여 안전진단 통과 단지 분할 탐색</strong></span>
+</div>
+</div>
+</div>
+<!-- Card 6: 강남구 대치/개포 (RED / ALERT) -->
+<div class="bg-surface-container-low border border-error/50 hover:border-error rounded-xl p-space-md relative overflow-hidden transition-all duration-200 hover:shadow-[0_0_20px_rgba(255,68,68,0.25)] group">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error glow-red animate-pulse"></span>
+<span class="px-2 py-0.5 rounded bg-error/10 text-error border border-error/40 font-mono text-[10px] font-bold">OVERHEAT ALERT</span>
+<span class="text-xs font-mono text-outline">강남3구</span>
+</div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface mt-1 group-hover:text-error transition-colors">강남구 대치/개포동</h3>
+</div>
+<div class="text-right">
+<span class="font-mono text-numeric-metric-lg text-error font-bold">62<span class="text-xs font-normal text-outline">점</span></span>
+<div class="font-mono text-[10px] text-outline">단기 신규진입 지수</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-space-sm py-space-xs border-y border-outline-variant/60 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-[10px] text-outline block">자산 안전도</span>
+<span class="text-secondary font-semibold">98점 (S)</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">학군 등급</span>
+<span class="text-primary font-semibold">최고 S+ 등급</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">전세가율</span>
+<span class="text-error font-semibold">43.2% (과열)</span>
+</div>
+</div>
+<div class="mt-space-sm space-y-1 font-body text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-error" style="font-size: 15px;">warning</span>
+<span>신축 평당 1억 2천~1억 4천 돌파로 단기 오버슈팅 리스크 극대화</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-error" style="font-size: 15px;">block</span>
+<span class="text-on-surface">리스크 경고: <strong class="text-error">DSR 2단계 규제 + 취득세 중과 부담으로 단기 추격매수 절대 비추천</strong></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 4. DEEP-DIVE ANALYTICAL SECTION (BENTO DUAL PANE) ================= -->
+<section class="bg-surface-container-low border border-outline-variant rounded-xl p-space-md space-y-space-md">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-sm pb-space-sm border-b border-outline-variant">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary glow-pink">map</span>
+<h2 class="font-headline text-headline-md font-bold text-on-surface">수도권 전역 매매·전세 갭 &amp; 신호등 인터랙티브 히트맵 <span class="text-xs font-mono text-outline font-normal">(Seoul &amp; Gyeonggi Heat Map Matrix)</span></h2>
+</div>
+<p class="font-body text-body-sm text-outline mt-0.5">자치구/시·군·구 단위 실시간 투자 심리, 전세가율 및 갭 축소 강도 시각화</p>
+</div>
+<div class="flex flex-wrap items-center gap-space-xs font-mono text-[11px]">
+<div class="inline-flex items-center rounded-lg bg-surface-container-lowest p-0.5 border border-outline-variant">
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-semibold shadow-[0_0_10px_rgba(255,45,120,0.4)]">전체 종합 신호</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-secondary transition-colors">전세가율 히트맵</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-secondary transition-colors">갭투자 안전마진</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-secondary transition-colors">거래 회복률</button>
+</div>
+<div class="inline-flex items-center rounded-lg bg-surface-container-lowest p-0.5 border border-outline-variant text-outline">
+<button class="px-2 py-1 rounded bg-surface-container-high text-secondary font-bold">실시간</button>
+<button class="px-2 py-1 rounded hover:text-on-surface">1주일</button>
+<button class="px-2 py-1 rounded hover:text-on-surface">1개월</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<div class="lg:col-span-8 space-y-space-sm">
+<div class="flex items-center justify-between text-xs font-mono text-outline px-1">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-secondary glow-cyan"></span>매수 우위/갭 축소 (24개구·시)</span>
+<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-tertiary glow-yellow"></span>관망·중립 (16개구·시)</span>
+<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-error glow-red"></span>과열·규제경계 (7개구·시)</span>
+</div>
+<span class="font-mono text-primary font-bold">TOTAL 47 NODES TRACKED</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 font-mono">
+<div class="p-2.5 rounded-lg bg-surface-container border-2 border-secondary/60 hover:border-secondary shadow-[0_0_12px_rgba(0,255,204,0.15)] transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">성남 분당구</span>
+<span class="w-2 h-2 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">64.5%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">6.8억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary">
+<span>모멘텀 +3.8%</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">적극매수</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">마포구</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">61.2%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">5.4억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary">
+<span>모멘텀 +2.9%</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">급매소진</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">화성 동탄</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">66.8%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">4.3억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary">
+<span>모멘텀 +4.1%</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">GTX수혜</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-error/50 hover:border-error transition-all cursor-pointer relative overflow-hidden group shadow-[0_0_12px_rgba(255,68,68,0.12)]">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">강남구</span>
+<span class="w-2 h-2 rounded-full bg-error glow-red"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-error">43.2%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">16.2억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-error font-mono">
+<span>과열지수 92pt</span>
+<span class="px-1 rounded bg-error/10 border border-error/40 font-bold">진입주의</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-tertiary/40 hover:border-tertiary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">송파구</span>
+<span class="w-2 h-2 rounded-full bg-tertiary glow-yellow"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-tertiary">51.4%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">12.5억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-tertiary font-mono">
+<span>토허제 유지</span>
+<span class="px-1 rounded bg-tertiary/10 border border-tertiary/40 font-bold">관망/조정</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-error/40 hover:border-error transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">서초구</span>
+<span class="w-2 h-2 rounded-full bg-error glow-red"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-error">46.1%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">15.8억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-error font-mono">
+<span>신고가 속출</span>
+<span class="px-1 rounded bg-error/10 border border-error/40 font-bold">과열구간</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">용산구</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">52.8%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">13.4억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>정비사업 활황</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">장기유망</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">성동구 (성수·옥수)</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">58.4%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">7.5억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>매물감소세</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">선별매수</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">수원 영통/광교</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">63.2%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">4.9억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>신분당선 호재</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">진입우수</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">안양 동안 (평촌)</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">65.0%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">3.9억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>1기신도시 선도</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">학군우위</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-tertiary/40 hover:border-tertiary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">노원구 (상계/중계)</span>
+<span class="w-2 h-2 rounded-full bg-tertiary glow-yellow"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-tertiary">58.9%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">2.8억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-tertiary font-mono">
+<span>재건축 분담금</span>
+<span class="px-1 rounded bg-tertiary/10 border border-tertiary/40 font-bold">선별접근</span>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container border border-secondary/40 hover:border-secondary transition-all cursor-pointer relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-headline text-xs font-bold text-on-surface">하남 미사/감일</span>
+<span class="w-2 h-2 rounded-full bg-secondary glow-cyan"></span>
+</div>
+<div class="mt-1.5 flex items-baseline justify-between text-numeric-metric-sm">
+<span class="text-[11px] text-outline font-label">전세가율</span>
+<span class="font-bold text-secondary">62.1%</span>
+</div>
+<div class="flex items-baseline justify-between text-numeric-metric-sm text-[11px]">
+<span class="text-outline font-label">평균 갭</span>
+<span class="font-bold text-on-surface">4.1억</span>
+</div>
+<div class="mt-1.5 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>강남 접근성</span>
+<span class="px-1 rounded bg-secondary/10 border border-secondary/40 font-bold">안정권역</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Deep Telemetry Box -->
+<div class="lg:col-span-4 bg-surface-container p-space-sm rounded-xl border border-primary/50 flex flex-col justify-between relative overflow-hidden shadow-[0_0_25px_rgba(255,45,120,0.15)]">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs font-mono">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary glow-pink" style="font-size:18px;">radar</span>
+<span class="text-[11px] text-primary font-bold uppercase tracking-wider">선택 권역 심층 텔레메트리</span>
+</div>
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-bold">ACTIVE NODE</span>
+</div>
+<div class="mt-3 flex items-start justify-between">
+<div>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface">성남시 분당구</h3>
+<p class="font-body text-xs text-outline">동판교·백현·정자·수내 클러스터</p>
+</div>
+<div class="text-right font-mono">
+<span class="text-numeric-metric-md text-secondary font-bold">91점</span>
+<div class="text-[10px] text-secondary font-bold">BUY STRONG</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-space-sm font-mono">
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant/60">
+<span class="text-[10px] text-outline block font-label">외지인 원정투자 비중</span>
+<span class="text-numeric-metric-sm text-primary font-bold">28.4%</span>
+<span class="text-[10px] text-secondary ml-1">+5.2%p ↑</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant/60">
+<span class="text-[10px] text-outline block font-label">전세 매물 소진 속도</span>
+<span class="text-numeric-metric-sm text-secondary font-bold">18.2일</span>
+<span class="text-[10px] text-secondary ml-1">초고속</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant/60">
+<span class="text-[10px] text-outline block font-label">하방 지지 안전마진</span>
+<span class="text-numeric-metric-sm text-on-surface font-bold">4.8억원</span>
+<span class="text-[10px] text-secondary ml-1">견고</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant/60">
+<span class="text-[10px] text-outline block font-label">규제 및 세제 상태</span>
+<span class="text-numeric-metric-sm text-secondary font-bold">비규제 지역</span>
+<span class="text-[10px] text-outline ml-1">LTV 70%</span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/40 space-y-1.5">
+<div class="text-xs font-mono text-outline">권역 주요 대장단지 갭 현황</div>
+<div class="space-y-1 text-xs">
+<div class="flex items-center justify-between bg-surface-container-low px-2 py-1 rounded">
+<span class="text-on-surface font-medium font-body">판교 봇들마을 8단지</span>
+<span class="font-mono text-secondary font-bold">갭 8.3억</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-2 py-1 rounded">
+<span class="text-on-surface font-medium font-body">정자동 파크뷰 (84㎡)</span>
+<span class="font-mono text-secondary font-bold">갭 9.1억</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-2 py-1 rounded">
+<span class="text-on-surface font-medium font-body">수내동 파크타운 삼익</span>
+<span class="font-mono text-primary font-bold">갭 5.6억</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-space-sm pt-2 border-t border-outline-variant flex items-center justify-between font-mono">
+<span class="text-[11px] text-outline flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary glow-pink"></span>실시간 타일 연동 중
+        </span>
+<button class="px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold border border-primary/40 transition-colors shadow-[0_0_8px_rgba(255,45,120,0.2)]">
+          단지 상세분석 →
+        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 5. CYCLICAL GRAPH & ALPHA PROPERTIES ================= -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- LEFT PANEL (7 cols): Price Trend & Jeonse Gap Dynamics -->
+<div class="lg:col-span-7 bg-surface-container-low border border-outline-variant hover:border-primary/40 rounded-xl p-space-md flex flex-col justify-between transition-all">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary glow-pink">show_chart</span>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface">수도권 24개월 매매가 vs 전세가 갭 추이 (Jeonse Gap Corridor)</h3>
+</div>
+<p class="font-body text-body-sm text-outline mt-0.5">전세가 회복에 따른 갭 축소 구간: 하방 안전 마진(Safety Buffer) 확대 분석</p>
+</div>
+<div class="flex items-center gap-2 text-xs font-mono">
+<span class="flex items-center gap-1 text-primary"><span class="w-2.5 h-2.5 bg-primary rounded-sm glow-pink"></span>평균 매매가</span>
+<span class="flex items-center gap-1 text-secondary"><span class="w-2.5 h-2.5 bg-secondary rounded-sm glow-cyan"></span>평균 전세가</span>
+</div>
+</div>
+<!-- Custom High-Tech SVG Cyclical Telemetry Graph -->
+<div class="mt-space-md w-full h-56 bg-surface-container-lowest rounded-lg p-space-sm border border-outline-variant relative flex flex-col justify-between">
+<!-- Background Grid Lines -->
+<div class="absolute inset-0 grid grid-rows-4 pointer-events-none p-space-sm">
+<div class="border-b border-outline-variant/30 flex justify-end text-[10px] text-outline font-mono">15.0억</div>
+<div class="border-b border-outline-variant/30 flex justify-end text-[10px] text-outline font-mono">12.5억</div>
+<div class="border-b border-outline-variant/30 flex justify-end text-[10px] text-outline font-mono">10.0억</div>
+<div class="flex justify-end text-[10px] text-outline font-mono">7.5억</div>
+</div>
+<!-- Vector Canvas Chart -->
+<svg class="w-full h-full relative z-10 overflow-visible" preserveaspectratio="none" viewbox="0 0 540 180">
+<defs>
+<!-- Corridor Fill Gradient - Neon Tokyo Magenta to Cyan -->
+<lineargradient id="neonGapGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ff2d78" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#00ffcc" stop-opacity="0.08"></stop>
+</lineargradient>
+</defs>
+<!-- Bollinger Style Gap Corridor Area (Fill between Sale & Jeonse) -->
+<polygon fill="url(#neonGapGradient)" points="
+                  20,120 70,110 120,95 180,85 240,75 300,70 360,65 420,55 480,45 520,40
+                  520,95 480,102 420,115 360,125 300,132 240,140 180,150 120,155 70,158 20,160
+                "></polygon>
+<!-- Average Sale Price Curve (Neon Pink) -->
+<path d="M 20 120 Q 70 110, 120 95 T 240 75 T 360 65 T 480 45 T 520 40" fill="none" stroke="#ff2d78" stroke-linecap="round" stroke-width="2.5" style="filter: drop-shadow(0 0 4px #ff2d78);"></path>
+<!-- Jeonse Deposit Curve (Neon Cyan) -->
+<path d="M 20 160 Q 70 158, 120 155 T 240 140 T 360 125 T 480 102 T 520 95" fill="none" stroke="#00ffcc" stroke-dasharray="4,2" stroke-linecap="round" stroke-width="2.5" style="filter: drop-shadow(0 0 4px #00ffcc);"></path>
+<!-- Telemetry Points & Tooltip Callout -->
+<circle cx="520" cy="40" fill="#ff2d78" r="4"></circle>
+<circle cx="520" cy="95" fill="#00ffcc" r="4"></circle>
+<!-- Active Gap Measure Bracket -->
+<line stroke="#ff80aa" stroke-dasharray="2,2" stroke-width="1.5" x1="520" x2="520" y1="40" y2="95"></line>
+</svg>
+<!-- Dynamic Interactive Pill Callout (Current Point) -->
+<div class="absolute right-4 top-6 bg-surface-container/90 border border-primary/50 rounded-lg p-2 backdrop-blur-md z-20 shadow-[0_0_15px_rgba(255,45,120,0.3)] pointer-events-none">
+<div class="text-[10px] font-mono text-primary font-bold">2025.Q2 현재 갭 축소율</div>
+<div class="font-mono text-numeric-metric-sm text-on-surface">실투자 갭: <strong class="text-secondary font-bold">38.2% 축소</strong></div>
+<div class="text-[10px] text-outline font-mono">평균 갭 마진: 4.85억원 (안전 진입대)</div>
+</div>
+<!-- Time axis -->
+<div class="flex justify-between text-[11px] font-mono text-outline pt-1 z-10 border-t border-outline-variant/30">
+<span>2023.06 (저점 형성)</span>
+<span>2023.12 (거래량 반등)</span>
+<span>2024.06 (전세가율 60% 회복)</span>
+<span>2024.12 (신축 오버슈팅)</span>
+<span class="text-secondary font-bold">2025.04 (현재 갭메우기)</span>
+</div>
+</div>
+<!-- Hak-gun Quality Scoreboard -->
+<div class="mt-space-md">
+<div class="flex items-center justify-between mb-2">
+<span class="font-mono text-[11px] text-outline uppercase tracking-wider">권역별 명문 학군 방어력 스코어보드 (SCHOOL DISTRICT RESILIENCE)</span>
+<span class="text-xs text-primary font-mono">가격방어 상관계수 R = 0.88</span>
+</div>
+<div class="grid grid-cols-3 gap-space-sm font-mono">
+<!-- Gangnam Academy Cluster -->
+<div class="bg-surface-container p-2.5 rounded-lg border border-outline-variant hover:border-primary/40 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface font-headline">대치동 학원가</span>
+<span class="text-[10px] px-1 py-0.5 rounded bg-primary/10 text-primary border border-primary/40 font-bold">TOP 0.1%</span>
+</div>
+<p class="text-xs text-outline mt-1 font-body">학원 밀집도 1,080개</p>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-xs text-on-surface-variant font-body">의대/명문대 진학률</span>
+<span class="text-numeric-metric-sm text-primary font-bold">S+ 등급</span>
+</div>
+</div>
+<!-- Bundang Academy Cluster -->
+<div class="bg-surface-container p-2.5 rounded-lg border border-outline-variant hover:border-secondary/40 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface font-headline">분당 수내·정자</span>
+<span class="text-[10px] px-1 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-bold">TOP 1.2%</span>
+</div>
+<p class="text-xs text-outline mt-1 font-body">학원 밀집도 432개</p>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-xs text-on-surface-variant font-body">특목·자사고 합격률</span>
+<span class="text-numeric-metric-sm text-secondary font-bold">14.2% (1등급)</span>
+</div>
+</div>
+<!-- Nowon Academy Cluster -->
+<div class="bg-surface-container p-2.5 rounded-lg border border-outline-variant hover:border-tertiary/40 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface font-headline">중계 은행사거리</span>
+<span class="text-[10px] px-1 py-0.5 rounded bg-tertiary/10 text-tertiary border border-tertiary/40 font-bold">TOP 3.5%</span>
+</div>
+<p class="text-xs text-outline mt-1 font-body">학원 밀집도 318개</p>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-xs text-on-surface-variant font-body">동북권 학업성취도</span>
+<span class="text-numeric-metric-sm text-tertiary font-bold">92.4% (A+)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Micro-Disclaimer -->
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant/60 flex items-center justify-between text-[11px] text-outline font-mono">
+<span>출처: 국토교통부 실거래가 공개시스템, 한국부동산원, KB부동산 빅데이터 엔진 연동</span>
+<span class="text-primary font-bold">ALGORITHM: G-MART 4.2</span>
+</div>
+</div>
+<!-- RIGHT PANEL (5 cols): Top Recommended Investment Properties -->
+<div class="lg:col-span-5 bg-surface-container-low border border-outline-variant hover:border-secondary/40 rounded-xl p-space-md flex flex-col justify-between transition-all">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary glow-cyan">recommend</span>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface">신호등 추천 유망 단지 (Top Alpha Complexes)</h3>
+</div>
+<span class="font-mono text-[10px] px-2 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 font-bold shadow-[0_0_8px_rgba(0,255,204,0.2)]">
+                ACTIVE 4
+              </span>
+</div>
+<div class="mt-space-sm space-y-space-sm">
+<!-- Complex Card 1: 판교 봇들마을 8단지 -->
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant hover:border-secondary transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(0,255,204,0.12)]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary glow-cyan"></span>
+<h4 class="font-headline text-headline-sm font-semibold text-on-surface">판교 봇들마을 8단지</h4>
+<span class="font-mono text-[10px] text-outline bg-surface-container-high px-1 rounded">전용 84㎡</span>
+</div>
+<span class="font-mono text-[10px] px-2 py-0.5 rounded bg-secondary/10 text-secondary font-bold border border-secondary/40">
+                    강력 추천
+                  </span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-outline-variant/40 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-xs text-outline block font-label">매매 실거래</span>
+<span class="text-on-surface font-bold">21.8억</span>
+</div>
+<div>
+<span class="text-xs text-outline block font-label">최근 전세가</span>
+<span class="text-on-surface font-semibold">13.5억</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block font-label">실투자 갭</span>
+<span class="text-secondary font-bold">8.3억원</span>
+</div>
+</div>
+<div class="mt-2 text-xs text-on-surface-variant flex items-center justify-between font-body">
+<span>안전점수: <strong class="text-on-surface font-mono">95점</strong> | 보평초·중·고 초품아 연계 <strong class="text-primary font-mono">99점</strong></span>
+<span class="text-secondary text-[11px] font-mono">판교역 도보 5분</span>
+</div>
+</div>
+<!-- Complex Card 2: 마포 래미안 푸르지오 2단지 -->
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant hover:border-secondary transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(0,255,204,0.12)]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary glow-cyan"></span>
+<h4 class="font-headline text-headline-sm font-semibold text-on-surface">마포 래미안 푸르지오 2단지</h4>
+<span class="font-mono text-[10px] text-outline bg-surface-container-high px-1 rounded">전용 59㎡</span>
+</div>
+<span class="font-mono text-[10px] px-2 py-0.5 rounded bg-secondary/10 text-secondary font-bold border border-secondary/40">
+                    진입 적기
+                  </span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-outline-variant/40 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-xs text-outline block font-label">매매 실거래</span>
+<span class="text-on-surface font-bold">15.2억</span>
+</div>
+<div>
+<span class="text-xs text-outline block font-label">최근 전세가</span>
+<span class="text-on-surface font-semibold">9.8억</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block font-label">실투자 갭</span>
+<span class="text-secondary font-bold">5.4억원</span>
+</div>
+</div>
+<div class="mt-2 text-xs text-on-surface-variant flex items-center justify-between font-body">
+<span>안전점수: <strong class="text-on-surface font-mono">91점</strong> | 여의도/광화문 직주근접 최고</span>
+<span class="text-secondary text-[11px] font-mono">애오개역 초역세권</span>
+</div>
+</div>
+<!-- Complex Card 3: 동탄역 시범우남퍼스트빌 -->
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant hover:border-secondary transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(0,255,204,0.12)]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary glow-cyan"></span>
+<h4 class="font-headline text-headline-sm font-semibold text-on-surface">동탄역 시범우남퍼스트빌</h4>
+<span class="font-mono text-[10px] text-outline bg-surface-container-high px-1 rounded">전용 84㎡</span>
+</div>
+<span class="font-mono text-[10px] px-2 py-0.5 rounded bg-secondary/10 text-secondary font-bold border border-secondary/40">
+                    유망 단지
+                  </span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-outline-variant/40 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-xs text-outline block font-label">매매 실거래</span>
+<span class="text-on-surface font-bold">11.4억</span>
+</div>
+<div>
+<span class="text-xs text-outline block font-label">최근 전세가</span>
+<span class="text-on-surface font-semibold">7.1억</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block font-label">실투자 갭</span>
+<span class="text-secondary font-bold">4.3억원</span>
+</div>
+</div>
+<div class="mt-2 text-xs text-on-surface-variant flex items-center justify-between font-body">
+<span>안전점수: <strong class="text-on-surface font-mono">87점</strong> | GTX-A 동탄역 광역환승센터 수혜</span>
+<span class="text-secondary text-[11px] font-mono">동탄역 도보 3분</span>
+</div>
+</div>
+<!-- Complex Card 4: 잠실 리센츠 -->
+<div class="bg-surface-container p-space-sm rounded-lg border border-outline-variant hover:border-tertiary transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(255,224,74,0.15)]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary glow-yellow"></span>
+<h4 class="font-headline text-headline-sm font-semibold text-on-surface">잠실 리센츠</h4>
+<span class="font-mono text-[10px] text-outline bg-surface-container-high px-1 rounded">전용 84㎡</span>
+</div>
+<span class="font-mono text-[10px] px-2 py-0.5 rounded bg-tertiary/10 text-tertiary font-bold border border-tertiary/40">
+                    호가조정 대기
+                  </span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-outline-variant/40 font-mono text-numeric-metric-sm">
+<div>
+<span class="text-xs text-outline block font-label">매매 실거래</span>
+<span class="text-on-surface font-bold">26.5억</span>
+</div>
+<div>
+<span class="text-xs text-outline block font-label">최근 전세가</span>
+<span class="text-on-surface font-semibold">14.0억</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block font-label">실투자 갭</span>
+<span class="text-tertiary font-bold">12.5억원</span>
+</div>
+</div>
+<div class="mt-2 text-xs text-on-surface-variant flex items-center justify-between font-body">
+<span>안전점수: <strong class="text-on-surface font-mono">80점</strong> | 잠신초·중·고 단지내 내재</span>
+<span class="text-tertiary text-[11px] font-mono">토지거래허가 매물 소화 체크</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Action Bar -->
+<div class="mt-space-md pt-space-xs border-t border-outline-variant flex items-center justify-between font-mono">
+<button class="text-xs text-primary hover:text-secondary flex items-center gap-1 font-bold transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
+              전체 148개 추천 단지 스크리너 열기
+            </button>
+<span class="text-[10px] text-outline uppercase tracking-wider">AUTO RE-BALANCING DAILY</span>
+</div>
+</div>
+</section>
+<!-- ================= 6. REAL-TIME TRANSACTION TAPE & REGULATORY MAP OVERVIEW ================= -->
+<section class="bg-surface-container-low border border-outline-variant rounded-xl p-space-md">
+<div class="flex items-center justify-between mb-space-sm flex-wrap gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary glow-pink">table_chart</span>
+<h3 class="font-headline text-headline-sm font-bold text-on-surface">수도권 당일 국토부 실거래가 및 신고가 장부 (Live Transaction Tape)</h3>
+</div>
+<div class="flex items-center gap-2 font-mono">
+<span class="w-2 h-2 rounded-full bg-secondary signal-pulse glow-cyan"></span>
+<span class="text-xs text-outline">LIVE SYNCED: KOREA MOCT API</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse text-body-sm">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-lowest font-mono text-[11px] text-outline">
+<th class="py-2.5 px-3">신호</th>
+<th class="py-2.5 px-3">단지명 및 동호수</th>
+<th class="py-2.5 px-3">지역 권역</th>
+<th class="py-2.5 px-3 text-center">전용면적</th>
+<th class="py-2.5 px-3 text-center">층수</th>
+<th class="py-2.5 px-3 text-right">체결 실거래가</th>
+<th class="py-2.5 px-3 text-right">직전거래 대비</th>
+<th class="py-2.5 px-3 text-right">추정 전세가</th>
+<th class="py-2.5 px-3 text-right">예상 실투자 갭</th>
+<th class="py-2.5 px-3 text-center">규제상태</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/40 font-mono text-numeric-metric-sm">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container hover:outline hover:outline-1 hover:outline-secondary/50 transition-all">
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 shadow-[0_0_6px_rgba(0,255,204,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>SAFE
+                  </span>
+</td>
+<td class="py-2.5 px-3 font-body text-on-surface font-semibold">봇들마을 8단지 휴먼시아</td>
+<td class="py-2.5 px-3 font-body text-outline text-xs">성남시 분당구 백현동</td>
+<td class="py-2.5 px-3 text-center">84.92㎡</td>
+<td class="py-2.5 px-3 text-center text-outline">16F</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">21억 8,000만</td>
+<td class="py-2.5 px-3 text-right text-primary font-bold">+5,000만 (신고가)</td>
+<td class="py-2.5 px-3 text-right text-outline">13억 5,000만</td>
+<td class="py-2.5 px-3 text-right font-bold text-secondary">8억 3,000만</td>
+<td class="py-2.5 px-3 text-center font-mono text-[10px] text-on-surface-variant">비규제</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container hover:outline hover:outline-1 hover:outline-secondary/50 transition-all">
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 shadow-[0_0_6px_rgba(0,255,204,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>SAFE
+                  </span>
+</td>
+<td class="py-2.5 px-3 font-body text-on-surface font-semibold">마포래미안푸르지오 2단지</td>
+<td class="py-2.5 px-3 font-body text-outline text-xs">서울시 마포구 아현동</td>
+<td class="py-2.5 px-3 text-center">59.98㎡</td>
+<td class="py-2.5 px-3 text-center text-outline">21F</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">15억 2,000만</td>
+<td class="py-2.5 px-3 text-right text-secondary font-bold">+3,000만</td>
+<td class="py-2.5 px-3 text-right text-outline">9억 8,000만</td>
+<td class="py-2.5 px-3 text-right font-bold text-secondary">5억 4,000만</td>
+<td class="py-2.5 px-3 text-center font-mono text-[10px] text-on-surface-variant">비규제</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container hover:outline hover:outline-1 hover:outline-secondary/50 transition-all">
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-secondary/10 text-secondary border border-secondary/40 shadow-[0_0_6px_rgba(0,255,204,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>SAFE
+                  </span>
+</td>
+<td class="py-2.5 px-3 font-body text-on-surface font-semibold">동탄역 시범우남퍼스트빌</td>
+<td class="py-2.5 px-3 font-body text-outline text-xs">화성시 오산동</td>
+<td class="py-2.5 px-3 text-center">84.95㎡</td>
+<td class="py-2.5 px-3 text-center text-outline">19F</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">11억 4,000만</td>
+<td class="py-2.5 px-3 text-right text-secondary font-bold">+2,000만</td>
+<td class="py-2.5 px-3 text-right text-outline">7억 1,000만</td>
+<td class="py-2.5 px-3 text-right font-bold text-secondary">4억 3,000만</td>
+<td class="py-2.5 px-3 text-center font-mono text-[10px] text-on-surface-variant">비규제</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container hover:outline hover:outline-1 hover:outline-tertiary/50 transition-all">
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary border border-tertiary/40 shadow-[0_0_6px_rgba(255,224,74,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>HOLD
+                  </span>
+</td>
+<td class="py-2.5 px-3 font-body text-on-surface font-semibold">잠실 리센츠</td>
+<td class="py-2.5 px-3 font-body text-outline text-xs">서울시 송파구 잠실동</td>
+<td class="py-2.5 px-3 text-center">84.99㎡</td>
+<td class="py-2.5 px-3 text-center text-outline">11F</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">26억 5,000만</td>
+<td class="py-2.5 px-3 text-right text-outline font-bold">보합 (0)</td>
+<td class="py-2.5 px-3 text-right text-outline">14억 0,000만</td>
+<td class="py-2.5 px-3 text-right font-bold text-tertiary">12억 5,000만</td>
+<td class="py-2.5 px-3 text-center font-mono text-[10px] text-tertiary font-bold">토지거래허가</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container hover:outline hover:outline-1 hover:outline-error/50 transition-all">
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-error/10 text-error border border-error/40 shadow-[0_0_6px_rgba(255,68,68,0.25)]">
+<span class="w-1.5 h-1.5 rounded-full bg-error glow-red"></span>RISK
+                  </span>
+</td>
+<td class="py-2.5 px-3 font-body text-on-surface font-semibold">디에이치 아너힐즈</td>
+<td class="py-2.5 px-3 font-body text-outline text-xs">서울시 강남구 개포동</td>
+<td class="py-2.5 px-3 text-center">84.36㎡</td>
+<td class="py-2.5 px-3 text-center text-outline">28F</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">32억 2,000만</td>
+<td class="py-2.5 px-3 text-right text-error font-bold">+1억 2,000만 (급등)</td>
+<td class="py-2.5 px-3 text-right text-outline">15억 5,000만</td>
+<td class="py-2.5 px-3 text-right font-bold text-error">16억 7,000만</td>
+<td class="py-2.5 px-3 text-center font-mono text-[10px] text-error font-bold">투기과열지구</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+</body></html>

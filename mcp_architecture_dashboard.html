@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>MCP 아키텍처 & 실시간 데이터 플로우 대시보드</title>
   <script>
     (function () {
@@ -12,51 +13,114 @@
         t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', t);
+      if (t === 'dark') { document.documentElement.classList.add('dark'); }
+      else { document.documentElement.classList.remove('dark'); }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     :root {
+      /* Semantic Backgrounds (Tailwind RGB Tokens from DESIGN.md) */
+      --bg-primary: 255 255 255;
+      --bg-secondary: 248 250 252;
+      --bg-elevated: 255 255 255;
+
+      /* Text & Foreground */
+      --text-primary: 15 23 42;
+      --text-secondary: 71 85 105;
+      --text-muted: 148 163 184;
+
+      /* Borders */
+      --border-default: 226 232 240;
+      --border-subtle: 241 245 249;
+
+      /* Mapped Layout Variables */
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-border: #e2e8f0;
+      --panel-hover: #f1f5f9;
+      --text: #0f172a;
+      --text-sub: #334155;
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.25);
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --cyan: #06b6d4;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --line-strong: #cbd5e1;
+
+      --buy: #10b981;
+      --watch: #ef4444;
+    }
+
+    [data-theme="dark"], .dark {
+      /* Dark Mode Tokens from DESIGN.md */
+      --bg-primary: 11 15 23;
+      --bg-secondary: 17 24 39;
+      --bg-elevated: 30 41 59;
+
+      --text-primary: 248 250 252;
+      --text-secondary: 148 163 184;
+      --text-muted: 100 116 139;
+
+      --border-default: 30 41 59;
+      --border-subtle: 15 23 42;
+
+      /* Mapped Layout Variables */
       --bg: #0b0f19;
       --panel: #111827;
       --panel-border: rgba(255, 255, 255, 0.08);
       --panel-hover: #162032;
       --text: #f3f4f6;
       --text-sub: #cbd5e1;
-      --text-muted: #9ca3af;
-      --primary: #3b82f6;
-      --primary-glow: rgba(59, 130, 246, 0.4);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.4);
       --accent: #10b981;
       --accent-glow: rgba(16, 185, 129, 0.4);
       --warning: #f59e0b;
       --danger: #ef4444;
       --purple: #8b5cf6;
       --cyan: #06b6d4;
-      --mono: ui-monospace, 'SF Mono', Consolas, monospace;
       --line-strong: #363e4b;
+
+      --buy: #10b981;
+      --watch: #ef4444;
     }
 
-    [data-theme="light"] {
-      --bg: #f4f5f7;
-      --panel: #ffffff;
-      --panel-border: #e3e6eb;
-      --panel-hover: #f8f9fb;
-      --text: #131820;
-      --text-sub: #3d4654;
-      --text-muted: #647085;
-      --primary: #1d4ed8;
-      --accent: #137a48;
-      --line-strong: #cbd1da;
+    h1, h2, h3, h4, .brand, .font-heading {
+      font-family: 'Space Grotesk', 'Pretendard Variable', sans-serif;
     }
+    .num, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Semantic Utility Classes */
+    .header-title-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .header-meta-box { font-family: var(--mono); font-size: 13px; color: var(--text-muted); }
+    .text-accent { color: var(--primary) !important; }
+    .text-buy { color: var(--accent) !important; }
+    .text-warning { color: var(--warning) !important; }
+    .text-purple { color: var(--purple) !important; }
+    .kpi-unit { font-size: 16px; font-weight: 500; color: var(--text-muted); margin-left: 2px; }
+    .status-idle-text { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+    .status-success-text { color: var(--accent) !important; }
+    .flex-1-5 { flex: 1.5; }
+    .flex-2 { flex: 2; }
+    .panel-title-spaced { margin-top: 10px; margin-bottom: 8px; }
+    .panel-sub-text { font-size: 13px; color: var(--text-muted); }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', system-ui, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
       min-height: 100vh;
       line-height: 1.5;
       overflow-x: hidden;
@@ -402,6 +466,12 @@
     ::-webkit-scrollbar-track { background: #0b0f19; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* 상태 및 유틸리티 클래스 */
+    .status-processing { color: var(--accent, #38bdf8); }
+    .status-success { color: var(--color-buy, #34d399); }
+    .bus-transport-active { background: rgba(59, 130, 246, 0.4); }
+    .kpi-unit { font-size: 16px; font-weight: 500; color: var(--text-muted, #94a3b8); }
   </style>
 </head>
 <body>
@@ -433,14 +503,14 @@
   <!-- 헤더 -->
   <header>
     <div class="header-left">
-      <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">🚦 RealEstate MCP 실시간 아키텍처 대시보드</h1>
+      <h1 class="header-title-text">🚦 RealEstate MCP 실시간 아키텍처 대시보드</h1>
       <span class="status-badge">
         <span class="pulse-dot"></span>
         MCP Server: seoul-realty-mcp (Online)
       </span>
     </div>
-    <div style="font-family: var(--mono); font-size: 13px; color: var(--text-muted);">
-      Protocol: <span style="color: #60a5fa;">JSON-RPC 2.0 (Stdio)</span> | Engine: <span style="color: #34d399;">Node.js v24</span>
+    <div class="header-meta-box">
+      Protocol: <span class="text-accent">JSON-RPC 2.0 (Stdio)</span> | Engine: <span class="text-buy">Node.js v24</span>
     </div>
   </header>
 
@@ -448,19 +518,19 @@
   <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-title">총 등록 도구 (Total Tools)</div>
-      <div class="kpi-val" style="color: #38bdf8;">27<span style="font-size: 16px; font-weight: 500; color: #94a3b8;"> 개</span></div>
+      <div class="kpi-val text-accent">27<span class="kpi-unit"> 개</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-title">연계 데이터 소스 (Data Sources)</div>
-      <div class="kpi-val" style="color: #34d399;">6<span style="font-size: 16px; font-weight: 500; color: #94a3b8;"> 개 기관</span></div>
+      <div class="kpi-val text-buy">6<span class="kpi-unit"> 개 기관</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-title">평균 응답 속도 (Latency)</div>
-      <div class="kpi-val" id="kpi-latency" style="color: #facc15;">14<span style="font-size: 16px; font-weight: 500; color: #94a3b8;"> ms (Cache)</span></div>
+      <div class="kpi-val text-warning" id="kpi-latency">14<span class="kpi-unit"> ms (Cache)</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-title">캐시 적중률 (Cache Hit Ratio)</div>
-      <div class="kpi-val" style="color: #c084fc;">94.2<span style="font-size: 16px; font-weight: 500; color: #94a3b8;"> %</span></div>
+      <div class="kpi-val text-purple">94.2<span class="kpi-unit"> %</span></div>
     </div>
   </div>
 
@@ -471,7 +541,7 @@
     <div class="diagram-panel">
       <div class="panel-title">
         <span>⚡ MCP 실시간 요청·응답 데이터 플로우 블록도</span>
-        <span id="flow-status" style="font-family: var(--mono); font-size: 12px; color: #94a3b8;">대기 중 (IDLE)</span>
+        <span id="flow-status" class="status-idle-text">대기 중 (IDLE)</span>
       </div>
 
       <div class="block-diagram">
@@ -522,12 +592,12 @@
 
         <!-- 5계층: 외부 데이터 제공자 & 저장소 -->
         <div class="diagram-layer">
-          <div class="diagram-node" id="node-storage" style="flex: 1.5;">
+          <div class="diagram-node flex-1-5" id="node-storage">
             <div class="node-header">Data Storage & Cache</div>
             <div class="node-title">🗄️ .cache/ (L2 Cache) & data/*.csv</div>
             <div class="node-sub">과거 확정월 100% 재사용 · 당월 증분 병합</div>
           </div>
-          <div class="diagram-node" id="node-external" style="flex: 2;">
+          <div class="diagram-node flex-2" id="node-external">
             <div class="node-header">External Open APIs</div>
             <div class="node-title">🌐 공공데이터포털 / 한국은행 / NEIS / 청약홈</div>
             <div class="node-sub">MOLIT 실거래가, ECOS 금리, 청약홈 분양정보</div>
@@ -584,7 +654,7 @@
         <span>▶</span> 실시간 도구 호출 및 패킷 전송 시뮬레이션
       </button>
 
-      <div class="panel-title" style="margin-top: 10px; margin-bottom: 8px;">
+      <div class="panel-title panel-title-spaced">
         <span>📡 JSON-RPC 트래픽 & 실시간 콘솔</span>
       </div>
       <div class="terminal-box" id="terminal">
@@ -599,7 +669,7 @@
   <div class="diagram-panel">
     <div class="panel-title">
       <span>📚 탑재된 28개 MCP 도구 전체 탐색기</span>
-      <span style="font-size: 13px; color: var(--text-muted);">카드를 클릭하면 시뮬레이터로 자동 로드됩니다</span>
+      <span class="panel-sub-text">카드를 클릭하면 시뮬레이터로 자동 로드됩니다</span>
     </div>
     <div class="tools-grid" id="tools-grid"></div>
   </div>
@@ -697,7 +767,7 @@
 
       const flowStatus = document.getElementById("flow-status");
       flowStatus.innerText = "요청 처리 중 (PROCESSING)";
-      flowStatus.style.color = "#38bdf8";
+      flowStatus.className = "status-processing";
 
       // 1. Client Node 활성화
       document.getElementById("node-client").classList.add("active-pulse");
@@ -707,12 +777,12 @@
 
       // 2. Transport Bus & Server Core 활성화
       document.getElementById("node-client").classList.remove("active-pulse");
-      document.getElementById("bus-transport").style.background = "rgba(59, 130, 246, 0.4)";
+      document.getElementById("bus-transport").classList.add("bus-transport-active");
       document.getElementById("node-server").classList.add("active-pulse");
       log("log", `Server Core: 파라미터 검증 완료 · Zod Schema OK`);
 
       await sleep(350);
-      document.getElementById("bus-transport").style.background = "";
+      document.getElementById("bus-transport").classList.remove("bus-transport-active");
 
       // 3. 해당 도메인 클러스터 하이라이트
       document.querySelectorAll(".cluster-box").forEach(b => b.classList.remove("highlight"));
@@ -744,14 +814,14 @@
       log("out", `JSON-RPC Result 반환 완료: { isError: false, content: [Text, JSON] }`);
 
       const randLatency = isCacheHit ? Math.floor(Math.random() * 10) + 8 : Math.floor(Math.random() * 80) + 120;
-      document.getElementById("kpi-latency").innerHTML = `${randLatency}<span style="font-size: 16px; font-weight: 500; color: #94a3b8;"> ms</span>`;
+      document.getElementById("kpi-latency").innerHTML = `${randLatency}<span class="kpi-unit"> ms</span>`;
 
       await sleep(400);
       document.getElementById("node-client").classList.remove("target-active");
       if (targetCluster) targetCluster.classList.remove("highlight");
 
       flowStatus.innerText = "정상 완료 (SUCCESS · 200 OK)";
-      flowStatus.style.color = "#34d399";
+      flowStatus.className = "status-success";
       isRunning = false;
     }
 
